@@ -69,7 +69,6 @@ const poultrySchema = new mongoose.Schema(
 // Create 2dsphere index for location search
 poultrySchema.index({ location: "2dsphere" });
 poultrySchema.index({ ownerId: 1 });
-poultrySchema.index({ businessName: 1 });
 
 const Poultry = mongoose.model("Poultry", poultrySchema);
 

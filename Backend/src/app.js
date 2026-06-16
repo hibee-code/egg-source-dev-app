@@ -1,4 +1,5 @@
 const express = require("express");
+const path = require("path");
 const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
@@ -14,7 +15,20 @@ const ApiError = require("./utils/ApiError");
 const app = express();
 
 // ── Security headers ──────────────────────────────────────
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'", "https://unpkg.com"],
+        styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+        fontSrc: ["'self'", "https://fonts.gstatic.com"],
+        imgSrc: ["'self'", "data:", "https://images.unsplash.com"],
+        connectSrc: ["'self'"],
+      },
+    },
+  })
+);
 
 // ── CORS ──────────────────────────────────────────────────
 app.use(
@@ -44,18 +58,16 @@ app.use("/api/poultries", poultryRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/search", searchRoutes);
 
-// ── Root route ────────────────────────────────────────────
-app.get("/", (_req, res) => {
-  res.status(200).json({
-    success: true,
-    message: "Welcome to the Egg Source Dev App API",
-    version: "1.0.0",
-    docs: "/api/v1/health",
-  });
+// ── Serve static frontend assets ──────────────────────────
+app.use(express.static(path.join(__dirname, "../../Frontend")));
+
+// ── Root SPA fallback route ────────────────────────────────
+app.get(/^(?!\/api).*$/, (_req, res) => {
+  res.sendFile(path.join(__dirname, "../../Frontend/index.html"));
 });
 
 // ── 404 handler ───────────────────────────────────────────
-app.all("*", (req, _res, next) => {
+app.all("*all", (req, _res, next) => {
   next(ApiError.notFound(`Cannot find ${req.method} ${req.originalUrl}`));
 });
 

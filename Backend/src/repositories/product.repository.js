@@ -48,6 +48,10 @@ class ProductRepository {
   async delete(id) {
     return Product.findByIdAndDelete(id);
   }
+
+  async deleteMany(filter) {
+    return Product.deleteMany(filter);
+  }
 }
 
 module.exports = new ProductRepository();

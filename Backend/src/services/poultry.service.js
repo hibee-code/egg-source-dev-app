@@ -1,4 +1,5 @@
 const poultryRepository = require("../repositories/poultry.repository");
+const productRepository = require("../repositories/product.repository");
 const ApiError = require("../utils/ApiError");
 
 class PoultryService {
@@ -51,6 +52,9 @@ class PoultryService {
     if (poultry.ownerId.toString() !== userId.toString() && userRole !== "ADMIN") {
       throw ApiError.forbidden("You do not have permission to delete this poultry farm");
     }
+
+    // Cascade delete: Remove all products belonging to this poultry farm
+    await productRepository.deleteMany({ poultryId: id });
 
     return poultryRepository.delete(id);
   }
