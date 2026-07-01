@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Buyer Dashboard — Egg Source</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/tokens.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
+</head>
+<body>
+  <div id="sidebar-root"></div>
+  <main class="page">
+    <section class="stats-grid">
+      <div>
+        <h1>Buyer Dashboard</h1>
+        <p style="color: var(--color-text-muted);">Welcome back, Egg Source partner.</p>
+      </div>
+      <div style="display:flex; align-items:center; justify-content:flex-end; gap: 14px;">
+        <span class="chip chip--orange">3 new alerts</span>
+        <div class="avatar-circle" style="background: var(--color-light-green);">ES</div>
+      </div>
+    </section>
+    <section class="stats-grid">
+      <div class="stats-card">
+        <div class="card-header"><h3>Total Bookings</h3><span class="chip chip--success">+12% ↑</span></div>
+        <p id="stat-total-bookings" style="font-size: 2rem; margin: 0;">0</p>
+      </div>
+      <div class="stats-card">
+        <div class="card-header"><h3>In Transit</h3><span class="chip chip--orange">8 Pending</span></div>
+        <p id="stat-in-transit" style="font-size: 2rem; margin: 0;">0</p>
+      </div>
+      <div class="stats-card stats-card--dark">
+        <h3>Premium Supplier Access</h3>
+        <p>Unlock trusted farms and priority inventory.</p>
+        <a class="btn btn-ghost" href="/pages/marketplace.html">Browse Farms</a>
+      </div>
+    </section>
+    <section class="dashboard-main">
+      <div class="booking-panel card">
+        <div class="card-header"><h3>My Bookings</h3><a class="btn btn-ghost" href="#">View All</a></div>
+        <table class="table-list" id="buyer-bookings">
+          <thead>
+            <tr><th>Supplier</th><th>Product</th><th>Quantity</th><th>Status</th><th>Action</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div style="display:grid; gap:24px;">
+        <div class="notification-card card">
+          <div class="card-header"><h3>Recent Notifications</h3><span class="badge-pill badge-pill--accent">4 New</span></div>
+          <div class="notification-item"><div><span class="notification-dot notification-dot--green"></span><strong>New farm added near Lagos</strong><div style="color: var(--color-text-muted);">Updated just now</div></div></div>
+          <div class="notification-item"><div><span class="notification-dot notification-dot--orange"></span><strong>Price drop on feed orders</strong><div style="color: var(--color-text-muted);">2h ago</div></div></div>
+        </div>
+        <div class="saved-card card">
+          <div class="card-header"><h3>Saved Suppliers</h3><button class="btn btn-secondary btn-pill">+ Add</button></div>
+          <div class="saved-item"><div><div class="avatar-circle" style="background: #d38a18;">NA</div><div><strong>North Farm</strong><div style="color: var(--color-text-muted);">⭐ 4.7</div></div></div><i data-lucide="chevron-right"></i></div>
+          <div class="saved-item"><div><div class="avatar-circle" style="background: #1f4d0a;">SA</div><div><strong>Sun Agri</strong><div style="color: var(--color-text-muted);">⭐ 4.5</div></div></div><i data-lucide="chevron-right"></i></div>
+        </div>
+        <div class="profile-card card">
+          <div class="card-header"><h3 id="profile-name">Buyer Name</h3><span id="profile-role" style="color: var(--color-text-muted);">Buyer</span></div>
+          <p id="profile-company" style="color: var(--color-text-muted);">EggSource Buyer</p>
+          <p id="profile-email" style="color: var(--color-text-muted); margin: 8px 0 0;">support@eggsource.dev</p>
+          <div class="profile-actions"><button class="btn btn-ghost">Edit Profile</button><button class="btn btn-primary">Upgrade Account</button></div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <script type="module" src="/components/layout/navbar.js"></script>
+  <script type="module" src="/pages/dashboard-buyer.js"></script>
+</body>
+</html>

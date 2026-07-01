@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Auth — Egg Source</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/tokens.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
+</head>
+<body class="page-auth">
+  <div id="navbar-root"></div>
+  <main class="page">
+    <div class="auth-layout">
+      <section class="auth-visual">
+        <div class="auth-overlay"></div>
+        <div class="auth-visual__inner">
+          <h1 class="auth-visual__title">Empowering the Future of Poultry</h1>
+          <div class="auth-badges">
+            <div class="badge-pill"><span>✓</span> Verified Supply Chain</div>
+            <div class="badge-pill"><span>✓</span> Real-time Market Data</div>
+          </div>
+        </div>
+      </section>
+      <section class="auth-panel card">
+        <div class="auth-card">
+          <div class="auth-tabs">
+            <button id="tab-login" class="auth-tab active" type="button">Login</button>
+            <button id="tab-register" class="auth-tab" type="button">Register</button>
+          </div>
+
+          <form id="login-form" class="auth-form">
+            <div class="filter-group">
+              <label class="label" for="login-email">Email address</label>
+              <input id="login-email" type="email" class="input-field" required>
+            </div>
+            <div class="filter-group">
+              <label class="label" for="login-password">Password</label>
+              <div class="password-field">
+                <input id="login-password" type="password" class="input-field" required style="padding-right: 48px;">
+                <button type="button" class="password-toggle toggle-password" data-target="login-password" aria-label="Toggle Password Visibility">
+                  <i data-lucide="eye" style="width: 18px; height: 18px; display: block;"></i>
+                </button>
+              </div>
+            </div>
+            <div class="filter-group" style="display:flex; justify-content:flex-end;">
+              <a href="#" class="btn btn-ghost">Forgot Password?</a>
+            </div>
+            <button id="login-submit" type="submit" class="btn btn-primary" style="width:100%;">Login to Dashboard →</button>
+          </form>
+
+          <form id="register-form" class="auth-form hidden">
+            <div class="field-row">
+              <div class="filter-group">
+                <label class="label" for="register-firstname">First name</label>
+                <input id="register-firstname" type="text" class="input-field" required>
+              </div>
+              <div class="filter-group">
+                <label class="label" for="register-lastname">Last name</label>
+                <input id="register-lastname" type="text" class="input-field" required>
+              </div>
+            </div>
+            <div class="filter-group">
+              <label class="label" for="register-email">Email address</label>
+              <input id="register-email" type="email" class="input-field" required>
+            </div>
+            <div class="filter-group">
+              <label class="label" for="register-phone">Phone number</label>
+              <input id="register-phone" type="tel" class="input-field" required>
+            </div>
+            <div class="filter-group auth-roles">
+              <button type="button" class="role-card active" data-role="CUSTOMER">Buyer</button>
+              <button type="button" class="role-card" data-role="FARM_OWNER">Farm Owner</button>
+            </div>
+            <input id="register-role" type="hidden" value="CUSTOMER">
+            <div class="filter-group">
+              <label class="label" for="register-password">Password</label>
+              <div class="password-field">
+                <input id="register-password" type="password" class="input-field" required style="padding-right: 48px;">
+                <button type="button" class="password-toggle toggle-password" data-target="register-password" aria-label="Toggle Password Visibility">
+                  <i data-lucide="eye" style="width: 18px; height: 18px; display: block;"></i>
+                </button>
+              </div>
+            </div>
+            <div class="filter-group">
+              <label class="label" for="register-confirm">Confirm password</label>
+              <div class="password-field">
+                <input id="register-confirm" type="password" class="input-field" required style="padding-right: 48px;">
+                <button type="button" class="password-toggle toggle-password" data-target="register-confirm" aria-label="Toggle Password Visibility">
+                  <i data-lucide="eye" style="width: 18px; height: 18px; display: block;"></i>
+                </button>
+              </div>
+            </div>
+            <button id="register-submit" type="submit" class="btn btn-primary" style="width:100%;">Create Account</button>
+          </form>
+
+          <div class="auth-footer">
+            <a href="#">Help</a>
+            <a href="#">Privacy</a>
+            <a href="mailto:contact@eggsource.dev">Contact</a>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+  <script type="module" src="/components/layout/navbar.js"></script>
+  <script type="module" src="/pages/auth.js"></script>
+</body>
+</html>

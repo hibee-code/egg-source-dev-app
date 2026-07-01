@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Marketplace — Egg Source</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/tokens.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
+</head>
+<body>
+  <div id="navbar-root"></div>
+  <main class="page">
+    <section class="page-marketplace">
+      <div class="listing-header">
+        <div>
+          <h1>Marketplace</h1>
+          <p style="color: var(--color-text-muted);">Showing verified listings in Nigeria.</p>
+        </div>
+        <div class="sort-row">
+          <label class="label" for="filter-sort">Sort</label>
+          <select id="filter-sort" class="select-field">
+            <option value="newest">Newest</option>
+            <option value="top">Top Rated</option>
+            <option value="priceAsc">Price ↑</option>
+            <option value="priceDesc">Price ↓</option>
+          </select>
+        </div>
+      </div>
+      <div class="market-grid">
+        <aside class="filter-panel">
+          <div class="filter-group">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <h3>⚙ Filters</h3>
+              <button id="filter-clear" class="btn btn-ghost btn-pill" type="button">Clear All</button>
+            </div>
+          </div>
+
+          <div class="filter-group">
+            <label class="label" for="filter-state">State</label>
+            <select id="filter-state" class="select-field">
+              <option value="">All states</option>
+              <option value="Lagos">Lagos</option>
+              <option value="Oyo">Oyo</option>
+              <option value="Ogun">Ogun</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label class="label" for="filter-lga">LGA</label>
+            <select id="filter-lga" class="select-field">
+              <option value="">All LGAs</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label class="label" for="filter-min-price">Price min</label>
+            <input id="filter-min-price" type="number" class="input-field" placeholder="₦0">
+          </div>
+
+          <div class="filter-group">
+            <label class="label" for="filter-max-price">Price max</label>
+            <input id="filter-max-price" type="number" class="input-field" placeholder="₦100000">
+          </div>
+
+          <div class="filter-group">
+            <label class="label">Delivery</label>
+            <label class="filter-group" style="gap: 12px; display:flex; align-items:center;"><input id="filter-delivery" type="checkbox"> Delivery available</label>
+          </div>
+
+          <div class="filter-group">
+            <label class="label">Stock</label>
+            <label class="filter-group" style="gap: 12px; display:flex; align-items:center;"><input id="filter-stock" type="checkbox"> In stock only</label>
+          </div>
+
+          <div class="filter-group">
+            <label class="label" for="filter-category">Category</label>
+            <input id="filter-category" type="text" class="input-field" placeholder="Eggs, Feed, Chicks">
+          </div>
+
+          <button id="filter-apply" class="btn btn-primary btn-pill filter-actions" type="button">Apply Filters</button>
+
+          <div class="card sidebar-card" style="background: var(--color-primary); color: #fff;">
+            <h3>Verified Farmers Program</h3>
+            <p>Only trusted farms with verified ratings appear here. Learn how to become a premium seller.</p>
+            <a href="#" class="btn btn-ghost" style="color: #fff; border-color: rgba(255,255,255,0.3);">Learn More</a>
+          </div>
+        </aside>
+        <div class="results-container results-container--split">
+          <!-- Left side: Listings list -->
+          <div class="listings-pane">
+            <div class="results-header" style="margin-bottom: 18px;">
+              <div>
+                <h2>Poultry Listings</h2>
+                <p id="marketplace-results-count" style="color: var(--color-text-muted);">Loading listings...</p>
+              </div>
+            </div>
+            <div id="marketplace-results-grid" class="cards-grid"></div>
+            <div id="pagination" style="margin-top: 24px;"></div>
+          </div>
+
+          <!-- Right side: Sticky Visual Map Container -->
+          <div class="map-pane">
+            <div class="map-container-wrapper">
+              <div class="map-header" style="padding: 16px 20px; border-bottom: 1px solid var(--color-border); background: var(--color-surface-soft); display: flex; justify-content: space-between; align-items: center;">
+                <span class="map-header__title" style="font-weight: var(--font-weight-bold); color: var(--color-primary); display: flex; align-items: center; gap: 8px;">
+                  <i data-lucide="map-pin" style="width: 18px; height: 18px;"></i>
+                  Interactive Farm Locator
+                </span>
+                <span class="map-header__sub" id="map-location-context" style="font-size: 0.85rem; color: var(--color-text-muted); font-weight: var(--font-weight-medium);">All States</span>
+              </div>
+              <div class="map-canvas-area" id="map-canvas-area" style="position: relative; flex-grow: 1; background: radial-gradient(circle, #f9faf7 0%, #eeeee8 100%); overflow: hidden; min-height: 400px;">
+                <!-- Compass Rose / Grid lines -->
+                <div class="map-canvas__grid-lines" style="position: absolute; inset: 0; background-size: 40px 40px; background-image: linear-gradient(to right, rgba(31, 77, 10, 0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(31, 77, 10, 0.04) 1px, transparent 1px);"></div>
+                <div class="map-canvas__compass" style="position: absolute; top: 16px; right: 16px; width: 36px; height: 36px; border: 2px solid var(--color-border); border-radius: 50%; display: grid; place-items: center; font-size: 0.75rem; font-weight: var(--font-weight-bold); color: var(--color-text-muted); background: rgba(255, 255, 255, 0.8);">N</div>
+                
+                <!-- Markers will be rendered here dynamically -->
+                <div id="map-markers-root" style="position: absolute; inset: 0; z-index: 5;"></div>
+              </div>
+              <div class="map-legend" style="padding: 12px 20px; border-top: 1px solid var(--color-border); background: var(--color-surface-soft); display: flex; gap: 16px; font-size: 0.82rem;">
+                <span class="legend-item" style="display: flex; align-items: center; gap: 6px; color: var(--color-text-muted);">
+                  <span class="legend-dot legend-dot--primary" style="width: 10px; height: 10px; border-radius: 50%; background: var(--color-accent); display: inline-block;"></span>
+                  Poultry Farm
+                </span>
+                <span class="legend-item" id="user-location-legend" style="display: none; align-items: center; gap: 6px; color: var(--color-text-muted);">
+                  <span class="legend-dot legend-dot--user" style="width: 10px; height: 10px; border-radius: 50%; background: var(--color-primary); display: inline-block; border: 2px double #fff;"></span>
+                  Selected Center
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <script type="module" src="/components/layout/navbar.js"></script>
+  <script type="module" src="/pages/marketplace.js"></script>
+</body>
+</html>
