@@ -1,0 +1,414 @@
+import { renderNavbar } from '/components/layout/navbar.js';
+import { SearchAPI, PoultryAPI } from '/assets/js/api.js';
+import { Auth } from '/assets/js/auth.js';
+import { Format, Loading, Pagination, Toast, $ } from '/assets/js/utils.js';
+
+const LGA_MAP = {
+  Lagos: [
+    'Agege', 'Alimosho', 'Ifako-Ijaiye', 'Ikeja', 'Kosofe', 'Mushin', 
+    'Oshodi-Isolo', 'Shomolu', 'Apapa', 'Eti-Osa', 'Lagos Island', 
+    'Lagos Mainland', 'Surulere', 'Ajeromi-Ifelodun', 'Amuwo-Odofin', 
+    'Ojo', 'Badagry', 'Ikorodu', 'Lekki', 'Epe'
+  ],
+  Oyo: [
+    'Afijio', 'Akinyele', 'Atiba', 'Atisbo', 'Egbeda', 'Ibadan North', 
+    'Ibadan North East', 'Ibadan North West', 'Ibadan South East', 'Ibadan South West', 
+    'Ibarapa Central', 'Ibarapa East', 'Ibarapa North', 'Ido', 'Irepo', 
+    'Itesiwaju', 'Kajola', 'Lagelu', 'Ogbomosho North', 'Ogbomosho South', 
+    'Ogo Oluwa', 'Olorunsogo', 'Oluyole', 'Ona Ara', 'Orelope', 'Ori Ire', 
+    'Oyo East', 'Oyo West', 'Saki East', 'Saki West', 'Surulere', 'Ibarapa'
+  ],
+  Ogun: [
+    'Abeokuta North', 'Abeokuta South', 'Ogun Waterside', 'Ijebu Ode', 'Ijebu East', 
+    'Ijebu North', 'Ijebu North East', 'Ikenne', 'Odogbolu', 'Remo North', 
+    'Sagamu', 'Imeko Afon', 'Ipokia', 'Yewa North', 'Yewa South', 'Ado-Odo/Ota', 
+    'Ewekoro', 'Ifo', 'Obafemi Owode', 'Odeda'
+  ],
+};
+
+const LGA_COORDS = {
+  // Lagos
+  'Ikeja': [3.3421, 6.6018],
+  'Surulere': [3.3614, 6.5003],
+  'Lekki': [3.4833, 6.4281],
+  'Epe': [3.9834, 6.5841],
+  'Badagry': [2.8834, 6.4244],
+  'Lagos Mainland': [3.3792, 6.5244],
+  'Kosofe': [3.3721, 6.5802],
+  'Amuwo-Odofin': [3.2844, 6.4682],
+  'Ikorodu': [3.5101, 6.6149],
+  'Eti-Osa': [3.4833, 6.4281],
+  'Alimosho': [3.2678, 6.6083],
+  'Agege': [3.3278, 6.6178],
+  'Ifako-Ijaiye': [3.2878, 6.6800],
+  'Oshodi-Isolo': [3.3100, 6.5500],
+  'Shomolu': [3.3700, 6.5400],
+  'Apapa': [3.3600, 6.4400],
+  'Lagos Island': [3.4000, 6.4500],
+  'Ajeromi-Ifelodun': [3.3200, 6.4800],
+  'Ojo': [3.1800, 6.4600],
+  'Ibeju-Lekki': [3.6500, 6.4300],
+
+  // Oyo
+  'Ibadan North': [3.9167, 7.4167],
+  'Ibadan South': [3.9000, 7.3300],
+  'Oyo East': [3.9300, 7.8400],
+  'Ogbomosho': [4.2500, 8.1333],
+  'Ibarapa': [3.4833, 7.4333],
+  'Ibadan South West': [3.8667, 7.3500],
+  'Ibadan North East': [3.9333, 7.3833],
+  'Ibadan South East': [3.9000, 7.3300],
+  'Ibadan North West': [3.8833, 7.4000],
+  'Akinyele': [3.9000, 7.5300],
+  'Egbeda': [4.0200, 7.3800],
+  'Oluyole': [3.8600, 7.2200],
+  'Ido': [3.7700, 7.4700],
+  'Lagelu': [4.0900, 7.4800],
+  'Oyo West': [3.9000, 7.8500],
+
+  // Ogun
+  'Abeokuta North': [3.3294, 7.1994],
+  'Abeokuta South': [3.3483, 7.1475],
+  'Odeda': [3.4333, 7.1667],
+  'Obafemi Owode': [3.4500, 7.0200],
+  'Ifo': [3.2000, 6.8100],
+  'Sagamu': [3.6500, 6.8400],
+  'Ijebu Ode': [3.9200, 6.8200],
+  'Remo North': [3.7200, 6.9800],
+  'Odogbolu': [3.7700, 6.8400],
+  'Ikenne': [3.7100, 6.8700],
+  'Ewekoro': [3.2100, 6.9300],
+  'Ado-Odo/Ota': [3.0100, 6.7000],
+};
+
+let currentPage = 1;
+let totalPages = 1;
+let currentResults = [];
+let currentSort = 'newest';
+
+const calculateDistance = (coord1, coord2) => {
+  if (!coord1 || !coord2) return null;
+  const [lon1, lat1] = coord1;
+  const [lon2, lat2] = coord2;
+  const R = 6371; // Radius of Earth in km
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = 
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+    Math.sin(dLon/2) * Math.sin(dLon/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return R * c;
+};
+
+const getFarmCoords = (farm) => {
+  if (farm.location && farm.location.coordinates && farm.location.coordinates.length === 2) {
+    return farm.location.coordinates;
+  }
+  if (farm.lga && LGA_COORDS[farm.lga]) {
+    return LGA_COORDS[farm.lga];
+  }
+  if (farm.state) {
+    if (farm.state === 'Lagos') return [3.3792, 6.5244];
+    if (farm.state === 'Oyo') return [3.9167, 7.4167];
+    if (farm.state === 'Ogun') return [3.3483, 7.1475];
+  }
+  return [3.3792, 6.5244];
+};
+
+const renderCard = (farm) => {
+  const badge = farm.verified ? '<span class="badge-pill badge-pill--success">✓ Verified</span>' : farm.isPremium ? '<span class="badge-pill badge-pill--accent">PREMIUM</span>' : '';
+  const chip = farm.deliveryAvailable ? '<span class="product-chip chip--success">Delivery</span>' : '<span class="product-chip chip--muted">Pickup</span>';
+  
+  let distanceHTML = '';
+  const selectedLga = $('#filter-lga')?.value;
+  if (selectedLga && LGA_COORDS[selectedLga]) {
+    const farmCoords = getFarmCoords(farm);
+    const dist = calculateDistance(LGA_COORDS[selectedLga], farmCoords);
+    if (dist !== null) {
+      distanceHTML = `
+        <div class="distance-badge">
+          <i data-lucide="map-pin"></i>
+          <span>${dist.toFixed(1)} km away</span>
+        </div>
+      `;
+    }
+  }
+
+  return `
+    <article class="product-card" data-id="${farm._id}">
+      <div class="product-card__image">
+        <img src="${farm.imageUrl || 'https://images.unsplash.com/photo-1548550023-2bdb3c5beed7?auto=format&fit=crop&q=80&w=900'}" alt="${farm.businessName}" />
+        <div class="product-card__badge">${badge}</div>
+      </div>
+      <div class="product-card__body" style="display: flex; flex-direction: column; flex-grow: 1;">
+        <div class="badge-pill badge-pill--muted" style="width: fit-content;">${farm.category || 'Poultry'}</div>
+        <h3 class="product-card__title" style="margin: 8px 0 4px;">${farm.businessName}</h3>
+        <div class="product-card__meta" style="color: var(--color-text-muted); font-size: 0.88rem;">${farm.lga || 'LGA'}, ${farm.state || 'State'}</div>
+        ${distanceHTML}
+        <div class="product-card__price" style="margin-top: 12px; margin-bottom: 12px; font-size: 1.25rem; font-weight: var(--font-weight-bold); color: var(--color-primary);">${Format.currency(farm.pricePerCrate || 4200)}</div>
+        <div style="margin-top: auto; display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+          ${chip}
+          <a class="btn btn-secondary btn-pill" href="/pages/farm-detail.html?farmId=${farm._id}">View Details</a>
+        </div>
+      </div>
+    </article>
+  `;
+};
+
+const renderResults = (farms) => {
+  const grid = $('#marketplace-results-grid');
+  const count = $('#marketplace-results-count');
+  if (!grid || !count) return;
+
+  if (!farms.length) {
+    grid.innerHTML = `<div class="card" style="padding: 32px; text-align: center; color: var(--color-text-muted); grid-column: 1 / -1;">No listings match these filters.</div>`;
+    count.textContent = '0 verified listings';
+    return;
+  }
+
+  count.textContent = `Showing ${farms.length} verified listings in Nigeria`;
+  grid.innerHTML = farms.map(renderCard).join('');
+
+  if (window.lucide) {
+    window.lucide.createIcons();
+  }
+};
+
+const renderMap = (farms, selectedLgaCoord = null) => {
+  const root = $('#map-markers-root');
+  const contextText = $('#map-location-context');
+  const userLegend = $('#user-location-legend');
+  if (!root) return;
+  root.innerHTML = '';
+
+  const activeState = $('#filter-state')?.value || 'All States';
+  const activeLga = $('#filter-lga')?.value || '';
+  contextText.textContent = activeLga ? `${activeLga}, ${activeState}` : activeState;
+
+  if (!farms || !farms.length) {
+    return;
+  }
+
+  const points = farms.map(farm => {
+    return {
+      id: farm._id,
+      name: farm.businessName,
+      price: farm.pricePerCrate,
+      rating: farm.rating || 4.8,
+      coords: getFarmCoords(farm),
+      isUserCenter: false,
+      lga: farm.lga,
+      state: farm.state
+    };
+  });
+
+  if (selectedLgaCoord) {
+    points.push({
+      id: 'selected-center',
+      name: `Selected Center: ${activeLga}`,
+      coords: selectedLgaCoord,
+      isUserCenter: true
+    });
+    if (userLegend) userLegend.style.display = 'flex';
+  } else {
+    if (userLegend) userLegend.style.display = 'none';
+  }
+
+  const lats = points.map(p => p.coords[1]);
+  const lons = points.map(p => p.coords[0]);
+
+  let minLat = Math.min(...lats);
+  let maxLat = Math.max(...lats);
+  let minLon = Math.min(...lons);
+  let maxLon = Math.max(...lons);
+
+  const latDiff = maxLat - minLat;
+  const lonDiff = maxLon - minLon;
+  const padLat = latDiff === 0 ? 0.05 : latDiff * 0.25;
+  const padLon = lonDiff === 0 ? 0.05 : lonDiff * 0.25;
+
+  minLat -= padLat;
+  maxLat += padLat;
+  minLon -= padLon;
+  maxLon += padLon;
+
+  const latRange = maxLat - minLat;
+  const lonRange = maxLon - minLon;
+
+  points.forEach(point => {
+    const x = ((point.coords[0] - minLon) / lonRange) * 100;
+    const y = 100 - (((point.coords[1] - minLat) / latRange) * 100);
+
+    const marker = document.createElement('div');
+    marker.className = `map-marker${point.isUserCenter ? ' active' : ''}`;
+    marker.style.left = `${x}%`;
+    marker.style.top = `${y}%`;
+    marker.dataset.id = point.id;
+
+    if (point.isUserCenter) {
+      marker.innerHTML = `
+        <div class="marker-pin marker-pin--center"></div>
+        <div class="marker-tooltip">
+          <h4 class="marker-tooltip__title" style="white-space: normal;">${point.name}</h4>
+          <div class="marker-tooltip__meta">Search Target</div>
+        </div>
+      `;
+    } else {
+      marker.innerHTML = `
+        <div class="marker-pulse"></div>
+        <div class="marker-pin">
+          <span class="marker-inner">🥚</span>
+        </div>
+        <div class="marker-tooltip">
+          <h4 class="marker-tooltip__title">${point.name}</h4>
+          <div class="marker-tooltip__meta">${point.lga}, ${point.state}</div>
+          <div class="marker-tooltip__footer">
+            <span class="marker-tooltip__price">₦${point.price || 4200}</span>
+            <span class="marker-tooltip__rating">★ ${point.rating.toFixed(1)}</span>
+          </div>
+        </div>
+      `;
+
+      marker.addEventListener('mouseenter', () => {
+        const card = document.querySelector(`.product-card[data-id="${point.id}"]`);
+        if (card) card.classList.add('highlighted');
+      });
+
+      marker.addEventListener('mouseleave', () => {
+        const card = document.querySelector(`.product-card[data-id="${point.id}"]`);
+        if (card) card.classList.remove('highlighted');
+      });
+
+      marker.addEventListener('click', () => {
+        const card = document.querySelector(`.product-card[data-id="${point.id}"]`);
+        if (card) {
+          card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          card.classList.add('highlighted');
+          setTimeout(() => card.classList.remove('highlighted'), 2000);
+        }
+      });
+    }
+
+    root.appendChild(marker);
+  });
+};
+
+const loadLgas = () => {
+  const state = $('#filter-state')?.value;
+  const lgaField = $('#filter-lga');
+  if (!lgaField) return;
+  lgaField.innerHTML = `<option value="">All LGAs</option>`;
+  (LGA_MAP[state] || []).forEach((lga) => {
+    lgaField.innerHTML += `<option value="${lga}">${lga}</option>`;
+  });
+};
+
+const sortResults = (farms) => {
+  if (!farms || !farms.length) return farms;
+  return farms.slice().sort((a, b) => {
+    if (currentSort === 'newest') {
+      // If distance exists, distance-sort by default
+      if (a.distance !== undefined && b.distance !== undefined) {
+        return a.distance - b.distance;
+      }
+      return 0;
+    }
+    if (currentSort === 'top') return (b.rating || 0) - (a.rating || 0);
+    if (currentSort === 'priceAsc') return (a.pricePerCrate || 0) - (b.pricePerCrate || 0);
+    return (b.pricePerCrate || 0) - (a.pricePerCrate || 0);
+  });
+};
+
+const applyFilters = async (page = 1) => {
+  const btn = $('#filter-apply');
+  Loading.show(btn, 'Searching...');
+  currentPage = page;
+
+  try {
+    const filters = {
+      state: $('#filter-state')?.value,
+      lga: $('#filter-lga')?.value,
+      category: $('#filter-category')?.value,
+      minPrice: $('#filter-min-price')?.value,
+      maxPrice: $('#filter-max-price')?.value,
+      deliveryAvailable: $('#filter-delivery')?.checked,
+      stockAvailable: $('#filter-stock')?.checked,
+      page,
+      limit: 9,
+    };
+    const response = await SearchAPI.searchPoultries(filters);
+    let farms = [];
+    let apiTotalPages = 1;
+    if (response && response.data) {
+      if (Array.isArray(response.data)) {
+        farms = response.data;
+      } else if (response.data.data && Array.isArray(response.data.data)) {
+        farms = response.data.data;
+        apiTotalPages = response.data.totalPages || 1;
+      }
+    }
+
+    const selectedLga = $('#filter-lga')?.value;
+    let selectedLgaCoord = null;
+    if (selectedLga && LGA_COORDS[selectedLga]) {
+      selectedLgaCoord = LGA_COORDS[selectedLga];
+      farms.forEach(farm => {
+        farm.distance = calculateDistance(selectedLgaCoord, getFarmCoords(farm));
+      });
+    }
+
+    currentResults = sortResults(farms);
+    totalPages = apiTotalPages || response.pagination?.totalPages || Math.max(1, Math.ceil((farms.length || 0) / 9));
+    renderResults(currentResults);
+    renderMap(currentResults, selectedLgaCoord);
+    Pagination.render($('#pagination'), { page: currentPage, totalPages }, applyFilters);
+  } catch (err) {
+    Toast.error(err.message || 'Unable to load listings');
+    $('#marketplace-results-grid').innerHTML = `<div class="card" style="padding: 32px; text-align: center; color: var(--color-accent); grid-column: 1 / -1;">Try again later.</div>`;
+  } finally {
+    Loading.hide(btn);
+  }
+};
+
+const initPage = async () => {
+  renderNavbar({ searchBar: true });
+  $('#filter-state')?.addEventListener('change', loadLgas);
+  $('#filter-apply')?.addEventListener('click', () => applyFilters(1));
+  $('#filter-sort')?.addEventListener('change', (event) => {
+    currentSort = event.target.value;
+    renderResults(sortResults(currentResults));
+    renderMap(currentResults, ($('#filter-lga')?.value && LGA_COORDS[$('#filter-lga').value]) || null);
+  });
+
+  $('#filter-clear')?.addEventListener('click', () => {
+    ['filter-state', 'filter-lga', 'filter-min-price', 'filter-max-price', 'filter-category'].forEach((id) => {
+      const field = document.getElementById(id);
+      if (!field) return;
+      if (field.type === 'checkbox') {
+        field.checked = false;
+      } else {
+        field.value = '';
+      }
+    });
+    document.getElementById('filter-delivery').checked = false;
+    document.getElementById('filter-stock').checked = false;
+    loadLgas();
+    applyFilters(1);
+  });
+
+  window.addEventListener('navbar:search', (event) => {
+    $('#filter-category').value = event.detail.query;
+    applyFilters(1);
+  });
+
+  const params = new URLSearchParams(window.location.search);
+  const state = params.get('state');
+  const category = params.get('category');
+  if (state) $('#filter-state').value = state;
+  if (category) $('#filter-category').value = category;
+  loadLgas();
+  applyFilters(1);
+};
+
+window.addEventListener('DOMContentLoaded', initPage);

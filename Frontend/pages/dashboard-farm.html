@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Farm Dashboard — Egg Source</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/tokens.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
+</head>
+<body>
+  <div id="sidebar-root"></div>
+  <main class="page">
+    <section class="stats-grid">
+      <div>
+        <h1>Farm Overview</h1>
+        <p style="color: var(--color-text-muted);">Welcome back, farm owner. Here's what's happening today.</p>
+      </div>
+      <div style="display:flex; align-items:center; justify-content:flex-end; gap: 14px;">
+        <span class="chip chip--success"><i data-lucide="calendar"></i> Today</span>
+      </div>
+    </section>
+    <section class="stats-grid">
+      <div class="stats-card">
+        <h3>Total Sales MTD</h3>
+        <p id="sales-value" style="font-size: 2rem; margin: 0;">₦0</p>
+        <span class="chip chip--success">+12% ↑</span>
+      </div>
+      <div class="stats-card">
+        <h3>Active Requests</h3>
+        <p id="active-requests" style="font-size: 2rem; margin: 0;">0</p>
+        <span class="chip chip--orange">High Priority</span>
+      </div>
+      <div class="stats-card stats-card--dark">
+        <h3>Live Inventory Units</h3>
+        <p id="capacity-value" style="font-size: 2rem; margin: 0;">82%</p>
+        <span style="color:#fff;">82% Capacity</span>
+      </div>
+    </section>
+    <section class="dashboard-main">
+      <div>
+        <div class="booking-panel card">
+          <div class="card-header"><h3>Inventory Health</h3><a class="btn btn-ghost" href="#">Full Report →</a></div>
+          <table class="table-list" id="farm-inventory">
+            <thead><tr><th>Product Name</th><th>Batch ID</th><th>Available Stock</th><th>Price/Unit</th><th>Status</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="request-panel card" style="margin-top: 24px;">
+          <div class="card-header">
+            <h3>Customer Bookings & Delivery</h3>
+            <span class="badge-pill badge-pill--accent" id="booking-badge-count">0 Bookings</span>
+          </div>
+          <table class="table-list" id="farm-bookings-table">
+            <thead>
+              <tr>
+                <th>Booking ID</th>
+                <th>Customer</th>
+                <th>Product</th>
+                <th>Qty</th>
+                <th>Fulfillment</th>
+                <th>Total</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td colspan="7" style="color: var(--color-text-muted); padding: 18px 0; text-align: center;">Loading bookings...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div style="display:grid; gap:24px;">
+        <div class="quick-card card" style="background: var(--color-primary); color: #fff;">
+          <h3>Quick Manage</h3>
+          <p>Manage all product listings and respond to booking requests from one dashboard.</p>
+          <a class="btn btn-secondary" href="#">≡ Product Management</a>
+        </div>
+        <div class="profile-card card">
+          <div class="card-header"><div><h3 id="farm-owner-name">Farm Owner</h3><span id="farm-owner-role" style="color: var(--color-text-muted);">Premium Seller</span></div><span class="avatar-circle" style="background: var(--color-accent);">FO</span></div>
+          <p style="color: var(--color-text-muted);">Manage your listings, inventory, and booking requests with the Egg Source seller portal.</p>
+          <div class="profile-actions"><button class="btn btn-ghost">Edit Profile</button><button class="btn btn-primary">Upgrade Account</button></div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <script type="module" src="/components/layout/navbar.js"></script>
+  <script type="module" src="/pages/dashboard-farm.js"></script>
+</body>
+</html>

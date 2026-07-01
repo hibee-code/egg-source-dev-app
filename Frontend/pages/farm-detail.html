@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Farm Detail — Egg Source</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/tokens.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
+</head>
+<body>
+  <div id="navbar-root"></div>
+  <main class="page detail-page">
+    <nav class="breadcrumb">
+      <a href="/pages/marketplace.html">Marketplace</a>
+      <span>Poultry Farms</span>
+      <span id="breadcrumb-farm-name">Farm Name</span>
+    </nav>
+    <div class="page-grid">
+      <div id="detail-content" class="detail-panel">
+        <div class="detail-image card">
+          <img id="detail-photo" src="https://images.unsplash.com/photo-1548550023-2bdb3c5beed7?auto=format&fit=crop&q=80&w=1200" alt="Farm photo">
+          <div class="detail-icons">
+            <button class="icon-button"><i data-lucide="heart"></i></button>
+            <button class="icon-button"><i data-lucide="share-2"></i></button>
+          </div>
+        </div>
+        <div class="card detail-card">
+          <div class="card-header">
+            <div>
+              <h2 id="detail-name">Farm Name</h2>
+              <p id="detail-status" style="color: var(--color-text-muted);">✓ Verified Seller</p>
+            </div>
+            <span id="detail-response" class="badge-pill badge-pill--success">Est. Response</span>
+          </div>
+          <p id="fulfillment-method" style="color: var(--color-text-muted); margin-bottom: 18px;">Standard Delivery</p>
+          <div class="field-row">
+            <div class="option-card active">
+              <input type="radio" name="fulfillment" value="pickup" checked>
+              <h4>Self Pickup</h4>
+              <p style="color: var(--color-text-muted);">Collect directly from the farm.</p>
+            </div>
+            <div class="option-card">
+              <input type="radio" name="fulfillment" value="delivery">
+              <h4>Standard Delivery</h4>
+              <p style="color: var(--color-text-muted);">Delivered by our logistics partners.</p>
+            </div>
+          </div>
+          <div class="card" style="padding: 22px;">
+            <h3>Delivery Address</h3>
+            <form id="detail-booking-form" class="auth-form">
+              <div class="field-row">
+                <div class="filter-group">
+                  <label class="label">Full Name</label>
+                  <input id="customer-name" type="text" class="input-field" required>
+                </div>
+                <div class="filter-group">
+                  <label class="label">Phone</label>
+                  <input id="customer-phone" type="tel" class="input-field" required>
+                </div>
+              </div>
+              <div class="field-row">
+                <div class="filter-group">
+                  <label class="label" for="booking-quantity">Quantity</label>
+                  <input id="booking-quantity" type="number" class="input-field" min="1" value="1" required>
+                </div>
+                <div class="filter-group">
+                  <label class="label">Street Address</label>
+                  <input id="customer-address" type="text" class="input-field" required>
+                </div>
+              </div>
+              <div class="field-row">
+                <div class="filter-group">
+                  <label class="label">City</label>
+                  <input id="customer-city" type="text" class="input-field" required>
+                </div>
+                <div class="filter-group">
+                  <label class="label">State</label>
+                  <input id="customer-state" type="text" class="input-field" required>
+                </div>
+                <div class="filter-group">
+                  <label class="label">ZIP</label>
+                  <input id="customer-zip" type="text" class="input-field" required>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div id="detail-loading" class="card" style="padding: 28px; color: var(--color-text-muted);">Loading farm details...</div>
+        <div id="detail-product-list" class="cards-grid"></div>
+      </div>
+      <aside class="sticky-panel">
+        <div class="summary-card card">
+          <h3>Booking Summary</h3>
+          <div class="summary-row"><span>Subtotal</span><strong id="summary-subtotal">₦0</strong></div>
+          <div class="summary-row"><span>Shipping & Handling</span><strong id="summary-shipping">₦0</strong></div>
+          <div class="summary-row"><span>Service Fee (2.5%)</span><strong id="summary-service">₦0</strong></div>
+          <div class="summary-total"><span>Total</span><strong id="summary-total">₦0</strong></div>
+          <button id="booking-submit" class="btn btn-primary" style="width: 100%; margin-top: 18px;">Confirm Booking →</button>
+          <p style="margin-top: 14px; color: var(--color-text-muted); font-size: 0.95rem;">By confirming you agree to our terms of service.</p>
+        </div>
+        <div class="protection-card card">
+          <h3>Buyer Protection</h3>
+          <p style="color: var(--color-text-muted);">Your funds are held in escrow until delivery is confirmed by both parties.</p>
+          <a class="btn btn-secondary btn-pill" href="#">Need help?</a>
+        </div>
+      </aside>
+    </div>
+  </main>
+  <script type="module" src="/components/layout/navbar.js"></script>
+  <script type="module" src="/pages/farm-detail.js"></script>
+</body>
+</html>
