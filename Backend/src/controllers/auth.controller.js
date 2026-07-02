@@ -1,6 +1,7 @@
 const catchAsync = require("../utils/catchAsync");
 const { sendSuccess } = require("../utils/ApiResponse");
 const authService = require("../services/auth.service");
+const env = require("../config/env");
 
 /**
  * @desc    Register a new user
@@ -9,10 +10,25 @@ const authService = require("../services/auth.service");
  */
 const register = catchAsync(async (req, res) => {
   const { user } = await authService.register(req.body);
+  const response = { user };
 
-  sendSuccess(res, 201, "Registration successful", {
-    user,
-  });
+  if (env.isDevelopment) {
+    // Auto-verify user in dev mode so the login check passes
+    const User = require("../models/user.model");
+    await User.findByIdAndUpdate(user._id, { isVerified: true });
+
+    try {
+      const loginResult = await authService.login(req.body.email, req.body.password, res);
+      if (loginResult.accessToken) {
+        response.accessToken = loginResult.accessToken;
+      }
+    } catch (err) {
+      // If auto-login fails for any reason in dev, still return the user
+      console.warn("Dev auto-login failed:", err.message);
+    }
+  }
+
+  sendSuccess(res, 201, "Registration successful", response);
 });
 
 /**
