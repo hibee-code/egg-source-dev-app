@@ -9,6 +9,7 @@ const routes = require("./routes");
 const poultryRoutes = require("./routes/poultry.routes");
 const productRoutes = require("./routes/product.routes");
 const searchRoutes = require("./routes/search.routes");
+const bookingRoutes = require("./routes/booking.routes");
 const errorMiddleware = require("./middleware/error.middleware");
 const ApiError = require("./utils/ApiError");
 
@@ -57,6 +58,7 @@ app.use("/api/v1", routes);
 app.use("/api/poultries", poultryRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/search", searchRoutes);
+app.use("/api/bookings", bookingRoutes);
 
 // ── Serve static frontend assets ──────────────────────────
 app.use(express.static(path.join(__dirname, "../../Frontend")));
