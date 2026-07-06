@@ -83,13 +83,15 @@ class SearchService {
       pipeline.push({ $match: matchConditions });
     }
 
-    // 4. Project response fields: businessName, state, lga, address, distance, pricePerCrate, deliveryAvailable
+    // 4. Project response fields: businessName, state, lga, address, distance, pricePerCrate, deliveryAvailable, location
     pipeline.push({
       $project: {
         businessName: 1,
         state: 1,
         lga: 1,
         address: 1,
+        location: 1,
+        rating: 1,
         distance: { $ifNull: ["$distance", null] },
         deliveryAvailable: 1,
         pricePerCrate: {
