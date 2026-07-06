@@ -60,6 +60,9 @@ export const AuthAPI = {
   getProfile() {
     return request('/api/v1/auth/profile', { method: 'GET' });
   },
+  updateProfile(payload) {
+    return request('/api/v1/auth/profile', { method: 'PATCH', body: payload });
+  },
 };
 
 export const PoultryAPI = {
@@ -73,6 +76,9 @@ export const PoultryAPI = {
   create(payload) {
     return request('/api/poultries', { method: 'POST', body: payload });
   },
+  update(id, payload) {
+    return request(`/api/poultries/${id}`, { method: 'PATCH', body: payload });
+  },
 };
 
 export const ProductAPI = {
@@ -82,6 +88,15 @@ export const ProductAPI = {
   },
   getById(id) {
     return request(`/api/products/${id}`, { method: 'GET' });
+  },
+  create(payload) {
+    return request('/api/products', { method: 'POST', body: payload });
+  },
+  update(id, payload) {
+    return request(`/api/products/${id}`, { method: 'PATCH', body: payload });
+  },
+  delete(id) {
+    return request(`/api/products/${id}`, { method: 'DELETE' });
   },
 };
 
@@ -98,13 +113,22 @@ export const SearchAPI = {
 };
 
 export const BookingAPI = {
-  save(payload) {
-    const bookings = JSON.parse(localStorage.getItem('eggsource_bookings') || '[]');
-    bookings.push(payload);
-    localStorage.setItem('eggsource_bookings', JSON.stringify(bookings));
-    return Promise.resolve(payload);
+  create(payload) {
+    return request('/api/bookings', { method: 'POST', body: payload });
   },
-  list() {
-    return JSON.parse(localStorage.getItem('eggsource_bookings') || '[]');
+  getMyBookings() {
+    return request('/api/bookings/my', { method: 'GET' });
+  },
+  getFarmBookings() {
+    return request('/api/bookings/farm', { method: 'GET' });
+  },
+  getById(id) {
+    return request(`/api/bookings/${id}`, { method: 'GET' });
+  },
+  updateStatus(id, status) {
+    return request(`/api/bookings/${id}/status`, { method: 'PATCH', body: { status } });
+  },
+  cancel(id) {
+    return request(`/api/bookings/${id}/cancel`, { method: 'PATCH' });
   },
 };

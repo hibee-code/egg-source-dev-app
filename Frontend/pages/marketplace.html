@@ -12,6 +12,8 @@
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
 </head>
 <body>
+  <!-- Elegant watermark -->
+  <div class="page-watermark"></div>
   <div id="navbar-root"></div>
   <main class="page">
     <section class="page-marketplace">
@@ -56,6 +58,32 @@
             </select>
           </div>
 
+          <!-- Geolocation Section -->
+          <div class="filter-group geolocation-group">
+            <button id="btn-geolocation" class="btn btn-geolocation btn-pill" type="button" aria-label="Use your current GPS location to find nearby farms">
+              <i data-lucide="locate" class="btn-geolocation__icon"></i>
+              <span>Use Current Location</span>
+            </button>
+            <div id="gps-status-badge" class="gps-status-badge hidden">
+              <span class="gps-status-badge__label">
+                <span class="gps-pulse-dot"></span>
+                GPS Active
+              </span>
+              <button id="btn-clear-gps" class="btn-clear-gps" type="button" title="Clear GPS location" aria-label="Clear GPS location">&times;</button>
+            </div>
+          </div>
+
+          <div id="filter-radius-group" class="filter-group hidden">
+            <label class="label" for="filter-radius">Search Radius</label>
+            <select id="filter-radius" class="select-field">
+              <option value="5">Within 5 km</option>
+              <option value="10" selected>Within 10 km</option>
+              <option value="25">Within 25 km</option>
+              <option value="50">Within 50 km</option>
+              <option value="100">Within 100 km</option>
+            </select>
+          </div>
+
           <div class="filter-group">
             <label class="label" for="filter-min-price">Price min</label>
             <input id="filter-min-price" type="number" class="input-field" placeholder="₦0">
@@ -78,7 +106,7 @@
 
           <div class="filter-group">
             <label class="label" for="filter-category">Category</label>
-            <input id="filter-category" type="text" class="input-field" placeholder="Eggs, Feed, Chicks">
+            <input id="filter-category" type="text" class="input-field" placeholder="Eggs">
           </div>
 
           <button id="filter-apply" class="btn btn-primary btn-pill filter-actions" type="button">Apply Filters</button>
@@ -105,28 +133,28 @@
           <!-- Right side: Sticky Visual Map Container -->
           <div class="map-pane">
             <div class="map-container-wrapper">
-              <div class="map-header" style="padding: 16px 20px; border-bottom: 1px solid var(--color-border); background: var(--color-surface-soft); display: flex; justify-content: space-between; align-items: center;">
-                <span class="map-header__title" style="font-weight: var(--font-weight-bold); color: var(--color-primary); display: flex; align-items: center; gap: 8px;">
-                  <i data-lucide="map-pin" style="width: 18px; height: 18px;"></i>
+              <div class="map-header">
+                <span class="map-header__title">
+                  <i data-lucide="map-pin" class="map-header__icon"></i>
                   Interactive Farm Locator
                 </span>
-                <span class="map-header__sub" id="map-location-context" style="font-size: 0.85rem; color: var(--color-text-muted); font-weight: var(--font-weight-medium);">All States</span>
+                <span class="map-header__sub" id="map-location-context">All States</span>
               </div>
-              <div class="map-canvas-area" id="map-canvas-area" style="position: relative; flex-grow: 1; background: radial-gradient(circle, #f9faf7 0%, #eeeee8 100%); overflow: hidden; min-height: 400px;">
+              <div class="map-canvas-area" id="map-canvas-area">
                 <!-- Compass Rose / Grid lines -->
-                <div class="map-canvas__grid-lines" style="position: absolute; inset: 0; background-size: 40px 40px; background-image: linear-gradient(to right, rgba(31, 77, 10, 0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(31, 77, 10, 0.04) 1px, transparent 1px);"></div>
-                <div class="map-canvas__compass" style="position: absolute; top: 16px; right: 16px; width: 36px; height: 36px; border: 2px solid var(--color-border); border-radius: 50%; display: grid; place-items: center; font-size: 0.75rem; font-weight: var(--font-weight-bold); color: var(--color-text-muted); background: rgba(255, 255, 255, 0.8);">N</div>
+                <div class="map-canvas__grid-lines"></div>
+                <div class="map-canvas__compass">N</div>
                 
                 <!-- Markers will be rendered here dynamically -->
-                <div id="map-markers-root" style="position: absolute; inset: 0; z-index: 5;"></div>
+                <div id="map-markers-root" class="map-markers-root"></div>
               </div>
-              <div class="map-legend" style="padding: 12px 20px; border-top: 1px solid var(--color-border); background: var(--color-surface-soft); display: flex; gap: 16px; font-size: 0.82rem;">
-                <span class="legend-item" style="display: flex; align-items: center; gap: 6px; color: var(--color-text-muted);">
-                  <span class="legend-dot legend-dot--primary" style="width: 10px; height: 10px; border-radius: 50%; background: var(--color-accent); display: inline-block;"></span>
+              <div class="map-legend">
+                <span class="legend-item">
+                  <span class="legend-dot legend-dot--primary"></span>
                   Poultry Farm
                 </span>
-                <span class="legend-item" id="user-location-legend" style="display: none; align-items: center; gap: 6px; color: var(--color-text-muted);">
-                  <span class="legend-dot legend-dot--user" style="width: 10px; height: 10px; border-radius: 50%; background: var(--color-primary); display: inline-block; border: 2px double #fff;"></span>
+                <span class="legend-item hidden" id="user-location-legend">
+                  <span class="legend-dot legend-dot--user"></span>
                   Selected Center
                 </span>
               </div>

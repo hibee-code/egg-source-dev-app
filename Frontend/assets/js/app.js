@@ -469,7 +469,7 @@ class EggSourceApp {
     return `
       <article class="listing-card">
         <div class="farm-card__img">
-          <img src="https://images.unsplash.com/photo-1516448424440-9dbca97779c1?auto=format&fit=crop&q=80&w=900" alt="${farm.businessName}">
+          <img src="https://images.unsplash.com/photo-1506976785307-8732e854ad03?auto=format&fit=crop&q=80&w=900" alt="${farm.businessName}">
         </div>
         <div class="listing-details">
           <div class="pill">${farm.state} • ${farm.lga}</div>
@@ -498,11 +498,11 @@ class EggSourceApp {
 
     hero.innerHTML = `
       <div class="farm-detail-card">
-        <div class="farm-card__img"><img src="https://images.unsplash.com/photo-1498654896293-37aacf113fd9?auto=format&fit=crop&q=80&w=1100" alt="${this.currentFarm.businessName}"></div>
+        <div class="farm-card__img"><img src="https://images.unsplash.com/photo-1506976785307-8732e854ad03?auto=format&fit=crop&q=80&w=1100" alt="${this.currentFarm.businessName}"></div>
         <div class="card-body">
           <span class="badge">${this.currentFarm.deliveryAvailable ? 'Delivery ready' : 'Pickup only'}</span>
           <h2>${this.currentFarm.businessName}</h2>
-          <p>${this.currentFarm.description || 'Local poultry farm offering eggs, chicks, and layer feeds in bulk at competitive prices.'}</p>
+          <p>${this.currentFarm.description || 'Local poultry farm offering fresh eggs in bulk at competitive prices.'}</p>
           <div class="meta-row">
             <span><i data-lucide="map-pin"></i> ${this.currentFarm.lga}, ${this.currentFarm.state}</span>
             <span><i data-lucide="phone"></i> ${this.currentFarm.phoneNumber}</span>
@@ -523,7 +523,7 @@ class EggSourceApp {
 
     productsGrid.innerHTML = products.map((product) => `
       <article class="product-card">
-        <img src="https://images.unsplash.com/photo-1548550023-2bdb3c5beed7?auto=format&fit=crop&q=80&w=900" alt="${product.productName}">
+        <img src="https://images.unsplash.com/photo-1516448424440-9dbca97779c1?auto=format&fit=crop&q=80&w=900" alt="${product.productName}">
         <div class="card-body">
           <span class="badge">${product.category}</span>
           <h3>${product.productName}</h3>

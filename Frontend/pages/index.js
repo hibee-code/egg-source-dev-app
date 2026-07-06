@@ -14,7 +14,7 @@ const renderFarmCard = (farm) => {
   return `
     <article class="farm-card">
       <div class="farm-card__image">
-        <img src="${farm.imageUrl || 'https://images.unsplash.com/photo-1548550023-2bdb3c5beed7?auto=format&fit=crop&q=80&w=800'}" alt="${farm.businessName}" />
+        <img src="${farm.imageUrl || 'https://images.unsplash.com/photo-1506976785307-8732e854ad03?auto=format&fit=crop&q=80&w=800'}" alt="${farm.businessName}" />
         <span class="farm-card__badge">Rating ${farm.rating || '4.8'}</span>
       </div>
       <div class="farm-card__body">

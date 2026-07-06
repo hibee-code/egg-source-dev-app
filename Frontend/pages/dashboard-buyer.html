@@ -12,63 +12,190 @@
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
 </head>
 <body>
-  <div id="sidebar-root"></div>
-  <main class="page">
-    <section class="stats-grid">
-      <div>
-        <h1>Buyer Dashboard</h1>
-        <p style="color: var(--color-text-muted);">Welcome back, Egg Source partner.</p>
+  <!-- Elegant watermark -->
+  <div class="page-watermark"></div>
+
+  <div class="sidebar-layout" style="min-height: 100vh; padding: 24px; max-width: var(--page-max); margin: 0 auto;">
+    <div id="sidebar-root" style="width: 280px; flex-shrink: 0;"></div>
+    
+    <main class="page" style="flex-grow: 1; padding: 0;">
+      
+      <!-- TAB: DASHBOARD -->
+      <div id="tab-dashboard" class="tab-content">
+        <section class="stats-grid" style="margin-bottom: 24px;">
+          <div>
+            <h1>Buyer Dashboard</h1>
+            <p style="color: var(--color-text-muted);">Welcome back, Egg Source partner.</p>
+          </div>
+          <div style="display:flex; align-items:center; justify-content:flex-end; gap: 14px;">
+            <span class="chip chip--orange">3 new alerts</span>
+            <div class="avatar-circle" style="background: var(--color-light-green);">ES</div>
+          </div>
+        </section>
+
+        <section class="stats-grid" style="margin-bottom: 24px;">
+          <div class="stats-card">
+            <div class="card-header"><h3>Total Bookings</h3><span class="chip chip--success">+12% ↑</span></div>
+            <p id="stat-total-bookings" style="font-size: 2rem; margin: 0; font-weight: bold;">0</p>
+          </div>
+          <div class="stats-card">
+            <div class="card-header"><h3>In Transit</h3><span class="chip chip--orange">Pending</span></div>
+            <p id="stat-in-transit" style="font-size: 2rem; margin: 0; font-weight: bold;">0</p>
+          </div>
+          <div class="stats-card stats-card--dark">
+            <h3>Premium Supplier Access</h3>
+            <p style="font-size: 0.9rem; margin-bottom: 12px; color: rgba(255,255,255,0.85);">Unlock trusted farms and priority inventory.</p>
+            <a class="btn btn-ghost" href="/pages/marketplace.html" style="color: #fff; border-color: rgba(255,255,255,0.3);">Browse Farms</a>
+          </div>
+        </section>
+
+        <section class="dashboard-main" style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 24px;">
+          <div class="booking-panel card">
+            <div class="card-header"><h3>My Bookings</h3><a class="btn btn-ghost select-tab-link" href="#orders">View All</a></div>
+            <table class="table-list" id="buyer-bookings">
+              <thead>
+                <tr><th>Supplier</th><th>Product</th><th>Quantity</th><th>Status</th><th>Action</th></tr>
+              </thead>
+              <tbody>
+                <tr><td colspan="5" style="color: var(--color-text-muted); padding: 18px 0; text-align: center;">Loading bookings...</td></tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <div style="display:grid; gap:24px;">
+            <div class="notification-card card">
+              <div class="card-header"><h3>Recent Notifications</h3><span class="badge-pill badge-pill--accent" style="padding: 4px 10px; font-size: 0.8rem;">4 New</span></div>
+              <div class="notification-item"><div><span class="notification-dot notification-dot--green"></span><strong>New farm added near Lagos</strong><div style="color: var(--color-text-muted); font-size: 0.8rem; margin-top: 4px;">Updated just now</div></div></div>
+              <div class="notification-item"><div><span class="notification-dot notification-dot--orange"></span><strong>Price drop on feed orders</strong><div style="color: var(--color-text-muted); font-size: 0.8rem; margin-top: 4px;">2h ago</div></div></div>
+            </div>
+            <div class="saved-card card">
+              <div class="card-header"><h3>Saved Suppliers</h3><button class="btn btn-secondary btn-pill" style="font-size: 0.8rem; padding: 6px 12px;">+ Add</button></div>
+              <div class="saved-item"><div><div class="avatar-circle" style="background: #d38a18; width: 34px; height: 34px; display: inline-grid; place-items: center; margin-right: 8px; font-size: 0.8rem;">NA</div><strong>North Farm</strong><div style="color: var(--color-text-muted); font-size: 0.8rem;">⭐ 4.7</div></div></div>
+              <div class="saved-item"><div><div class="avatar-circle" style="background: #1f4d0a; width: 34px; height: 34px; display: inline-grid; place-items: center; margin-right: 8px; font-size: 0.8rem;">SA</div><strong>Sun Agri</strong><div style="color: var(--color-text-muted); font-size: 0.8rem;">⭐ 4.5</div></div></div>
+            </div>
+          </div>
+        </section>
       </div>
-      <div style="display:flex; align-items:center; justify-content:flex-end; gap: 14px;">
-        <span class="chip chip--orange">3 new alerts</span>
-        <div class="avatar-circle" style="background: var(--color-light-green);">ES</div>
-      </div>
-    </section>
-    <section class="stats-grid">
-      <div class="stats-card">
-        <div class="card-header"><h3>Total Bookings</h3><span class="chip chip--success">+12% ↑</span></div>
-        <p id="stat-total-bookings" style="font-size: 2rem; margin: 0;">0</p>
-      </div>
-      <div class="stats-card">
-        <div class="card-header"><h3>In Transit</h3><span class="chip chip--orange">8 Pending</span></div>
-        <p id="stat-in-transit" style="font-size: 2rem; margin: 0;">0</p>
-      </div>
-      <div class="stats-card stats-card--dark">
-        <h3>Premium Supplier Access</h3>
-        <p>Unlock trusted farms and priority inventory.</p>
-        <a class="btn btn-ghost" href="/pages/marketplace.html">Browse Farms</a>
-      </div>
-    </section>
-    <section class="dashboard-main">
-      <div class="booking-panel card">
-        <div class="card-header"><h3>My Bookings</h3><a class="btn btn-ghost" href="#">View All</a></div>
-        <table class="table-list" id="buyer-bookings">
-          <thead>
-            <tr><th>Supplier</th><th>Product</th><th>Quantity</th><th>Status</th><th>Action</th></tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-      <div style="display:grid; gap:24px;">
-        <div class="notification-card card">
-          <div class="card-header"><h3>Recent Notifications</h3><span class="badge-pill badge-pill--accent">4 New</span></div>
-          <div class="notification-item"><div><span class="notification-dot notification-dot--green"></span><strong>New farm added near Lagos</strong><div style="color: var(--color-text-muted);">Updated just now</div></div></div>
-          <div class="notification-item"><div><span class="notification-dot notification-dot--orange"></span><strong>Price drop on feed orders</strong><div style="color: var(--color-text-muted);">2h ago</div></div></div>
+
+      <!-- TAB: INVENTORY -->
+      <div id="tab-inventory" class="tab-content hidden">
+        <section class="stats-grid" style="margin-bottom: 24px;">
+          <div>
+            <h1>Sourced Inventory</h1>
+            <p style="color: var(--color-text-muted);">Track materials and products you have sourced via Egg Source.</p>
+          </div>
+        </section>
+        <div class="card" style="padding: 24px;">
+          <table class="table-list" id="inventory-tracker-table">
+            <thead>
+              <tr><th>Item/Product</th><th>Supplier Farm</th><th>Total Crates Sourced</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+              <tr><td colspan="4" style="color: var(--color-text-muted); padding: 18px 0; text-align: center;">No inventory logged. Complete a booking to see it here.</td></tr>
+            </tbody>
+          </table>
         </div>
-        <div class="saved-card card">
-          <div class="card-header"><h3>Saved Suppliers</h3><button class="btn btn-secondary btn-pill">+ Add</button></div>
-          <div class="saved-item"><div><div class="avatar-circle" style="background: #d38a18;">NA</div><div><strong>North Farm</strong><div style="color: var(--color-text-muted);">⭐ 4.7</div></div></div><i data-lucide="chevron-right"></i></div>
-          <div class="saved-item"><div><div class="avatar-circle" style="background: #1f4d0a;">SA</div><div><strong>Sun Agri</strong><div style="color: var(--color-text-muted);">⭐ 4.5</div></div></div><i data-lucide="chevron-right"></i></div>
-        </div>
-        <div class="profile-card card">
-          <div class="card-header"><h3 id="profile-name">Buyer Name</h3><span id="profile-role" style="color: var(--color-text-muted);">Buyer</span></div>
-          <p id="profile-company" style="color: var(--color-text-muted);">EggSource Buyer</p>
-          <p id="profile-email" style="color: var(--color-text-muted); margin: 8px 0 0;">support@eggsource.dev</p>
-          <div class="profile-actions"><button class="btn btn-ghost">Edit Profile</button><button class="btn btn-primary">Upgrade Account</button></div>
+      </div>
+
+      <!-- TAB: ORDERS -->
+      <div id="tab-orders" class="tab-content hidden">
+        <section class="stats-grid" style="margin-bottom: 24px;">
+          <div>
+            <h1>All Booking Orders</h1>
+            <p style="color: var(--color-text-muted);">View, track, and cancel your order requests.</p>
+          </div>
+        </section>
+        <div class="card" style="padding: 24px;">
+          <table class="table-list" id="full-orders-table">
+            <thead>
+              <tr><th>Order ID</th><th>Supplier Farm</th><th>Product</th><th>Quantity</th><th>Total Amount</th><th>Status</th><th>Action</th></tr>
+            </thead>
+            <tbody>
+              <tr><td colspan="7" style="color: var(--color-text-muted); padding: 18px 0; text-align: center;">No orders found.</td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
-    </section>
-  </main>
+
+      <!-- TAB: ANALYTICS -->
+      <div id="tab-analytics" class="tab-content hidden">
+        <section class="stats-grid" style="margin-bottom: 24px;">
+          <div>
+            <h1>Expenditure & Sourcing Analytics</h1>
+            <p style="color: var(--color-text-muted);">Real-time tracking of purchasing patterns.</p>
+          </div>
+        </section>
+        <section class="stats-grid" style="margin-bottom: 24px;">
+          <div class="stats-card">
+            <h3>Total Spent (All-Time)</h3>
+            <p id="analytics-total-spent" style="font-size: 2rem; margin: 0; font-weight: bold; color: var(--color-primary);">₦0</p>
+          </div>
+          <div class="stats-card">
+            <h3>Average Cost/Crate</h3>
+            <p id="analytics-avg-crate" style="font-size: 2rem; margin: 0; font-weight: bold; color: var(--color-primary);">₦0</p>
+          </div>
+          <div class="stats-card">
+            <h3>Total Crates Ordered</h3>
+            <p id="analytics-total-crates" style="font-size: 2rem; margin: 0; font-weight: bold;">0 Crates</p>
+          </div>
+        </section>
+        <div class="card" style="padding: 24px;">
+          <h3>Monthly Sourcing Volume</h3>
+          <p style="color: var(--color-text-muted); margin-bottom: 20px;">Detailed analysis of crates ordered month-by-month.</p>
+          <div style="height: 150px; display: flex; align-items: flex-end; gap: 20px; padding: 20px; background: rgba(31,77,10,0.03); border-radius: 8px; border: 1px solid var(--color-border);">
+            <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+              <div style="width: 100%; height: 40px; background: var(--color-light-green); border-radius: 4px;"></div>
+              <span style="font-size: 0.8rem; color: var(--color-text-muted);">May</span>
+            </div>
+            <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+              <div style="width: 100%; height: 75px; background: var(--color-light-green); border-radius: 4px;"></div>
+              <span style="font-size: 0.8rem; color: var(--color-text-muted);">Jun</span>
+            </div>
+            <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+              <div id="analytics-bar-current" style="width: 100%; height: 20px; background: var(--color-primary); border-radius: 4px; transition: height 0.5s ease;"></div>
+              <span style="font-size: 0.8rem; color: var(--color-text); font-weight: bold;">Jul (Current)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: SETTINGS -->
+      <div id="tab-settings" class="tab-content hidden">
+        <section class="stats-grid" style="margin-bottom: 24px;">
+          <div>
+            <h1>Account Settings</h1>
+            <p style="color: var(--color-text-muted);">Manage your profile information and credentials.</p>
+          </div>
+        </section>
+        <div class="card" style="padding: 24px; max-width: 600px;">
+          <h3>Personal Details</h3>
+          <form id="settings-profile-form" class="auth-form" style="margin-top: 18px;">
+            <div class="field-row">
+              <div class="filter-group">
+                <label class="label">First Name</label>
+                <input id="settings-first-name" type="text" class="input-field" required>
+              </div>
+              <div class="filter-group">
+                <label class="label">Last Name</label>
+                <input id="settings-last-name" type="text" class="input-field" required>
+              </div>
+            </div>
+            <div class="filter-group">
+              <label class="label">Email Address</label>
+              <input id="settings-email" type="email" class="input-field" readonly style="background: rgba(0,0,0,0.03); cursor: not-allowed;">
+            </div>
+            <div class="filter-group">
+              <label class="label">Phone Number</label>
+              <input id="settings-phone" type="tel" class="input-field">
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: fit-content; margin-top: 12px; padding: 12px 24px;">Save Profile Changes</button>
+          </form>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
   <script type="module" src="/components/layout/navbar.js"></script>
   <script type="module" src="/pages/dashboard-buyer.js"></script>
 </body>
