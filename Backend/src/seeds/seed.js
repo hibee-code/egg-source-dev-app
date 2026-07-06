@@ -340,7 +340,7 @@ const seedData = async () => {
         ownerId: owner._id,
       });
 
-      // Generate 2-3 products per poultry
+      // Generate 3 egg-only products per poultry
       const products = [
         {
           poultryId: poultry._id,
@@ -348,26 +348,26 @@ const seedData = async () => {
           category: "Eggs",
           pricePerCrate: Math.floor(Math.random() * (2800 - 1800 + 1)) + 1800, // 1800 to 2800
           stockQuantity: Math.floor(Math.random() * 400) + 50, // 50 to 450
-          imageUrl: "https://images.unsplash.com/photo-1516448424440-9dbca97779c1",
+          imageUrl: "https://images.unsplash.com/photo-1516448424440-9dbca97779c1?auto=format&fit=crop&q=80&w=900",
           isAvailable: true,
         },
         {
           poultryId: poultry._id,
-          productName: "Day-Old Chicks (Pullets)",
-          category: "Chicks",
-          pricePerCrate: Math.floor(Math.random() * (850 - 450 + 1)) + 450, // 450 to 850
-          stockQuantity: Math.floor(Math.random() * 1000) + 100, // 100 to 1100
-          imageUrl: "https://images.unsplash.com/photo-1604848698030-c434ba08eca1",
+          productName: "Jumbo White Eggs",
+          category: "Eggs",
+          pricePerCrate: Math.floor(Math.random() * (3200 - 2200 + 1)) + 2200, // 2200 to 3200
+          stockQuantity: Math.floor(Math.random() * 300) + 40, 
+          imageUrl: "https://images.unsplash.com/photo-1506976785307-8732e854ad03?auto=format&fit=crop&q=80&w=900",
           isAvailable: true,
         },
         {
           poultryId: poultry._id,
-          productName: "Premium Layer Feed (25kg)",
-          category: "Feed",
-          pricePerCrate: Math.floor(Math.random() * (14000 - 9000 + 1)) + 9000, // 9000 to 14000
-          stockQuantity: Math.floor(Math.random() * 80) + 10, // 10 to 90
-          imageUrl: "https://images.unsplash.com/photo-1595273670150-bd0c3c392e46",
-          isAvailable: Math.random() > 0.15, // 85% availability chance
+          productName: "Free-Range Golden Eggs",
+          category: "Eggs",
+          pricePerCrate: Math.floor(Math.random() * (3600 - 2500 + 1)) + 2500, // 2500 to 3600
+          stockQuantity: Math.floor(Math.random() * 200) + 20, 
+          imageUrl: "https://images.unsplash.com/photo-1587486913049-53fc88980cfc?auto=format&fit=crop&q=80&w=900",
+          isAvailable: Math.random() > 0.15,
         },
       ];
 

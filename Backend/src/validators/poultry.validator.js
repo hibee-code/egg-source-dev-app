@@ -38,9 +38,13 @@ const updatePoultrySchema = Joi.object({
   rating: Joi.number().min(0).max(5).optional(),
   longitude: Joi.number().min(-180).max(180).optional(),
   latitude: Joi.number().min(-90).max(90).optional(),
-}).min(1).messages({
-  "object.min": "Please provide at least one field to update",
-});
+})
+  .and("latitude", "longitude")
+  .min(1)
+  .messages({
+    "object.min": "Please provide at least one field to update",
+    "object.and": "Both latitude and longitude must be provided together",
+  });
 
 module.exports = {
   createPoultrySchema,
