@@ -22,7 +22,7 @@
     <div class="page-grid">
       <div id="detail-content" class="detail-panel">
         <div class="detail-image card">
-          <img id="detail-photo" src="https://images.unsplash.com/photo-1548550023-2bdb3c5beed7?auto=format&fit=crop&q=80&w=1200" alt="Farm photo">
+          <img id="detail-photo" src="https://images.unsplash.com/photo-1506976785307-8732e854ad03?auto=format&fit=crop&q=80&w=1200" alt="Farm photo">
           <div class="detail-icons">
             <button class="icon-button"><i data-lucide="heart"></i></button>
             <button class="icon-button"><i data-lucide="share-2"></i></button>
@@ -36,6 +36,7 @@
             </div>
             <span id="detail-response" class="badge-pill badge-pill--success">Est. Response</span>
           </div>
+          <p id="detail-location" style="color: var(--color-text-muted); margin-bottom: 18px;">Loading location...</p>
           <p id="fulfillment-method" style="color: var(--color-text-muted); margin-bottom: 18px;">Standard Delivery</p>
           <div class="field-row">
             <div class="option-card active">
@@ -49,52 +50,60 @@
               <p style="color: var(--color-text-muted);">Delivered by our logistics partners.</p>
             </div>
           </div>
-          <div class="card" style="padding: 22px;">
-            <h3>Delivery Address</h3>
-            <form id="detail-booking-form" class="auth-form">
-              <div class="field-row">
-                <div class="filter-group">
-                  <label class="label">Full Name</label>
-                  <input id="customer-name" type="text" class="input-field" required>
-                </div>
-                <div class="filter-group">
-                  <label class="label">Phone</label>
-                  <input id="customer-phone" type="tel" class="input-field" required>
-                </div>
-              </div>
-              <div class="field-row">
-                <div class="filter-group">
-                  <label class="label" for="booking-quantity">Quantity</label>
-                  <input id="booking-quantity" type="number" class="input-field" min="1" value="1" required>
-                </div>
-                <div class="filter-group">
-                  <label class="label">Street Address</label>
-                  <input id="customer-address" type="text" class="input-field" required>
-                </div>
-              </div>
-              <div class="field-row">
-                <div class="filter-group">
-                  <label class="label">City</label>
-                  <input id="customer-city" type="text" class="input-field" required>
-                </div>
-                <div class="filter-group">
-                  <label class="label">State</label>
-                  <input id="customer-state" type="text" class="input-field" required>
-                </div>
-                <div class="filter-group">
-                  <label class="label">ZIP</label>
-                  <input id="customer-zip" type="text" class="input-field" required>
-                </div>
-              </div>
-            </form>
-          </div>
         </div>
+
         <div id="detail-loading" class="card" style="padding: 28px; color: var(--color-text-muted);">Loading farm details...</div>
-        <div id="detail-product-list" class="cards-grid"></div>
+
+        <div class="card" style="padding: 22px;">
+          <h3>Select Product</h3>
+          <div id="detail-product-list" class="cards-grid" style="margin-top: 12px;"></div>
+        </div>
+
+        <div class="card" style="padding: 22px;">
+          <h3>Delivery Details</h3>
+          <form id="detail-booking-form" class="auth-form" style="margin-top: 12px;">
+            <div class="field-row">
+              <div class="filter-group">
+                <label class="label" for="customer-name">Full Name</label>
+                <input id="customer-name" type="text" class="input-field" required>
+              </div>
+              <div class="filter-group">
+                <label class="label" for="customer-phone">Phone</label>
+                <input id="customer-phone" type="tel" class="input-field" required>
+              </div>
+            </div>
+            <div class="field-row">
+              <div class="filter-group">
+                <label class="label" for="booking-quantity">Quantity (crates)</label>
+                <input id="booking-quantity" type="number" class="input-field" min="1" value="1" required>
+              </div>
+              <div class="filter-group">
+                <label class="label" for="customer-address">Street Address</label>
+                <input id="customer-address" type="text" class="input-field">
+              </div>
+            </div>
+            <div class="field-row">
+              <div class="filter-group">
+                <label class="label" for="customer-city">City</label>
+                <input id="customer-city" type="text" class="input-field">
+              </div>
+              <div class="filter-group">
+                <label class="label" for="customer-state">State</label>
+                <input id="customer-state" type="text" class="input-field">
+              </div>
+              <div class="filter-group">
+                <label class="label" for="customer-zip">ZIP</label>
+                <input id="customer-zip" type="text" class="input-field">
+              </div>
+            </div>
+            <button type="submit" id="booking-submit-form" class="btn btn-primary" style="width: 100%; margin-top: 18px; display: none;">Confirm Booking →</button>
+          </form>
+        </div>
       </div>
       <aside class="sticky-panel">
         <div class="summary-card card">
           <h3>Booking Summary</h3>
+          <div id="selected-product-name" style="color: var(--color-text-muted); margin-bottom: 12px;">No product selected</div>
           <div class="summary-row"><span>Subtotal</span><strong id="summary-subtotal">₦0</strong></div>
           <div class="summary-row"><span>Shipping & Handling</span><strong id="summary-shipping">₦0</strong></div>
           <div class="summary-row"><span>Service Fee (2.5%)</span><strong id="summary-service">₦0</strong></div>

@@ -49,6 +49,8 @@ const registerSchema = Joi.object({
     .messages({
       "any.only": `Role must be one of: ${ALL_ROLES.join(", ")}`,
     }),
+  latitude: Joi.number().min(-90).max(90).optional(),
+  longitude: Joi.number().min(-180).max(180).optional(),
 });
 
 const loginSchema = Joi.object({
@@ -56,6 +58,8 @@ const loginSchema = Joi.object({
   password: Joi.string().required().messages({
     "any.required": "Password is required",
   }),
+  latitude: Joi.number().min(-90).max(90).optional(),
+  longitude: Joi.number().min(-180).max(180).optional(),
 });
 
 const forgotPasswordSchema = Joi.object({

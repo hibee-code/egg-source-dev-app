@@ -12,82 +12,259 @@
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
 </head>
 <body>
-  <div id="sidebar-root"></div>
-  <main class="page">
-    <section class="stats-grid">
-      <div>
-        <h1>Farm Overview</h1>
-        <p style="color: var(--color-text-muted);">Welcome back, farm owner. Here's what's happening today.</p>
-      </div>
-      <div style="display:flex; align-items:center; justify-content:flex-end; gap: 14px;">
-        <span class="chip chip--success"><i data-lucide="calendar"></i> Today</span>
-      </div>
-    </section>
-    <section class="stats-grid">
-      <div class="stats-card">
-        <h3>Total Sales MTD</h3>
-        <p id="sales-value" style="font-size: 2rem; margin: 0;">₦0</p>
-        <span class="chip chip--success">+12% ↑</span>
-      </div>
-      <div class="stats-card">
-        <h3>Active Requests</h3>
-        <p id="active-requests" style="font-size: 2rem; margin: 0;">0</p>
-        <span class="chip chip--orange">High Priority</span>
-      </div>
-      <div class="stats-card stats-card--dark">
-        <h3>Live Inventory Units</h3>
-        <p id="capacity-value" style="font-size: 2rem; margin: 0;">82%</p>
-        <span style="color:#fff;">82% Capacity</span>
-      </div>
-    </section>
-    <section class="dashboard-main">
-      <div>
-        <div class="booking-panel card">
-          <div class="card-header"><h3>Inventory Health</h3><a class="btn btn-ghost" href="#">Full Report →</a></div>
-          <table class="table-list" id="farm-inventory">
-            <thead><tr><th>Product Name</th><th>Batch ID</th><th>Available Stock</th><th>Price/Unit</th><th>Status</th></tr></thead>
-            <tbody></tbody>
-          </table>
-        </div>
-        <div class="request-panel card" style="margin-top: 24px;">
-          <div class="card-header">
-            <h3>Customer Bookings & Delivery</h3>
-            <span class="badge-pill badge-pill--accent" id="booking-badge-count">0 Bookings</span>
+  <!-- Elegant watermark -->
+  <div class="page-watermark"></div>
+
+  <div class="sidebar-layout" style="min-height: 100vh; padding: 24px; max-width: var(--page-max); margin: 0 auto;">
+    <div id="sidebar-root" style="width: 280px; flex-shrink: 0;"></div>
+    
+    <main class="page" style="flex-grow: 1; padding: 0;">
+
+      <!-- TAB: DASHBOARD -->
+      <div id="tab-dashboard" class="tab-content">
+        <section class="stats-grid" style="margin-bottom: 24px;">
+          <div>
+            <h1>Farm Overview</h1>
+            <p style="color: var(--color-text-muted);">Welcome back, farm owner. Here's what's happening today.</p>
           </div>
-          <table class="table-list" id="farm-bookings-table">
+          <div style="display:flex; align-items:center; justify-content:flex-end; gap: 14px;">
+            <span class="chip chip--success"><i data-lucide="calendar"></i> Today</span>
+          </div>
+        </section>
+
+        <section class="stats-grid" style="margin-bottom: 24px;">
+          <div class="stats-card">
+            <h3>Total Sales MTD</h3>
+            <p id="sales-value" style="font-size: 2rem; margin: 0; font-weight: bold; color: var(--color-primary);">₦0</p>
+            <span class="chip chip--success">+12% ↑</span>
+          </div>
+          <div class="stats-card">
+            <h3>Active Requests</h3>
+            <p id="active-requests" style="font-size: 2rem; margin: 0; font-weight: bold; color: var(--color-accent);">0</p>
+            <span class="chip chip--orange">High Priority</span>
+          </div>
+          <div class="stats-card stats-card--dark">
+            <h3>Live Inventory Units</h3>
+            <p id="capacity-value" style="font-size: 2rem; margin: 0; font-weight: bold; color: #fff;">0 Units</p>
+            <span style="color:#fff;">Available in Stock</span>
+          </div>
+        </section>
+
+        <section class="dashboard-main" style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 24px;">
+          <div>
+            <div class="booking-panel card">
+              <div class="card-header"><h3>Inventory Health</h3><a class="btn btn-ghost select-tab-link" href="#inventory">Full Report →</a></div>
+              <table class="table-list" id="farm-inventory">
+                <thead><tr><th>Product Name</th><th>Category</th><th>Available Stock</th><th>Price/Crate</th><th>Status</th></tr></thead>
+                <tbody>
+                  <tr><td colspan="5" style="color: var(--color-text-muted); padding: 18px 0; text-align: center;">Loading inventory...</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="request-panel card" style="margin-top: 24px;">
+              <div class="card-header">
+                <h3>Recent Bookings</h3>
+                <span class="badge-pill badge-pill--accent" id="booking-badge-count" style="padding: 4px 10px; font-size: 0.8rem;">0 Bookings</span>
+              </div>
+              <table class="table-list" id="farm-bookings-table">
+                <thead>
+                  <tr>
+                    <th>Booking ID</th>
+                    <th>Customer</th>
+                    <th>Product</th>
+                    <th>Qty</th>
+                    <th>Fulfillment</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td colspan="8" style="color: var(--color-text-muted); padding: 18px 0; text-align: center;">Loading bookings...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div style="display:grid; gap:24px; align-content: start;">
+            <div class="quick-card card" style="background: var(--color-primary); color: #fff; padding: 22px;">
+              <h3>Quick Manage</h3>
+              <p style="font-size: 0.9rem; color: rgba(255,255,255,0.85); margin-bottom: 16px;">Manage all product listings and respond to booking requests from one dashboard.</p>
+              <a class="btn btn-secondary select-tab-link" href="#products" style="color: var(--color-primary); background: #fff; border: none; width: 100%; text-align: center;">≡ Product Management</a>
+            </div>
+            <div class="profile-card card">
+              <div class="card-header"><div><h3 id="farm-owner-name">Farm Owner</h3><span id="farm-owner-role" style="color: var(--color-text-muted);">Premium Seller</span></div><div class="avatar-circle" style="background: var(--color-accent);">FO</div></div>
+              <p style="color: var(--color-text-muted); font-size: 0.9rem;">Manage your listings, inventory, and booking requests with the Egg Source seller portal.</p>
+              <div class="profile-actions" style="margin-top: 14px; display: flex; gap: 10px;"><button class="btn btn-ghost select-tab-link" href="#profile" style="flex: 1;">Edit Profile</button></div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- TAB: POULTRY PROFILE -->
+      <div id="tab-profile" class="tab-content hidden">
+        <section class="stats-grid" style="margin-bottom: 24px;">
+          <div>
+            <h1>Poultry Farm Profile</h1>
+            <p style="color: var(--color-text-muted);">Configure public details for your poultry farm.</p>
+          </div>
+        </section>
+        <div class="card" style="padding: 24px; max-width: 700px;">
+          <h3>Farm Details</h3>
+          <form id="poultry-profile-form" class="auth-form" style="margin-top: 18px;">
+            <div class="filter-group">
+              <label class="label">Business Name</label>
+              <input id="farm-business-name" type="text" class="input-field" required>
+            </div>
+            <div class="field-row">
+              <div class="filter-group">
+                <label class="label">State</label>
+                <input id="farm-state" type="text" class="input-field" required>
+              </div>
+              <div class="filter-group">
+                <label class="label">LGA</label>
+                <input id="farm-lga" type="text" class="input-field" required>
+              </div>
+            </div>
+            <div class="filter-group">
+              <label class="label">Street Address</label>
+              <input id="farm-address" type="text" class="input-field" required>
+            </div>
+            <div class="field-row">
+              <div class="filter-group">
+                <label class="label">Latitude</label>
+                <input id="farm-lat" type="number" step="any" class="input-field" required>
+              </div>
+              <div class="filter-group">
+                <label class="label">Longitude</label>
+                <input id="farm-lng" type="number" step="any" class="input-field" required>
+              </div>
+            </div>
+            <div class="filter-group">
+              <label class="label">Description</label>
+              <textarea id="farm-description" class="input-field" style="height: 100px; resize: vertical; padding: 12px;"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: fit-content; margin-top: 12px; padding: 12px 24px;">Save Farm Profile</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- TAB: PRODUCT MANAGEMENT -->
+      <div id="tab-products" class="tab-content hidden">
+        <section class="stats-grid" style="margin-bottom: 24px; grid-template-columns: 1.5fr 1fr;">
+          <div>
+            <h1>Product Management</h1>
+            <p style="color: var(--color-text-muted);">Create and manage egg and poultry listings.</p>
+          </div>
+          <div style="display:flex; justify-content:flex-end; align-items:center;">
+            <button id="add-product-btn" class="btn btn-primary">+ Add New Product</button>
+          </div>
+        </section>
+        
+        <!-- Add Product Form Panel (Dynamic Toggle) -->
+        <div id="add-product-panel" class="card hidden" style="padding: 24px; margin-bottom: 24px;">
+          <h3 id="product-form-title">Create New Listing</h3>
+          <form id="farm-product-form" class="auth-form" style="margin-top: 18px;">
+            <input type="hidden" id="edit-product-id">
+            <div class="field-row">
+              <div class="filter-group">
+                <label class="label">Product Name</label>
+                <input id="prod-name" type="text" class="input-field" placeholder="e.g. Premium White Eggs" required>
+              </div>
+              <div class="filter-group">
+                <label class="label">Category</label>
+                <select id="prod-category" class="input-field" required style="padding: 12px;">
+                  <option value="Eggs">Eggs</option>
+                </select>
+              </div>
+            </div>
+            <div class="field-row">
+              <div class="filter-group">
+                <label class="label">Price Per Crate (₦)</label>
+                <input id="prod-price" type="number" class="input-field" min="1" placeholder="3200" required>
+              </div>
+              <div class="filter-group">
+                <label class="label">Stock Quantity (Crates)</label>
+                <input id="prod-stock" type="number" class="input-field" min="0" placeholder="150" required>
+              </div>
+            </div>
+            <div class="filter-group">
+              <label class="label">Image URL</label>
+              <input id="prod-image" type="url" class="input-field" placeholder="https://images.unsplash.com/...">
+            </div>
+            <div style="display:flex; gap:12px; margin-top: 12px;">
+              <button type="submit" class="btn btn-primary">Save Product Listing</button>
+              <button type="button" id="cancel-product-btn" class="btn btn-secondary">Cancel</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="card" style="padding: 24px;">
+          <table class="table-list" id="products-management-table">
             <thead>
-              <tr>
-                <th>Booking ID</th>
-                <th>Customer</th>
-                <th>Product</th>
-                <th>Qty</th>
-                <th>Fulfillment</th>
-                <th>Total</th>
-                <th>Status</th>
-              </tr>
+              <tr><th>Product</th><th>Category</th><th>Stock</th><th>Price/Crate</th><th>Actions</th></tr>
             </thead>
             <tbody>
-              <tr>
-                <td colspan="7" style="color: var(--color-text-muted); padding: 18px 0; text-align: center;">Loading bookings...</td>
-              </tr>
+              <tr><td colspan="5" style="color: var(--color-text-muted); padding: 18px 0; text-align: center;">Loading listings...</td></tr>
             </tbody>
           </table>
         </div>
       </div>
-      <div style="display:grid; gap:24px;">
-        <div class="quick-card card" style="background: var(--color-primary); color: #fff;">
-          <h3>Quick Manage</h3>
-          <p>Manage all product listings and respond to booking requests from one dashboard.</p>
-          <a class="btn btn-secondary" href="#">≡ Product Management</a>
-        </div>
-        <div class="profile-card card">
-          <div class="card-header"><div><h3 id="farm-owner-name">Farm Owner</h3><span id="farm-owner-role" style="color: var(--color-text-muted);">Premium Seller</span></div><span class="avatar-circle" style="background: var(--color-accent);">FO</span></div>
-          <p style="color: var(--color-text-muted);">Manage your listings, inventory, and booking requests with the Egg Source seller portal.</p>
-          <div class="profile-actions"><button class="btn btn-ghost">Edit Profile</button><button class="btn btn-primary">Upgrade Account</button></div>
+
+      <!-- TAB: INVENTORY -->
+      <div id="tab-inventory" class="tab-content hidden">
+        <section class="stats-grid" style="margin-bottom: 24px;">
+          <div>
+            <h1>Live Stock Inventory</h1>
+            <p style="color: var(--color-text-muted);">Quickly adjust available stock counts for your active items.</p>
+          </div>
+        </section>
+        <div class="card" style="padding: 24px;">
+          <table class="table-list" id="inventory-edit-table">
+            <thead>
+              <tr><th>Product Name</th><th>Category</th><th>Current Stock</th><th>Quick Adjustment</th></tr>
+            </thead>
+            <tbody>
+              <tr><td colspan="4" style="color: var(--color-text-muted); padding: 18px 0; text-align: center;">Loading products...</td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
-    </section>
-  </main>
+
+      <!-- TAB: BOOKING REQUESTS -->
+      <div id="tab-requests" class="tab-content hidden">
+        <section class="stats-grid" style="margin-bottom: 24px;">
+          <div>
+            <h1>Customer Booking Requests</h1>
+            <p style="color: var(--color-text-muted);">Review orders placed by verified buyers and manage delivery dispatching.</p>
+          </div>
+        </section>
+        <div class="card" style="padding: 24px;">
+          <table class="table-list" id="requests-full-table">
+            <thead>
+              <tr>
+                <th>Booking ID</th>
+                <th>Customer Name</th>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Delivery Address</th>
+                <th>Fulfillment</th>
+                <th>Total Value</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td colspan="9" style="color: var(--color-text-muted); padding: 18px 0; text-align: center;">Loading requests...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
   <script type="module" src="/components/layout/navbar.js"></script>
   <script type="module" src="/pages/dashboard-farm.js"></script>
 </body>

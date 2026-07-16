@@ -10,6 +10,8 @@ const searchQuerySchema = Joi.object({
   maxPrice: Joi.number().min(0).optional(),
   deliveryAvailable: Joi.boolean().optional(),
   stockAvailable: Joi.boolean().optional(),
+  farmType: Joi.string().valid("farmer", "depot").optional(),
+  search: Joi.string().trim().allow("").optional(),
   page: Joi.number().integer().min(1).optional(),
   limit: Joi.number().integer().min(1).max(100).optional(),
 })

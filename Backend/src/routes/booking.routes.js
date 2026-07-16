@@ -26,7 +26,7 @@ router.get("/my", bookingController.getBuyerBookings);
 // Farm owner gets bookings for their farms
 router.get(
   "/farm",
-  restrictTo(ROLES.FARM_OWNER, ROLES.ADMIN),
+  restrictTo(ROLES.FARM_OWNER, ROLES.SUPER_ADMIN),
   bookingController.getFarmBookings
 );
 
@@ -36,7 +36,7 @@ router.get("/:id", bookingController.getBookingById);
 // Farm owner / admin updates booking status
 router.patch(
   "/:id/status",
-  restrictTo(ROLES.FARM_OWNER, ROLES.ADMIN),
+  restrictTo(ROLES.FARM_OWNER, ROLES.SUPER_ADMIN),
   validate(updateStatusSchema),
   bookingController.updateBookingStatus
 );

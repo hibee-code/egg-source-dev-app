@@ -18,12 +18,17 @@ const register = catchAsync(async (req, res) => {
     await User.findByIdAndUpdate(user._id, { isVerified: true });
 
     try {
-      const loginResult = await authService.login(req.body.email, req.body.password, res);
+      const loginResult = await authService.login(
+        req.body.email,
+        req.body.password,
+        res,
+        req.ip,
+        req.headers["user-agent"]
+      );
       if (loginResult.accessToken) {
         response.accessToken = loginResult.accessToken;
       }
     } catch (err) {
-      // If auto-login fails for any reason in dev, still return the user
       console.warn("Dev auto-login failed:", err.message);
     }
   }
@@ -37,12 +42,27 @@ const register = catchAsync(async (req, res) => {
  * @access  Public
  */
 const login = catchAsync(async (req, res) => {
-  const { email, password } = req.body;
-  const { user, accessToken } = await authService.login(email, password, res);
+  const { email, password, latitude, longitude } = req.body;
+  const { user, accessToken } = await authService.login(
+    email,
+    password,
+    res,
+    req.ip,
+    req.headers["user-agent"],
+    latitude,
+    longitude
+  );
+
+  const redirects = {
+    SUPER_ADMIN: "/pages/dashboard-admin.html",
+    FARM_OWNER: "/pages/dashboard-farm.html",
+    CUSTOMER: "/pages/dashboard-buyer.html",
+  };
 
   sendSuccess(res, 200, "Login successful", {
     user,
     accessToken,
+    redirectUrl: redirects[user.role] || "/pages/dashboard-buyer.html",
   });
 });
 
@@ -52,7 +72,12 @@ const login = catchAsync(async (req, res) => {
  * @access  Protected
  */
 const logout = catchAsync(async (req, res) => {
-  await authService.logout(req.user._id, res);
+  await authService.logout(
+    req.user._id,
+    res,
+    req.ip,
+    req.headers["user-agent"]
+  );
 
   sendSuccess(res, 200, "Logged out successfully");
 });
@@ -64,7 +89,12 @@ const logout = catchAsync(async (req, res) => {
  */
 const refreshToken = catchAsync(async (req, res) => {
   const token = req.cookies?.refreshToken;
-  const { accessToken } = await authService.refreshAccessToken(token, res);
+  const { accessToken } = await authService.refreshAccessToken(
+    token,
+    res,
+    req.ip,
+    req.headers["user-agent"]
+  );
 
   sendSuccess(res, 200, "Token refreshed", { accessToken });
 });

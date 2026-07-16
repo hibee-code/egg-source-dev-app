@@ -85,6 +85,80 @@ let currentPage = 1;
 let totalPages = 1;
 let currentResults = [];
 let currentSort = 'newest';
+let userCoords = null; // keeps track of { latitude, longitude }
+
+const CACHE_KEY = 'egg_source_gps_location';
+const CACHE_EXPIRY_MS = 15 * 60 * 1000; // 15 minutes
+
+const getCachedLocation = () => {
+  try {
+    const cached = sessionStorage.getItem(CACHE_KEY);
+    if (!cached) return null;
+    const { coords, timestamp } = JSON.parse(cached);
+    if (Date.now() - timestamp < CACHE_EXPIRY_MS) {
+      return coords;
+    }
+    sessionStorage.removeItem(CACHE_KEY);
+  } catch (e) {
+    console.error('Error reading cached location:', e);
+  }
+  return null;
+};
+
+const setCachedLocation = (coords) => {
+  try {
+    const data = { coords, timestamp: Date.now() };
+    sessionStorage.setItem(CACHE_KEY, JSON.stringify(data));
+  } catch (e) {
+    console.error('Error writing cached location:', e);
+  }
+};
+
+const clearCachedLocation = () => {
+  try {
+    sessionStorage.removeItem(CACHE_KEY);
+  } catch (e) {
+    console.error('Error clearing cached location:', e);
+  }
+};
+
+const requestGeolocation = () => {
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation) {
+      reject(new Error('Geolocation is not supported by your browser.'));
+      return;
+    }
+    const options = {
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 60000
+    };
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        resolve({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude
+        });
+      },
+      (error) => {
+        let msg = 'Unable to retrieve location.';
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            msg = 'Location permission denied. Please enable it in browser settings.';
+            break;
+          case error.POSITION_UNAVAILABLE:
+            msg = 'Location information is unavailable.';
+            break;
+          case error.TIMEOUT:
+            msg = 'Location request timed out. Please try again.';
+            break;
+        }
+        reject(new Error(msg));
+      },
+      options
+    );
+  });
+};
 
 const calculateDistance = (coord1, coord2) => {
   if (!coord1 || !coord2) return null;
@@ -121,10 +195,17 @@ const renderCard = (farm) => {
   const chip = farm.deliveryAvailable ? '<span class="product-chip chip--success">Delivery</span>' : '<span class="product-chip chip--muted">Pickup</span>';
   
   let distanceHTML = '';
-  const selectedLga = $('#filter-lga')?.value;
-  if (selectedLga && LGA_COORDS[selectedLga]) {
+  if (farm.distance !== undefined && farm.distance !== null) {
+    const dist = farm.distance / 1000;
+    distanceHTML = `
+      <div class="distance-badge">
+        <i data-lucide="map-pin"></i>
+        <span>${dist.toFixed(1)} km away</span>
+      </div>
+    `;
+  } else if (userCoords) {
     const farmCoords = getFarmCoords(farm);
-    const dist = calculateDistance(LGA_COORDS[selectedLga], farmCoords);
+    const dist = calculateDistance([userCoords.longitude, userCoords.latitude], farmCoords);
     if (dist !== null) {
       distanceHTML = `
         <div class="distance-badge">
@@ -133,12 +214,26 @@ const renderCard = (farm) => {
         </div>
       `;
     }
+  } else {
+    const selectedLga = $('#filter-lga')?.value;
+    if (selectedLga && LGA_COORDS[selectedLga]) {
+      const farmCoords = getFarmCoords(farm);
+      const dist = calculateDistance(LGA_COORDS[selectedLga], farmCoords);
+      if (dist !== null) {
+        distanceHTML = `
+          <div class="distance-badge">
+            <i data-lucide="map-pin"></i>
+            <span>${dist.toFixed(1)} km away</span>
+          </div>
+        `;
+      }
+    }
   }
 
   return `
     <article class="product-card" data-id="${farm._id}">
       <div class="product-card__image">
-        <img src="${farm.imageUrl || 'https://images.unsplash.com/photo-1548550023-2bdb3c5beed7?auto=format&fit=crop&q=80&w=900'}" alt="${farm.businessName}" />
+        <img src="${farm.imageUrl || 'https://images.unsplash.com/photo-1506976785307-8732e854ad03?auto=format&fit=crop&q=80&w=900'}" alt="${farm.businessName}" />
         <div class="product-card__badge">${badge}</div>
       </div>
       <div class="product-card__body" style="display: flex; flex-direction: column; flex-grow: 1;">
@@ -184,18 +279,21 @@ const renderMap = (farms, selectedLgaCoord = null) => {
 
   const activeState = $('#filter-state')?.value || 'All States';
   const activeLga = $('#filter-lga')?.value || '';
-  contextText.textContent = activeLga ? `${activeLga}, ${activeState}` : activeState;
-
-  if (!farms || !farms.length) {
-    return;
+  
+  if (userCoords) {
+    const radiusVal = $('#filter-radius')?.value || '10';
+    contextText.textContent = `GPS: Within ${radiusVal} km`;
+  } else {
+    contextText.textContent = activeLga ? `${activeLga}, ${activeState}` : activeState;
   }
 
-  const points = farms.map(farm => {
+  // Define points array
+  const points = (farms || []).map(farm => {
     return {
       id: farm._id,
       name: farm.businessName,
       price: farm.pricePerCrate,
-      rating: farm.rating || 4.8,
+      rating: farm.rating ?? 4.8,
       coords: getFarmCoords(farm),
       isUserCenter: false,
       lga: farm.lga,
@@ -203,16 +301,40 @@ const renderMap = (farms, selectedLgaCoord = null) => {
     };
   });
 
-  if (selectedLgaCoord) {
+  if (userCoords) {
+    points.push({
+      id: 'user-gps-location',
+      name: 'Your Location',
+      coords: [userCoords.longitude, userCoords.latitude],
+      isUserCenter: true
+    });
+    if (userLegend) {
+      userLegend.classList.remove('hidden');
+      userLegend.innerHTML = `
+        <span class="legend-dot legend-dot--user"></span>
+        Your Location
+      `;
+    }
+  } else if (selectedLgaCoord) {
     points.push({
       id: 'selected-center',
       name: `Selected Center: ${activeLga}`,
       coords: selectedLgaCoord,
       isUserCenter: true
     });
-    if (userLegend) userLegend.style.display = 'flex';
+    if (userLegend) {
+      userLegend.classList.remove('hidden');
+      userLegend.innerHTML = `
+        <span class="legend-dot legend-dot--user"></span>
+        Selected Center
+      `;
+    }
   } else {
-    if (userLegend) userLegend.style.display = 'none';
+    if (userLegend) userLegend.classList.add('hidden');
+  }
+
+  if (!points.length) {
+    return;
   }
 
   const lats = points.map(p => p.coords[1]);
@@ -327,8 +449,6 @@ const applyFilters = async (page = 1) => {
 
   try {
     const filters = {
-      state: $('#filter-state')?.value,
-      lga: $('#filter-lga')?.value,
       category: $('#filter-category')?.value,
       minPrice: $('#filter-min-price')?.value,
       maxPrice: $('#filter-max-price')?.value,
@@ -337,6 +457,17 @@ const applyFilters = async (page = 1) => {
       page,
       limit: 9,
     };
+
+    if (userCoords) {
+      filters.latitude = userCoords.latitude;
+      filters.longitude = userCoords.longitude;
+      const radiusVal = $('#filter-radius')?.value || '10';
+      filters.maxDistance = parseFloat(radiusVal) * 1000; // to meters
+    } else {
+      filters.state = $('#filter-state')?.value;
+      filters.lga = $('#filter-lga')?.value;
+    }
+
     const response = await SearchAPI.searchPoultries(filters);
     let farms = [];
     let apiTotalPages = 1;
@@ -351,10 +482,23 @@ const applyFilters = async (page = 1) => {
 
     const selectedLga = $('#filter-lga')?.value;
     let selectedLgaCoord = null;
-    if (selectedLga && LGA_COORDS[selectedLga]) {
+    if (userCoords) {
+      farms.forEach(farm => {
+        if (farm.distance === undefined || farm.distance === null) {
+          const farmCoords = getFarmCoords(farm);
+          const distKm = calculateDistance([userCoords.longitude, userCoords.latitude], farmCoords);
+          if (distKm !== null) {
+            farm.distance = distKm * 1000; // in meters
+          }
+        }
+      });
+    } else if (selectedLga && LGA_COORDS[selectedLga]) {
       selectedLgaCoord = LGA_COORDS[selectedLga];
       farms.forEach(farm => {
-        farm.distance = calculateDistance(selectedLgaCoord, getFarmCoords(farm));
+        const distKm = calculateDistance(selectedLgaCoord, getFarmCoords(farm));
+        if (distKm !== null) {
+          farm.distance = distKm * 1000; // in meters
+        }
       });
     }
 
@@ -371,14 +515,70 @@ const applyFilters = async (page = 1) => {
   }
 };
 
+const toggleGpsUI = (active) => {
+  const btnGeoloc = $('#btn-geolocation');
+  const gpsBadge = $('#gps-status-badge');
+  const radiusGrp = $('#filter-radius-group');
+  const stateSel = $('#filter-state');
+  const lgaSel = $('#filter-lga');
+
+  if (active) {
+    if (btnGeoloc) btnGeoloc.classList.add('hidden');
+    if (gpsBadge) gpsBadge.classList.remove('hidden');
+    if (radiusGrp) radiusGrp.classList.remove('hidden');
+    if (stateSel) { stateSel.disabled = true; stateSel.value = ''; }
+    if (lgaSel) { lgaSel.disabled = true; lgaSel.innerHTML = '<option value="">All LGAs</option>'; }
+  } else {
+    if (btnGeoloc) btnGeoloc.classList.remove('hidden');
+    if (gpsBadge) gpsBadge.classList.add('hidden');
+    if (radiusGrp) radiusGrp.classList.add('hidden');
+    if (stateSel) stateSel.disabled = false;
+    if (lgaSel) lgaSel.disabled = false;
+  }
+};
+
 const initPage = async () => {
   renderNavbar({ searchBar: true });
+
+  // Initialize Lucide icons for static elements (button icons, map header)
+  if (window.lucide) {
+    window.lucide.createIcons();
+  }
+
   $('#filter-state')?.addEventListener('change', loadLgas);
   $('#filter-apply')?.addEventListener('click', () => applyFilters(1));
+  $('#filter-radius')?.addEventListener('change', () => applyFilters(1));
   $('#filter-sort')?.addEventListener('change', (event) => {
     currentSort = event.target.value;
     renderResults(sortResults(currentResults));
     renderMap(currentResults, ($('#filter-lga')?.value && LGA_COORDS[$('#filter-lga').value]) || null);
+  });
+
+  // Geolocation trigger
+  $('#btn-geolocation')?.addEventListener('click', async () => {
+    const btn = $('#btn-geolocation');
+    Loading.show(btn, 'Locating...');
+    try {
+      const coords = await requestGeolocation();
+      userCoords = coords;
+      setCachedLocation(coords);
+      toggleGpsUI(true);
+      Toast.success('Location updated successfully');
+      applyFilters(1);
+    } catch (err) {
+      Toast.error(err.message || 'Could not access location');
+    } finally {
+      Loading.hide(btn);
+    }
+  });
+
+  // Clear Geolocation
+  $('#btn-clear-gps')?.addEventListener('click', () => {
+    userCoords = null;
+    clearCachedLocation();
+    toggleGpsUI(false);
+    loadLgas();
+    applyFilters(1);
   });
 
   $('#filter-clear')?.addEventListener('click', () => {
@@ -391,8 +591,16 @@ const initPage = async () => {
         field.value = '';
       }
     });
-    document.getElementById('filter-delivery').checked = false;
-    document.getElementById('filter-stock').checked = false;
+    const delivery = document.getElementById('filter-delivery');
+    if (delivery) delivery.checked = false;
+    const stock = document.getElementById('filter-stock');
+    if (stock) stock.checked = false;
+    
+    // Clear GPS as well
+    userCoords = null;
+    clearCachedLocation();
+    toggleGpsUI(false);
+
     loadLgas();
     applyFilters(1);
   });
@@ -402,11 +610,24 @@ const initPage = async () => {
     applyFilters(1);
   });
 
+  // Check cache for existing GPS permission/location
+  const cachedCoords = getCachedLocation();
+  if (cachedCoords) {
+    userCoords = cachedCoords;
+    toggleGpsUI(true);
+  }
+
   const params = new URLSearchParams(window.location.search);
   const state = params.get('state');
   const category = params.get('category');
-  if (state) $('#filter-state').value = state;
-  if (category) $('#filter-category').value = category;
+  
+  if (state && !userCoords) {
+    $('#filter-state').value = state;
+  }
+  if (category) {
+    $('#filter-category').value = category;
+  }
+  
   loadLgas();
   applyFilters(1);
 };

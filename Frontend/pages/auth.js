@@ -65,6 +65,11 @@ const submitRegister = async (event) => {
   try {
     const password = $('#register-password').value.trim();
     const confirm = $('#register-confirm').value.trim();
+    if (!password || !confirm) {
+      Toast.error('Please fill in both password fields');
+      Loading.hide(btn);
+      return;
+    }
     if (password !== confirm) {
       Toast.error('Passwords do not match');
       Loading.hide(btn);
@@ -77,6 +82,7 @@ const submitRegister = async (event) => {
       email: $('#register-email').value.trim(),
       phone: $('#register-phone').value.trim(),
       password,
+      confirmPassword: confirm,
       role: $('#register-role').value,
     };
     const response = await AuthAPI.register(payload);

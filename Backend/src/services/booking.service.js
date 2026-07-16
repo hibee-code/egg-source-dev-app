@@ -89,7 +89,7 @@ class BookingService {
       booking.poultryId._id || booking.poultryId,
       userId
     );
-    const isAdmin = userRole === "ADMIN";
+    const isAdmin = userRole === "SUPER_ADMIN";
 
     if (!isBuyer && !isFarmOwner && !isAdmin) {
       throw ApiError.forbidden("You do not have permission to view this booking");
@@ -134,7 +134,7 @@ class BookingService {
       booking.poultryId._id || booking.poultryId,
       userId
     );
-    const isAdmin = userRole === "ADMIN";
+    const isAdmin = userRole === "SUPER_ADMIN";
 
     if (!isFarmOwner && !isAdmin) {
       throw ApiError.forbidden(
@@ -185,7 +185,9 @@ class BookingService {
    */
   async _isOwnerOfFarm(poultryId, userId) {
     const poultry = await poultryRepository.findById(poultryId);
-    return poultry && poultry.ownerId.toString() === userId.toString();
+    if (!poultry) return false;
+    const ownerIdStr = poultry.ownerId._id?.toString() || poultry.ownerId.toString();
+    return ownerIdStr === userId.toString();
   }
 }
 

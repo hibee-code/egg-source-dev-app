@@ -35,7 +35,8 @@ class PoultryService {
     }
 
     // Authorization: Must be owner or admin
-    if (poultry.ownerId.toString() !== userId.toString() && userRole !== "ADMIN") {
+    const ownerIdStr = poultry.ownerId._id?.toString() || poultry.ownerId.toString();
+    if (ownerIdStr !== userId.toString() && userRole !== "SUPER_ADMIN") {
       throw ApiError.forbidden("You do not have permission to update this poultry farm");
     }
 
@@ -49,7 +50,8 @@ class PoultryService {
     }
 
     // Authorization: Must be owner or admin
-    if (poultry.ownerId.toString() !== userId.toString() && userRole !== "ADMIN") {
+    const ownerIdStr = poultry.ownerId._id?.toString() || poultry.ownerId.toString();
+    if (ownerIdStr !== userId.toString() && userRole !== "SUPER_ADMIN") {
       throw ApiError.forbidden("You do not have permission to delete this poultry farm");
     }
 

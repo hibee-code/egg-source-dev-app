@@ -1,5 +1,7 @@
 const { Router } = require("express");
 const authRoutes = require("./auth.routes");
+const invitationRoutes = require("./invitation.routes");
+const adminRoutes = require("./admin.routes");
 
 const router = Router();
 
@@ -14,12 +16,7 @@ router.get("/health", (_req, res) => {
 
 // ── Mount feature routes ──────────────────────────────────
 router.use("/auth", authRoutes);
-
-// Future modules will be mounted here:
-// router.use("/farms", farmRoutes);
-// router.use("/depots", depotRoutes);
-// router.use("/products", productRoutes);
-// router.use("/orders", orderRoutes);
-// router.use("/bookings", bookingRoutes);
+router.use("/invitations", invitationRoutes);
+router.use("/admin", adminRoutes);
 
 module.exports = router;
