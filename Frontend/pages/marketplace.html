@@ -42,6 +42,32 @@
           </div>
 
           <div class="filter-group">
+            <label class="label" for="filter-search-name">Search by Name</label>
+            <div style="position: relative; display: flex; align-items: center;">
+              <input id="filter-search-name" type="text" class="input-field" placeholder="Search farm name..." style="padding-left: 36px; width: 100%;">
+              <i data-lucide="search" style="position: absolute; left: 12px; width: 16px; height: 16px; color: var(--color-text-muted); pointer-events: none;"></i>
+            </div>
+          </div>
+
+          <div class="filter-group">
+            <label class="label">Listing Type</label>
+            <div class="farm-type-selector" style="display: flex; flex-direction: column; gap: 8px;">
+              <button type="button" class="type-pill active" data-type="">
+                <i data-lucide="layout-grid"></i>
+                <span>All Listings</span>
+              </button>
+              <button type="button" class="type-pill" data-type="farmer">
+                <i data-lucide="sprout"></i>
+                <span>Poultry Farmers</span>
+              </button>
+              <button type="button" class="type-pill" data-type="depot">
+                <i data-lucide="warehouse"></i>
+                <span>Egg Depots</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="filter-group">
             <label class="label" for="filter-state">State</label>
             <select id="filter-state" class="select-field">
               <option value="">All states</option>
@@ -82,31 +108,6 @@
               <option value="50">Within 50 km</option>
               <option value="100">Within 100 km</option>
             </select>
-          </div>
-
-          <div class="filter-group">
-            <label class="label" for="filter-min-price">Price min</label>
-            <input id="filter-min-price" type="number" class="input-field" placeholder="₦0">
-          </div>
-
-          <div class="filter-group">
-            <label class="label" for="filter-max-price">Price max</label>
-            <input id="filter-max-price" type="number" class="input-field" placeholder="₦100000">
-          </div>
-
-          <div class="filter-group">
-            <label class="label">Delivery</label>
-            <label class="filter-group" style="gap: 12px; display:flex; align-items:center;"><input id="filter-delivery" type="checkbox"> Delivery available</label>
-          </div>
-
-          <div class="filter-group">
-            <label class="label">Stock</label>
-            <label class="filter-group" style="gap: 12px; display:flex; align-items:center;"><input id="filter-stock" type="checkbox"> In stock only</label>
-          </div>
-
-          <div class="filter-group">
-            <label class="label" for="filter-category">Category</label>
-            <input id="filter-category" type="text" class="input-field" placeholder="Eggs">
           </div>
 
           <button id="filter-apply" class="btn btn-primary btn-pill filter-actions" type="button">Apply Filters</button>

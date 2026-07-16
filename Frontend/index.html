@@ -21,13 +21,13 @@
         <span class="hero__eyebrow">Fresh poultry supply</span>
         <h1 class="hero__title">Find Fresh Eggs From <strong>Trusted Poultry Farms</strong> Near You</h1>
         <p class="hero__copy">Search local farms, compare prices, and book safe, verified poultry supply from trusted producers.</p>
-        <form id="hero-search-form" class="hero-search-bar">
+        <form id="hero-search-form" class="hero-search-bar" style="cursor: default;">
           <div class="hero-search-bar__input-wrapper">
             <i data-lucide="map-pin" class="hero-search-bar__icon"></i>
-            <input id="hero-location" type="text" class="input-field" placeholder="Enter state or city (e.g. Lagos)" required>
+            <input id="hero-location" type="text" class="input-field" placeholder="Enter state or city (e.g. Lagos)" readonly style="cursor: default; background: transparent;">
           </div>
           <input type="hidden" id="hero-category" value="Eggs">
-          <button class="btn btn-accent" type="submit">
+          <button class="btn btn-accent" type="button" style="cursor: default;">
             <i data-lucide="search" style="width: 18px; height: 18px;"></i>
             <span>Search Farms</span>
           </button>
@@ -43,16 +43,6 @@
           <h2 style="margin: 8px 0 0; color: var(--color-primary); font-size: 2.2rem; font-weight: var(--font-weight-heavy);">4.9/5</h2>
         </div>
       </div>
-    </section>
-
-    <section class="section">
-      <div class="section-title">
-        <div>
-          <h2>Featured Farms</h2>
-          <p>Explore top-rated poultry farms with verified ratings and fast delivery.</p>
-        </div>
-      </div>
-      <div id="featured-farms" class="featured-grid"></div>
     </section>
 
     <section class="section how-it-works">
@@ -120,34 +110,44 @@
 
     <footer class="footer">
       <div class="footer-grid">
-        <div>
-          <h3>Egg Source</h3>
-          <p>Fresh poultry sourcing made easy.</p>
+        <div class="footer-brand-column">
+          <div class="logo" style="display: inline-flex; align-items: center; gap: 8px; font-family: 'Outfit', sans-serif; font-size: 1.4rem; font-weight: 800; color: #fff; margin-bottom: 16px;">
+            <img src="/assets/images/logo-egg.png" alt="Egg Source Logo" style="width: 32px; height: 32px; object-fit: contain; filter: brightness(0) invert(1);">
+            <span>Egg <span style="color: var(--color-accent);">Source</span></span>
+          </div>
+          <p style="color: var(--color-text-muted); line-height: 1.6; font-size: 0.92rem; max-width: 260px; margin: 0;">
+            Fresh poultry sourcing made easy. Connecting verified producers and buyers through secure escrow transactions.
+          </p>
         </div>
         <div>
-          <h3>Product</h3>
-          <a href="/pages/marketplace.html">Marketplace</a>
-          <a href="/pages/auth.html">Login</a>
+          <h3 style="font-size: 0.95rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #fff; margin-bottom: 20px; margin-top: 0;">Product</h3>
+          <a href="/pages/marketplace.html" style="color: var(--color-text-muted); text-decoration: none; display: block; margin-bottom: 12px; font-size: 0.92rem; transition: color var(--transition);">Marketplace</a>
+          <a href="/pages/marketplace.html" style="color: var(--color-text-muted); text-decoration: none; display: block; margin-bottom: 12px; font-size: 0.92rem; transition: color var(--transition);">Sourcing Directory</a>
+          <a href="#" style="color: var(--color-text-muted); text-decoration: none; display: block; margin-bottom: 12px; font-size: 0.92rem; transition: color var(--transition);">Escrow Protection</a>
+          <a href="#" style="color: var(--color-text-muted); text-decoration: none; display: block; margin-bottom: 12px; font-size: 0.92rem; transition: color var(--transition);">Booking Manager</a>
         </div>
         <div>
-          <h3>Company</h3>
-          <a href="#">About</a>
-          <a href="#">Careers</a>
+          <h3 style="font-size: 0.95rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #fff; margin-bottom: 20px; margin-top: 0;">Community</h3>
+          <a href="#" style="color: var(--color-text-muted); text-decoration: none; display: block; margin-bottom: 12px; font-size: 0.92rem; transition: color var(--transition);">Farms Network</a>
+          <a href="#" style="color: var(--color-text-muted); text-decoration: none; display: block; margin-bottom: 12px; font-size: 0.92rem; transition: color var(--transition);">Buyer Hubs</a>
+          <a href="#" style="color: var(--color-text-muted); text-decoration: none; display: block; margin-bottom: 12px; font-size: 0.92rem; transition: color var(--transition);">Partner Program</a>
         </div>
         <div>
-          <h3>Legal</h3>
-          <a href="#">Terms</a>
-          <a href="#">Privacy</a>
+          <h3 style="font-size: 0.95rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #fff; margin-bottom: 20px; margin-top: 0;">Company</h3>
+          <a href="#" style="color: var(--color-text-muted); text-decoration: none; display: block; margin-bottom: 12px; font-size: 0.92rem; transition: color var(--transition);">About Us</a>
+          <a href="#" style="color: var(--color-text-muted); text-decoration: none; display: block; margin-bottom: 12px; font-size: 0.92rem; transition: color var(--transition);">Careers</a>
+          <a href="mailto:support@eggsource.dev" style="color: var(--color-text-muted); text-decoration: none; display: block; margin-bottom: 12px; font-size: 0.92rem; transition: color var(--transition);">Contact Support</a>
         </div>
         <div>
-          <h3>Social</h3>
-          <a href="#">Instagram</a>
-          <a href="#">Twitter</a>
+          <h3 style="font-size: 0.95rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #fff; margin-bottom: 20px; margin-top: 0;">Legal</h3>
+          <a href="#" style="color: var(--color-text-muted); text-decoration: none; display: block; margin-bottom: 12px; font-size: 0.92rem; transition: color var(--transition);">Privacy Policy</a>
+          <a href="#" style="color: var(--color-text-muted); text-decoration: none; display: block; margin-bottom: 12px; font-size: 0.92rem; transition: color var(--transition);">Terms of Service</a>
+          <a href="#" style="color: var(--color-text-muted); text-decoration: none; display: block; margin-bottom: 12px; font-size: 0.92rem; transition: color var(--transition);">Cookie Policy</a>
         </div>
       </div>
-      <div class="footer-bottom">
-        <span>© 2026 Egg Source</span>
-        <span>🛡 Sustainable Farming Certified</span>
+      <div class="footer-bottom" style="margin-top: 48px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 24px; display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; color: var(--color-text-muted);">
+        <span>© 2026 Egg Source. All rights reserved.</span>
+        <span>Built for farmers, by poultry sourcing specialists</span>
       </div>
     </footer>
   </main>

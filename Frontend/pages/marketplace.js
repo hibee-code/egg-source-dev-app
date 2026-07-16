@@ -194,40 +194,10 @@ const renderCard = (farm) => {
   const badge = farm.verified ? '<span class="badge-pill badge-pill--success">✓ Verified</span>' : farm.isPremium ? '<span class="badge-pill badge-pill--accent">PREMIUM</span>' : '';
   const chip = farm.deliveryAvailable ? '<span class="product-chip chip--success">Delivery</span>' : '<span class="product-chip chip--muted">Pickup</span>';
   
-  let distanceHTML = '';
+  let distanceHtml = '';
   if (farm.distance !== undefined && farm.distance !== null) {
-    const dist = farm.distance / 1000;
-    distanceHTML = `
-      <div class="distance-badge">
-        <i data-lucide="map-pin"></i>
-        <span>${dist.toFixed(1)} km away</span>
-      </div>
-    `;
-  } else if (userCoords) {
-    const farmCoords = getFarmCoords(farm);
-    const dist = calculateDistance([userCoords.longitude, userCoords.latitude], farmCoords);
-    if (dist !== null) {
-      distanceHTML = `
-        <div class="distance-badge">
-          <i data-lucide="map-pin"></i>
-          <span>${dist.toFixed(1)} km away</span>
-        </div>
-      `;
-    }
-  } else {
-    const selectedLga = $('#filter-lga')?.value;
-    if (selectedLga && LGA_COORDS[selectedLga]) {
-      const farmCoords = getFarmCoords(farm);
-      const dist = calculateDistance(LGA_COORDS[selectedLga], farmCoords);
-      if (dist !== null) {
-        distanceHTML = `
-          <div class="distance-badge">
-            <i data-lucide="map-pin"></i>
-            <span>${dist.toFixed(1)} km away</span>
-          </div>
-        `;
-      }
-    }
+    const distKm = (farm.distance / 1000).toFixed(1);
+    distanceHtml = `<span style="color: var(--color-primary); font-weight: 600; font-size: 0.8rem; display: flex; align-items: center; gap: 4px;"><i data-lucide="map-pin" style="width: 12px; height: 12px;"></i> ${distKm} km away</span>`;
   }
 
   return `
@@ -237,10 +207,12 @@ const renderCard = (farm) => {
         <div class="product-card__badge">${badge}</div>
       </div>
       <div class="product-card__body" style="display: flex; flex-direction: column; flex-grow: 1;">
-        <div class="badge-pill badge-pill--muted" style="width: fit-content;">${farm.category || 'Poultry'}</div>
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+          <div class="badge-pill badge-pill--muted" style="width: fit-content;">${farm.farmType === 'depot' ? 'Egg Depot' : 'Poultry Farmer'}</div>
+          ${distanceHtml}
+        </div>
         <h3 class="product-card__title" style="margin: 8px 0 4px;">${farm.businessName}</h3>
         <div class="product-card__meta" style="color: var(--color-text-muted); font-size: 0.88rem;">${farm.lga || 'LGA'}, ${farm.state || 'State'}</div>
-        ${distanceHTML}
         <div class="product-card__price" style="margin-top: 12px; margin-bottom: 12px; font-size: 1.25rem; font-weight: var(--font-weight-bold); color: var(--color-primary);">${Format.currency(farm.pricePerCrate || 4200)}</div>
         <div style="margin-top: auto; display: flex; align-items: center; justify-content: space-between; gap: 12px;">
           ${chip}
@@ -270,21 +242,24 @@ const renderResults = (farms) => {
   }
 };
 
-const renderMap = (farms, selectedLgaCoord = null) => {
+const renderMap = (farms, centerCoord = null) => {
   const root = $('#map-markers-root');
   const contextText = $('#map-location-context');
   const userLegend = $('#user-location-legend');
   if (!root) return;
   root.innerHTML = '';
 
-  const activeState = $('#filter-state')?.value || 'All States';
-  const activeLga = $('#filter-lga')?.value || '';
-  
+  const activeState = $('#filter-state')?.value;
+  const activeLga = $('#filter-lga')?.value;
+
   if (userCoords) {
-    const radiusVal = $('#filter-radius')?.value || '10';
-    contextText.textContent = `GPS: Within ${radiusVal} km`;
+    contextText.textContent = 'Nearby (GPS Active)';
+  } else if (activeLga) {
+    contextText.textContent = `${activeLga}, ${activeState}`;
+  } else if (activeState) {
+    contextText.textContent = activeState;
   } else {
-    contextText.textContent = activeLga ? `${activeLga}, ${activeState}` : activeState;
+    contextText.textContent = 'All States';
   }
 
   // Define points array
@@ -301,34 +276,24 @@ const renderMap = (farms, selectedLgaCoord = null) => {
     };
   });
 
+  // If we have centerCoord (e.g. LGA) or user GPS coordinates, add it as a special target point on the map
+  let mapCenter = null;
   if (userCoords) {
+    mapCenter = [userCoords.longitude, userCoords.latitude];
+  } else if (centerCoord) {
+    mapCenter = centerCoord;
+  }
+
+  if (mapCenter) {
     points.push({
-      id: 'user-gps-location',
-      name: 'Your Location',
-      coords: [userCoords.longitude, userCoords.latitude],
-      isUserCenter: true
+      id: 'user-center',
+      name: userCoords ? 'Your Current Location' : `${activeLga} Center`,
+      coords: mapCenter,
+      isUserCenter: true,
+      lga: '',
+      state: ''
     });
-    if (userLegend) {
-      userLegend.classList.remove('hidden');
-      userLegend.innerHTML = `
-        <span class="legend-dot legend-dot--user"></span>
-        Your Location
-      `;
-    }
-  } else if (selectedLgaCoord) {
-    points.push({
-      id: 'selected-center',
-      name: `Selected Center: ${activeLga}`,
-      coords: selectedLgaCoord,
-      isUserCenter: true
-    });
-    if (userLegend) {
-      userLegend.classList.remove('hidden');
-      userLegend.innerHTML = `
-        <span class="legend-dot legend-dot--user"></span>
-        Selected Center
-      `;
-    }
+    if (userLegend) userLegend.classList.remove('hidden');
   } else {
     if (userLegend) userLegend.classList.add('hidden');
   }
@@ -363,17 +328,19 @@ const renderMap = (farms, selectedLgaCoord = null) => {
     const y = 100 - (((point.coords[1] - minLat) / latRange) * 100);
 
     const marker = document.createElement('div');
-    marker.className = `map-marker${point.isUserCenter ? ' active' : ''}`;
+    marker.className = 'map-marker';
     marker.style.left = `${x}%`;
     marker.style.top = `${y}%`;
     marker.dataset.id = point.id;
 
     if (point.isUserCenter) {
       marker.innerHTML = `
-        <div class="marker-pin marker-pin--center"></div>
+        <div class="marker-pulse marker-pulse--user"></div>
+        <div class="marker-pin marker-pin--user">
+          <span class="marker-inner">📍</span>
+        </div>
         <div class="marker-tooltip">
-          <h4 class="marker-tooltip__title" style="white-space: normal;">${point.name}</h4>
-          <div class="marker-tooltip__meta">Search Target</div>
+          <h4 class="marker-tooltip__title" style="color: var(--color-primary);">${point.name}</h4>
         </div>
       `;
     } else {
@@ -426,11 +393,32 @@ const loadLgas = () => {
   });
 };
 
+const toggleGpsUI = (active) => {
+  const btnGeoloc = $('#btn-geolocation');
+  const gpsBadge = $('#gps-status-badge');
+  const radiusGrp = $('#filter-radius-group');
+  const stateSel = $('#filter-state');
+  const lgaSel = $('#filter-lga');
+
+  if (active) {
+    if (btnGeoloc) btnGeoloc.classList.add('hidden');
+    if (gpsBadge) gpsBadge.classList.remove('hidden');
+    if (radiusGrp) radiusGrp.classList.remove('hidden');
+    if (stateSel) { stateSel.disabled = true; stateSel.value = ''; }
+    if (lgaSel) { lgaSel.disabled = true; lgaSel.innerHTML = '<option value="">All LGAs</option>'; }
+  } else {
+    if (btnGeoloc) btnGeoloc.classList.remove('hidden');
+    if (gpsBadge) gpsBadge.classList.add('hidden');
+    if (radiusGrp) radiusGrp.classList.add('hidden');
+    if (stateSel) stateSel.disabled = false;
+    if (lgaSel) lgaSel.disabled = false;
+  }
+};
+
 const sortResults = (farms) => {
   if (!farms || !farms.length) return farms;
   return farms.slice().sort((a, b) => {
     if (currentSort === 'newest') {
-      // If distance exists, distance-sort by default
       if (a.distance !== undefined && b.distance !== undefined) {
         return a.distance - b.distance;
       }
@@ -438,7 +426,8 @@ const sortResults = (farms) => {
     }
     if (currentSort === 'top') return (b.rating || 0) - (a.rating || 0);
     if (currentSort === 'priceAsc') return (a.pricePerCrate || 0) - (b.pricePerCrate || 0);
-    return (b.pricePerCrate || 0) - (a.pricePerCrate || 0);
+    if (currentSort === 'priceDesc') return (b.pricePerCrate || 0) - (a.pricePerCrate || 0);
+    return 0;
   });
 };
 
@@ -448,12 +437,13 @@ const applyFilters = async (page = 1) => {
   currentPage = page;
 
   try {
+    const selectedTypeBtn = document.querySelector('.type-pill.active');
+    const farmType = selectedTypeBtn ? selectedTypeBtn.dataset.type : '';
+    const searchName = $('#filter-search-name')?.value || '';
+
     const filters = {
-      category: $('#filter-category')?.value,
-      minPrice: $('#filter-min-price')?.value,
-      maxPrice: $('#filter-max-price')?.value,
-      deliveryAvailable: $('#filter-delivery')?.checked,
-      stockAvailable: $('#filter-stock')?.checked,
+      farmType,
+      search: searchName,
       page,
       limit: 9,
     };
@@ -515,35 +505,21 @@ const applyFilters = async (page = 1) => {
   }
 };
 
-const toggleGpsUI = (active) => {
-  const btnGeoloc = $('#btn-geolocation');
-  const gpsBadge = $('#gps-status-badge');
-  const radiusGrp = $('#filter-radius-group');
-  const stateSel = $('#filter-state');
-  const lgaSel = $('#filter-lga');
-
-  if (active) {
-    if (btnGeoloc) btnGeoloc.classList.add('hidden');
-    if (gpsBadge) gpsBadge.classList.remove('hidden');
-    if (radiusGrp) radiusGrp.classList.remove('hidden');
-    if (stateSel) { stateSel.disabled = true; stateSel.value = ''; }
-    if (lgaSel) { lgaSel.disabled = true; lgaSel.innerHTML = '<option value="">All LGAs</option>'; }
-  } else {
-    if (btnGeoloc) btnGeoloc.classList.remove('hidden');
-    if (gpsBadge) gpsBadge.classList.add('hidden');
-    if (radiusGrp) radiusGrp.classList.add('hidden');
-    if (stateSel) stateSel.disabled = false;
-    if (lgaSel) lgaSel.disabled = false;
-  }
-};
-
 const initPage = async () => {
-  renderNavbar({ searchBar: true });
+  renderNavbar({ searchBar: false, hideNavLinks: true });
 
-  // Initialize Lucide icons for static elements (button icons, map header)
   if (window.lucide) {
     window.lucide.createIcons();
   }
+
+  // Type pills event listeners
+  document.querySelectorAll('.type-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.type-pill').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      applyFilters(1);
+    });
+  });
 
   $('#filter-state')?.addEventListener('change', loadLgas);
   $('#filter-apply')?.addEventListener('click', () => applyFilters(1));
@@ -582,31 +558,32 @@ const initPage = async () => {
   });
 
   $('#filter-clear')?.addEventListener('click', () => {
-    ['filter-state', 'filter-lga', 'filter-min-price', 'filter-max-price', 'filter-category'].forEach((id) => {
-      const field = document.getElementById(id);
-      if (!field) return;
-      if (field.type === 'checkbox') {
-        field.checked = false;
-      } else {
-        field.value = '';
+    const searchField = document.getElementById('filter-search-name');
+    if (searchField) searchField.value = '';
+
+    document.querySelectorAll('.type-pill').forEach(btn => {
+      btn.classList.remove('active');
+      if (btn.dataset.type === '') {
+        btn.classList.add('active');
       }
     });
-    const delivery = document.getElementById('filter-delivery');
-    if (delivery) delivery.checked = false;
-    const stock = document.getElementById('filter-stock');
-    if (stock) stock.checked = false;
-    
-    // Clear GPS as well
+
+    ['filter-state', 'filter-lga', 'filter-radius'].forEach((id) => {
+      const field = document.getElementById(id);
+      if (field) {
+        if (id === 'filter-radius') {
+          field.value = '10';
+        } else {
+          field.value = '';
+        }
+      }
+    });
+
     userCoords = null;
     clearCachedLocation();
     toggleGpsUI(false);
-
     loadLgas();
-    applyFilters(1);
-  });
 
-  window.addEventListener('navbar:search', (event) => {
-    $('#filter-category').value = event.detail.query;
     applyFilters(1);
   });
 
@@ -619,15 +596,10 @@ const initPage = async () => {
 
   const params = new URLSearchParams(window.location.search);
   const state = params.get('state');
-  const category = params.get('category');
-  
   if (state && !userCoords) {
     $('#filter-state').value = state;
   }
-  if (category) {
-    $('#filter-category').value = category;
-  }
-  
+
   loadLgas();
   applyFilters(1);
 };

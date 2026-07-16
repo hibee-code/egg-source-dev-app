@@ -3,6 +3,25 @@ import { Auth } from '/assets/js/auth.js';
 import { AuthAPI } from '/assets/js/api.js';
 import { Loading, Toast, $ } from '/assets/js/utils.js';
 
+let userCoordinates = null;
+
+const requestUserLocation = () => {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        userCoordinates = {
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude
+        };
+      },
+      (error) => {
+        console.warn('Geolocation capture failed or denied:', error.message);
+      },
+      { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+    );
+  }
+};
+
 const updateRoleCards = () => {
   const cards = Array.from(document.querySelectorAll('.role-card'));
   cards.forEach((card) => {
@@ -20,6 +39,18 @@ const setTab = (tab) => {
   $('#register-form').classList.toggle('hidden', tab !== 'register');
   $('#tab-login').classList.toggle('active', tab === 'login');
   $('#tab-register').classList.toggle('active', tab === 'register');
+  
+  const loginHeader = $('#login-header-group');
+  const registerHeader = $('#register-header-group');
+  if (loginHeader && registerHeader) {
+    loginHeader.classList.toggle('hidden', tab !== 'login');
+    registerHeader.classList.toggle('hidden', tab !== 'register');
+  }
+
+  const newUrl = `${window.location.pathname}?tab=${tab === 'register' ? 'register' : 'login'}`;
+  window.history.replaceState(null, '', newUrl);
+
+  renderNavbar();
 };
 
 const handlePasswordToggle = () => {
@@ -45,10 +76,15 @@ const submitLogin = async (event) => {
   try {
     const email = $('#login-email').value.trim();
     const password = $('#login-password').value.trim();
-    const response = await AuthAPI.login({ email, password });
+    const payload = { email, password };
+    if (userCoordinates) {
+      payload.latitude = userCoordinates.latitude;
+      payload.longitude = userCoordinates.longitude;
+    }
+    const response = await AuthAPI.login(payload);
     Auth.setToken(response.data.accessToken);
     Auth.setUser(response.data.user);
-    const destination = ['FARM_OWNER', 'ADMIN'].includes(response.data.user.role) ? '/pages/dashboard-farm.html' : '/pages/dashboard-buyer.html';
+    const destination = response.data.redirectUrl || '/pages/dashboard-buyer.html';
     window.location.href = destination;
   } catch (err) {
     Toast.error(err.message || 'Login failed');
@@ -85,11 +121,14 @@ const submitRegister = async (event) => {
       confirmPassword: confirm,
       role: $('#register-role').value,
     };
+    if (userCoordinates) {
+      payload.latitude = userCoordinates.latitude;
+      payload.longitude = userCoordinates.longitude;
+    }
     const response = await AuthAPI.register(payload);
     Auth.setToken(response.data.accessToken);
     Auth.setUser(response.data.user);
-    const destination = ['FARM_OWNER', 'ADMIN'].includes(response.data.user.role) ? '/pages/dashboard-farm.html' : '/pages/dashboard-buyer.html';
-    window.location.href = destination;
+    window.location.href = '/pages/dashboard-buyer.html';
   } catch (err) {
     Toast.error(err.message || 'Registration failed');
   } finally {
@@ -100,9 +139,15 @@ const submitRegister = async (event) => {
 const initPage = () => {
   Auth.redirectIfLoggedIn();
   renderNavbar();
+  requestUserLocation();
 
   $('#tab-login').addEventListener('click', () => setTab('login'));
   $('#tab-register').addEventListener('click', () => setTab('register'));
+  
+  const params = new URLSearchParams(window.location.search);
+  const initialTab = params.get('tab') === 'register' ? 'register' : 'login';
+  setTab(initialTab);
+
   updateRoleCards();
   handlePasswordToggle();
   $('#login-form').addEventListener('submit', submitLogin);

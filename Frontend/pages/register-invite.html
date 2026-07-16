@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Complete Registration — Egg Source</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/tokens.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
+</head>
+<body class="page-auth">
+  <div id="navbar-root"></div>
+  <main class="page">
+    <div class="auth-layout" style="grid-template-columns: 1fr;">
+      <section class="auth-panel" style="max-width: 600px; margin: 40px auto; width: 100%;">
+        
+        <!-- Loading State -->
+        <div id="token-loading" class="auth-card" style="text-align: center; padding: 40px;">
+          <div class="spinner" style="margin: 0 auto 20px; border: 4px solid rgba(31,77,10,0.1); border-top-color: var(--color-primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite;"></div>
+          <h3>Verifying Invitation Token...</h3>
+          <p class="auth-subtitle">Please wait while we check your credentials.</p>
+        </div>
+
+        <!-- Error State -->
+        <div id="token-error" class="auth-card hidden" style="text-align: center; padding: 40px;">
+          <div class="logo-circle" style="background: rgba(220,38,38,0.1); color: #dc2626; width: 60px; height: 60px; border-radius: 50%; display: grid; place-items: center; margin: 0 auto 20px;">
+            <i data-lucide="alert-triangle" style="width: 32px; height: 32px;"></i>
+          </div>
+          <h3 style="color: #dc2626;">Invalid Invitation</h3>
+          <p id="error-message" class="auth-subtitle" style="margin-bottom: 24px;">Your registration link is invalid, has expired, or was already used.</p>
+          <a href="/pages/auth.html" class="btn btn-primary">Return to Sign In</a>
+        </div>
+
+        <!-- Registration Form (Hidden initially) -->
+        <div id="register-container" class="auth-card hidden">
+          <div class="auth-logo-box">
+            <div class="logo-circle" style="background: rgba(31,77,10,0.1); color: var(--color-primary); width: 60px; height: 60px; border-radius: 50%; display: grid; place-items: center; margin: 0 auto 20px;">
+              <i data-lucide="home" style="width: 32px; height: 32px;"></i>
+            </div>
+          </div>
+
+          <h2 class="auth-title">Complete Farm Owner Setup</h2>
+          <p id="invitation-subtitle" class="auth-subtitle">Registering account for poultry farm</p>
+
+          <form id="invite-register-form" class="auth-form" style="margin-top: 24px;">
+            <div class="field-row">
+              <div class="filter-group">
+                <label class="label label-pill" for="first-name">First Name <span class="required-star">*</span></label>
+                <input id="first-name" type="text" class="input-field input-pill" placeholder="Enter first name" required>
+              </div>
+              <div class="filter-group">
+                <label class="label label-pill" for="last-name">Last Name <span class="required-star">*</span></label>
+                <input id="last-name" type="text" class="input-field input-pill" placeholder="Enter last name" required>
+              </div>
+            </div>
+
+            <div class="filter-group">
+              <label class="label label-pill" for="phone">Phone Number <span class="required-star">*</span></label>
+              <input id="phone" type="tel" class="input-field input-pill" placeholder="e.g. 08031234567" required>
+            </div>
+
+            <div class="field-row">
+              <div class="filter-group">
+                <label class="label label-pill" for="state">State <span class="required-star">*</span></label>
+                <input id="state" type="text" class="input-field input-pill" placeholder="e.g. Lagos" required>
+              </div>
+              <div class="filter-group">
+                <label class="label label-pill" for="lga">LGA <span class="required-star">*</span></label>
+                <input id="lga" type="text" class="input-field input-pill" placeholder="e.g. Ikeja" required>
+              </div>
+            </div>
+
+            <div class="filter-group">
+              <label class="label label-pill" for="address">Street Address <span class="required-star">*</span></label>
+              <input id="address" type="text" class="input-field input-pill" placeholder="Enter farm street address" required>
+            </div>
+
+            <div class="field-row">
+              <div class="filter-group">
+                <label class="label label-pill" for="latitude">Latitude (Auto-detected)</label>
+                <input id="latitude" type="number" step="any" class="input-field input-pill" placeholder="Detecting location..." readonly style="background-color: #f1f5f9; color: #64748b; cursor: not-allowed;">
+              </div>
+              <div class="filter-group">
+                <label class="label label-pill" for="longitude">Longitude (Auto-detected)</label>
+                <input id="longitude" type="number" step="any" class="input-field input-pill" placeholder="Detecting location..." readonly style="background-color: #f1f5f9; color: #64748b; cursor: not-allowed;">
+              </div>
+            </div>
+
+            <div class="filter-group">
+              <label class="label label-pill" for="password">Password <span class="required-star">*</span></label>
+              <div class="password-field">
+                <input id="password" type="password" class="input-field input-pill" placeholder="Create secure password" required style="padding-right: 48px;">
+                <button type="button" class="password-toggle toggle-password" data-target="password">
+                  <i data-lucide="eye" style="width: 18px; height: 18px;"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="filter-group">
+              <label class="label label-pill" for="confirm-password">Confirm Password <span class="required-star">*</span></label>
+              <div class="password-field">
+                <input id="confirm-password" type="password" class="input-field input-pill" placeholder="Confirm password" required style="padding-right: 48px;">
+                <button type="button" class="password-toggle toggle-password" data-target="confirm-password">
+                  <i data-lucide="eye" style="width: 18px; height: 18px;"></i>
+                </button>
+              </div>
+            </div>
+
+            <button id="register-submit" type="submit" class="btn btn-gradient" style="width: 100%; margin-top: 12px;">Complete Registration</button>
+          </form>
+        </div>
+
+      </section>
+    </div>
+  </main>
+
+  <style>
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+
+  <script type="module" src="/components/layout/navbar.js"></script>
+  <script type="module" src="/pages/register-invite.js"></script>
+</body>
+</html>

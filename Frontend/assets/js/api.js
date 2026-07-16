@@ -63,6 +63,9 @@ export const AuthAPI = {
   updateProfile(payload) {
     return request('/api/v1/auth/profile', { method: 'PATCH', body: payload });
   },
+  changePassword(payload) {
+    return request('/api/v1/auth/change-password', { method: 'PATCH', body: payload });
+  },
 };
 
 export const PoultryAPI = {
@@ -130,5 +133,39 @@ export const BookingAPI = {
   },
   cancel(id) {
     return request(`/api/bookings/${id}/cancel`, { method: 'PATCH' });
+  },
+};
+
+export const AdminAPI = {
+  getUsers(query = {}) {
+    const params = new URLSearchParams(query);
+    return request(`/api/v1/admin/users?${params.toString()}`, { method: 'GET' });
+  },
+  updateUserStatus(id, isActive) {
+    return request(`/api/v1/admin/users/${id}/status`, { method: 'PATCH', body: { isActive } });
+  },
+  getAuditLogs() {
+    return request('/api/v1/admin/audit-logs', { method: 'GET' });
+  },
+  getStats() {
+    return request('/api/v1/admin/stats', { method: 'GET' });
+  },
+  getInvitations() {
+    return request('/api/v1/invitations', { method: 'GET' });
+  },
+  createInvitation(payload) {
+    return request('/api/v1/invitations', { method: 'POST', body: payload });
+  },
+  resendInvitation(id) {
+    return request(`/api/v1/invitations/${id}/resend`, { method: 'POST' });
+  },
+  revokeInvitation(id) {
+    return request(`/api/v1/invitations/${id}/revoke`, { method: 'DELETE' });
+  },
+  verifyInvitation(token) {
+    return request(`/api/v1/invitations/verify/${token}`, { method: 'GET' });
+  },
+  acceptInvitation(token, payload) {
+    return request(`/api/v1/invitations/accept/${token}`, { method: 'POST', body: payload });
   },
 };
