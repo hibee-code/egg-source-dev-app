@@ -10,18 +10,62 @@ let selectedProduct = null;
 
 const renderFulfillmentOptions = () => {
   const cards = document.querySelectorAll('.option-card');
+  const deliveryWrapper = document.getElementById('delivery-fields-wrapper');
+  const addressInput = document.getElementById('customer-address');
+  const cityInput = document.getElementById('customer-city');
+  const stateInput = document.getElementById('customer-state');
+
+  const updateFieldsVisibility = (method) => {
+    if (method === 'delivery') {
+      deliveryWrapper?.classList.remove('hidden');
+      if (addressInput) addressInput.required = true;
+      if (cityInput) cityInput.required = true;
+      if (stateInput) stateInput.required = true;
+    } else {
+      deliveryWrapper?.classList.add('hidden');
+      if (addressInput) { addressInput.required = false; addressInput.value = ''; }
+      if (cityInput) { cityInput.required = false; cityInput.value = ''; }
+      if (stateInput) { stateInput.required = false; stateInput.value = ''; }
+      const zipInput = document.getElementById('customer-zip');
+      if (zipInput) zipInput.value = '';
+    }
+  };
+
   cards.forEach((card) => {
     const input = card.querySelector('input');
-    card.classList.toggle('active', input?.checked);
+    const activeBadge = card.querySelector('.active-badge');
+    
+    // Initial state setup
+    if (input?.checked) {
+      card.classList.add('active');
+      card.style.borderColor = 'var(--color-primary)';
+      card.style.background = 'rgba(31, 77, 10, 0.04)';
+      if (activeBadge) activeBadge.style.display = 'grid';
+      selectedMethod = input.value;
+      updateFieldsVisibility(selectedMethod);
+    } else {
+      card.classList.remove('active');
+      card.style.borderColor = 'var(--color-border)';
+      card.style.background = 'var(--color-card)';
+      if (activeBadge) activeBadge.style.display = 'none';
+    }
+
     card.addEventListener('click', () => {
       if (input) {
         input.checked = true;
         selectedMethod = input.value;
-        cards.forEach((item) => item.classList.toggle('active', item === card));
-        const fulfillmentEl = document.getElementById('fulfillment-method');
-        if (fulfillmentEl) {
-          fulfillmentEl.textContent = selectedMethod === 'delivery' ? 'Standard Delivery' : 'Self Pickup';
-        }
+        
+        cards.forEach((item) => {
+          const itemInput = item.querySelector('input');
+          const itemBadge = item.querySelector('.active-badge');
+          const isCurrent = item === card;
+          item.classList.toggle('active', isCurrent);
+          item.style.borderColor = isCurrent ? 'var(--color-primary)' : 'var(--color-border)';
+          item.style.background = isCurrent ? 'rgba(31, 77, 10, 0.04)' : 'var(--color-card)';
+          if (itemBadge) itemBadge.style.display = isCurrent ? 'grid' : 'none';
+        });
+
+        updateFieldsVisibility(selectedMethod);
         updateSummary();
       }
     });
@@ -212,6 +256,25 @@ const initPage = async () => {
     if (loadingEl) loadingEl.classList.add('hidden');
   }
 
+  // Quantity buttons logic
+  const qtyInput = document.getElementById('booking-quantity');
+  const minusBtn = document.getElementById('qty-minus');
+  const plusBtn = document.getElementById('qty-plus');
+
+  minusBtn?.addEventListener('click', () => {
+    let currentVal = Number(qtyInput.value) || 1;
+    if (currentVal > 1) {
+      qtyInput.value = currentVal - 1;
+      updateSummary();
+    }
+  });
+
+  plusBtn?.addEventListener('click', () => {
+    let currentVal = Number(qtyInput.value) || 1;
+    qtyInput.value = currentVal + 1;
+    updateSummary();
+  });
+
   document.getElementById('booking-quantity')?.addEventListener('input', updateSummary);
   
   // Hook up Confirm Booking button in sticky panel to form submission
@@ -228,6 +291,10 @@ const initPage = async () => {
   });
 
   document.getElementById('detail-booking-form')?.addEventListener('submit', submitBooking);
+
+  if (window.lucide) {
+    window.lucide.createIcons();
+  }
 };
 
 window.addEventListener('DOMContentLoaded', initPage);

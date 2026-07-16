@@ -72,9 +72,6 @@ const initForm = () => {
   const heroForm = $('#hero-search-form');
   heroForm?.addEventListener('submit', (event) => {
     event.preventDefault();
-    const location = $('#hero-location')?.value.trim() || 'Lagos';
-    const category = $('#hero-category')?.value || 'All';
-    window.location.href = `/pages/marketplace.html?state=${encodeURIComponent(location)}&category=${encodeURIComponent(category)}`;
   });
 };
 
@@ -82,7 +79,6 @@ const initPage = () => {
   renderNavbar();
   initForm();
   renderTestimonials();
-  renderFeatured();
 };
 
 window.addEventListener('DOMContentLoaded', initPage);

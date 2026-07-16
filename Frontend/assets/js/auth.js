@@ -33,7 +33,12 @@ export const Auth = {
   redirectIfLoggedIn() {
     const user = this.getUser();
     if (!user) return;
-    const target = user.role === 'FARM_OWNER' || user.role === 'ADMIN' ? '/pages/dashboard-farm.html' : '/pages/dashboard-buyer.html';
+    let target = '/pages/dashboard-buyer.html';
+    if (user.role === 'SUPER_ADMIN') {
+      target = '/pages/dashboard-admin.html';
+    } else if (user.role === 'FARM_OWNER') {
+      target = '/pages/dashboard-farm.html';
+    }
     window.location.href = target;
   },
   logout() {
