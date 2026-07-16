@@ -6,7 +6,7 @@ class PoultryRepository {
   }
 
   async findById(id) {
-    return Poultry.findById(id);
+    return Poultry.findById(id).populate("ownerId", "firstName lastName email");
   }
 
   async findOne(filter) {
@@ -14,7 +14,7 @@ class PoultryRepository {
   }
 
   async findAll(filter = {}) {
-    return Poultry.find(filter);
+    return Poultry.find(filter).populate("ownerId", "firstName lastName email");
   }
 
   async update(id, updateData) {

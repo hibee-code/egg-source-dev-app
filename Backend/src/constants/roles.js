@@ -2,10 +2,9 @@
  * User roles for the Egg Source platform.
  */
 const ROLES = Object.freeze({
-  CUSTOMER: "CUSTOMER",
+  SUPER_ADMIN: "SUPER_ADMIN",
   FARM_OWNER: "FARM_OWNER",
-  DEPOT_OWNER: "DEPOT_OWNER",
-  ADMIN: "ADMIN",
+  CUSTOMER: "CUSTOMER",
 });
 
 const ALL_ROLES = Object.values(ROLES);

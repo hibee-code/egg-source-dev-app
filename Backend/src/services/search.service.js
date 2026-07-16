@@ -12,6 +12,8 @@ class SearchService {
       maxPrice,
       deliveryAvailable,
       stockAvailable,
+      farmType,
+      search,
       page = 1,
       limit = 10,
     } = params;
@@ -56,6 +58,12 @@ class SearchService {
       matchConditions.deliveryAvailable =
         deliveryAvailable === "true" || deliveryAvailable === true;
     }
+    if (farmType) {
+      matchConditions.farmType = farmType;
+    }
+    if (search) {
+      matchConditions.businessName = { $regex: new RegExp(search, "i") };
+    }
 
     // Product-level filters
     const productFilters = {};
@@ -92,6 +100,7 @@ class SearchService {
         address: 1,
         location: 1,
         rating: 1,
+        farmType: 1,
         distance: { $ifNull: ["$distance", null] },
         deliveryAvailable: 1,
         pricePerCrate: {

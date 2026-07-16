@@ -51,19 +51,33 @@ const protect = catchAsync(async (req, _res, next) => {
 
   // 5) Attach user to request
   req.user = user;
+  req.userPermissions = decoded.permissions || [];
   next();
 });
 
 /**
- * Role-based access control.
- * Usage: restrictTo(ROLES.ADMIN, ROLES.FARM_OWNER)
+ * Permission-based access control.
+ * Usage: restrictTo("poultry:write", "product:read")
  *
- * @param  {...string} roles - Allowed roles
+ * @param  {...string} requiredPermissions - Allowed permissions
  * @returns {Function} Express middleware
  */
-const restrictTo = (...roles) => {
+const restrictTo = (...allowedPermissionsOrRoles) => {
   return (req, _res, next) => {
-    if (!roles.includes(req.user.role)) {
+    const userPermissions = req.userPermissions || [];
+    const userRole = req.user ? req.user.role : null;
+
+    // SUPER_ADMIN automatically has all permissions
+    if (userPermissions.includes("*") || userRole === "SUPER_ADMIN") {
+      return next();
+    }
+
+    // Check if the user has any of the allowed permissions or roles
+    const isAllowed = allowedPermissionsOrRoles.some((item) =>
+      userPermissions.includes(item) || userRole === item
+    );
+
+    if (!isAllowed) {
       return next(
         ApiError.forbidden("You do not have permission to perform this action.")
       );

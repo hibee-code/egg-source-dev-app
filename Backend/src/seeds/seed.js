@@ -335,8 +335,10 @@ const seedData = async () => {
     logger.info(`Inserting ${poultryFarms.length} poultry farms...`);
 
     for (const farmInfo of poultryFarms) {
+      const isDepot = /hub|basket|palace|feeds|market|junction|depot|supreme|masters|kings/i.test(farmInfo.businessName);
       const poultry = await Poultry.create({
         ...farmInfo,
+        farmType: isDepot ? "depot" : "farmer",
         ownerId: owner._id,
       });
 

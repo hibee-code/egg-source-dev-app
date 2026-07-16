@@ -42,6 +42,12 @@ const poultrySchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    farmType: {
+      type: String,
+      enum: ["farmer", "depot"],
+      default: "farmer",
+      required: true,
+    },
     rating: {
       type: Number,
       default: 0,

@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
+const argon2 = require("argon2");
 const crypto = require("crypto");
 const { ALL_ROLES, ROLES } = require("../constants/roles");
 
@@ -53,6 +54,17 @@ const userSchema = new mongoose.Schema(
       },
       default: ROLES.CUSTOMER,
     },
+    failedLoginAttempts: {
+      type: Number,
+      default: 0,
+    },
+    lockoutUntil: {
+      type: Date,
+    },
+    refreshTokenHash: {
+      type: String,
+      select: false,
+    },
     isVerified: {
       type: Boolean,
       default: false,
@@ -68,6 +80,17 @@ const userSchema = new mongoose.Schema(
     address: {
       type: addressSchema,
       default: () => ({}),
+    },
+    lastLoginLocation: {
+      type: {
+        type: String,
+        enum: ["Point"],
+        default: "Point",
+      },
+      coordinates: {
+        type: [Number], // [longitude, latitude]
+        default: [0, 0],
+      },
     },
 
     // ── Auth tokens (never returned in queries) ──
@@ -112,15 +135,14 @@ const userSchema = new mongoose.Schema(
 
 // ── Indexes ──────────────────────────────────────────────
 userSchema.index({ role: 1 });
+userSchema.index({ lastLoginLocation: "2dsphere" });
 
 // ── Pre-save: hash password ─────────────────────────────
-const SALT_ROUNDS = 12;
-
 userSchema.pre("save", async function () {
   // Only hash when password field has been modified
   if (!this.isModified("password")) return;
 
-  this.password = await bcrypt.hash(this.password, SALT_ROUNDS);
+  this.password = await argon2.hash(this.password);
 });
 
 // ── Instance Methods ─────────────────────────────────────
@@ -131,7 +153,20 @@ userSchema.pre("save", async function () {
  * @returns {Promise<boolean>}
  */
 userSchema.methods.comparePassword = async function (candidatePassword) {
-  return bcrypt.compare(candidatePassword, this.password);
+  if (this.password.startsWith("$argon2")) {
+    return argon2.verify(this.password, candidatePassword);
+  }
+
+  // Bcrypt fallback for legacy hashes
+  const isBcryptMatch = await bcrypt.compare(candidatePassword, this.password);
+
+  if (isBcryptMatch) {
+    // Lazy Upgrade: Hash the password using Argon2id and save it to the DB
+    this.password = await argon2.hash(candidatePassword);
+    await this.save({ validateBeforeSave: false });
+  }
+
+  return isBcryptMatch;
 };
 
 /**

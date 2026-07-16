@@ -2,6 +2,36 @@ const productRepository = require("../repositories/product.repository");
 const poultryRepository = require("../repositories/poultry.repository");
 const ApiError = require("../utils/ApiError");
 
+const fs = require("fs");
+const path = require("path");
+
+const saveBase64Image = (base64Str) => {
+  if (!base64Str || !base64Str.startsWith("data:image")) {
+    return base64Str;
+  }
+  try {
+    const matches = base64Str.match(/^data:image\/([A-Za-z-+]+);base64,(.+)$/);
+    if (!matches || matches.length !== 3) {
+      return base64Str;
+    }
+    const ext = matches[1] === "jpeg" ? "jpg" : matches[1];
+    const buffer = Buffer.from(matches[2], "base64");
+    const filename = `product-${Date.now()}-${Math.round(Math.random() * 1e9)}.${ext}`;
+    
+    // Target directory: Frontend/uploads
+    const uploadDir = path.join(__dirname, "../../../Frontend/uploads");
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    
+    fs.writeFileSync(path.join(uploadDir, filename), buffer);
+    return `/uploads/${filename}`;
+  } catch (err) {
+    console.error("Failed to save base64 image:", err);
+    return base64Str;
+  }
+};
+
 class ProductService {
   async createProduct(data, userId, userRole) {
     // Verify poultry exists
@@ -11,8 +41,14 @@ class ProductService {
     }
 
     // Verify ownership or ADMIN
-    if (poultry.ownerId.toString() !== userId.toString() && userRole !== "ADMIN") {
+    const ownerIdStr = poultry.ownerId._id?.toString() || poultry.ownerId.toString();
+    if (ownerIdStr !== userId.toString() && userRole !== "SUPER_ADMIN") {
       throw ApiError.forbidden("You do not have permission to add products to this poultry farm");
+    }
+
+    // Save base64 image if present
+    if (data.imageUrl) {
+      data.imageUrl = saveBase64Image(data.imageUrl);
     }
 
     return productRepository.create(data);
@@ -42,8 +78,14 @@ class ProductService {
       throw ApiError.notFound("Associated poultry farm not found");
     }
 
-    if (poultry.ownerId.toString() !== userId.toString() && userRole !== "ADMIN") {
+    const ownerIdStr = poultry.ownerId._id?.toString() || poultry.ownerId.toString();
+    if (ownerIdStr !== userId.toString() && userRole !== "SUPER_ADMIN") {
       throw ApiError.forbidden("You do not have permission to update products for this poultry farm");
+    }
+
+    // Save base64 image if present
+    if (updateData.imageUrl) {
+      updateData.imageUrl = saveBase64Image(updateData.imageUrl);
     }
 
     return productRepository.update(id, updateData);
@@ -61,7 +103,8 @@ class ProductService {
       throw ApiError.notFound("Associated poultry farm not found");
     }
 
-    if (poultry.ownerId.toString() !== userId.toString() && userRole !== "ADMIN") {
+    const ownerIdStr = poultry.ownerId._id?.toString() || poultry.ownerId.toString();
+    if (ownerIdStr !== userId.toString() && userRole !== "SUPER_ADMIN") {
       throw ApiError.forbidden("You do not have permission to delete products from this poultry farm");
     }
 

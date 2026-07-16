@@ -2,16 +2,40 @@ const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user.model");
 const ApiError = require("../utils/ApiError");
-const sendEmail = require("../utils/email");
+const emailService = require("./email.service");
 const env = require("../config/env");
+const auditLogService = require("./auditLog.service");
 
 /**
  * Generate a signed JWT access token.
  * @param {string} id - User ID
+ * @param {string} role - User Role
  * @returns {string}
  */
-const generateAccessToken = (id) => {
-  return jwt.sign({ id }, env.JWT_SECRET, {
+const getPermissionsForRole = (role) => {
+  const mapping = {
+    SUPER_ADMIN: ["*"],
+    FARM_OWNER: [
+      "poultry:read",
+      "poultry:write",
+      "product:read",
+      "product:write",
+      "booking:read",
+      "booking:write:fulfillment",
+    ],
+    CUSTOMER: [
+      "poultry:read",
+      "product:read",
+      "booking:read:own",
+      "booking:write:own",
+    ],
+  };
+  return mapping[role] || [];
+};
+
+const generateAccessToken = (id, role) => {
+  const permissions = getPermissionsForRole(role);
+  return jwt.sign({ id, role, permissions }, env.JWT_SECRET, {
     expiresIn: env.JWT_EXPIRES_IN,
   });
 };
@@ -75,14 +99,23 @@ class AuthService {
     }
 
     // Create user (password hashed by pre-save hook)
-    const user = await User.create({
+    const userPayload = {
       firstName: data.firstName,
       lastName: data.lastName,
       email: data.email,
       password: data.password,
-      role: data.role,
+      role: "CUSTOMER", // Unified self-registration role is CUSTOMER
       phone: data.phone || "",
-    });
+    };
+
+    if (typeof data.latitude === "number" && typeof data.longitude === "number") {
+      userPayload.lastLoginLocation = {
+        type: "Point",
+        coordinates: [data.longitude, data.latitude],
+      };
+    }
+
+    const user = await User.create(userPayload);
 
     // Generate verification token
     const verificationToken = user.createVerificationToken();
@@ -90,15 +123,7 @@ class AuthService {
 
     // Send verification email
     const verificationURL = `${env.CORS_ORIGIN}/verify-email/${verificationToken}`;
-    await sendEmail({
-      to: user.email,
-      subject: "Egg Source — Verify Your Email Address",
-      text:
-        `Hi ${user.firstName},\n\n` +
-        `Welcome to Egg Source! Please verify your email by clicking the link below:\n\n` +
-        `${verificationURL}\n\n` +
-        `This link will expire in 24 hours.\n`,
-    });
+    await emailService.sendVerificationEmail(user.email, user.firstName, verificationURL);
 
     return { user };
   }
@@ -107,46 +132,82 @@ class AuthService {
    * Log in an existing user.
    * @param {string} email
    * @param {string} password
-   * @param {import('express').Response} res Role support
+   * @param {import('express').Response} res
+   * @param {string} ipAddress
+   * @param {string} userAgent
    * @returns {{ user, accessToken }}
    */
-  async login(email, password, res) {
+  async login(email, password, res, ipAddress = "", userAgent = "", latitude = null, longitude = null) {
     // Find user with password included
-    const user = await User.findOne({ email }).select("+password");
+    const user = await User.findOne({ email }).select("+password +refreshTokenHash");
     if (!user) {
+      await auditLogService.log(null, "USER_LOGIN_FAILED", ipAddress, userAgent, { email, reason: "User not found" }, "WARNING");
       throw ApiError.unauthorized("Invalid email or password");
+    }
+
+    // Check lockout status
+    if (user.lockoutUntil && user.lockoutUntil > Date.now()) {
+      const minutesLeft = Math.ceil((user.lockoutUntil - Date.now()) / (60 * 1000));
+      await auditLogService.log(user._id, "USER_LOGIN_LOCKED", ipAddress, userAgent, { email }, "WARNING");
+      throw ApiError.forbidden(`Your account is temporarily locked. Try again in ${minutesLeft} minutes.`);
     }
 
     // Check if account is active
     if (!user.isActive) {
-      throw ApiError.forbidden(
-        "Your account has been deactivated. Contact support."
-      );
+      await auditLogService.log(user._id, "USER_LOGIN_INACTIVE", ipAddress, userAgent, { email }, "WARNING");
+      throw ApiError.forbidden("Your account has been deactivated. Contact support.");
     }
 
     // Check if email is verified
     if (!user.isVerified) {
-      throw ApiError.forbidden(
-        "Please verify your email address to log in."
-      );
+      await auditLogService.log(user._id, "USER_LOGIN_UNVERIFIED", ipAddress, userAgent, { email }, "WARNING");
+      throw ApiError.forbidden("Please verify your email address to log in.");
     }
 
     // Verify password
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
+      // Increment failed login attempts
+      user.failedLoginAttempts += 1;
+      if (user.failedLoginAttempts >= 5) {
+        user.lockoutUntil = new Date(Date.now() + 15 * 60 * 1000); // Lock for 15 minutes
+        user.failedLoginAttempts = 0; // Reset counter
+        await user.save({ validateBeforeSave: false });
+        await auditLogService.log(user._id, "USER_ACCOUNT_LOCKED", ipAddress, userAgent, { email, reason: "5 failed attempts" }, "CRITICAL");
+        throw ApiError.forbidden("Account locked due to too many failed login attempts. Please try again in 15 minutes.");
+      }
+      await user.save({ validateBeforeSave: false });
+      await auditLogService.log(user._id, "USER_LOGIN_FAILED", ipAddress, userAgent, { email, reason: "Incorrect password" }, "WARNING");
       throw ApiError.unauthorized("Invalid email or password");
     }
 
+    // Reset failed login attempts
+    user.failedLoginAttempts = 0;
+    user.lockoutUntil = undefined;
+
     // Generate tokens
-    const accessToken = generateAccessToken(user._id);
+    const accessToken = generateAccessToken(user._id, user.role);
     const refreshToken = generateRefreshToken(user._id);
 
-    // Store refresh token
-    user.refreshToken = refreshToken;
+    // Store refresh token hash
+    const tokenHash = crypto.createHash("sha256").update(refreshToken).digest("hex");
+    user.refreshTokenHash = tokenHash;
+
+    // Update location for non-SUPER_ADMIN users if coordinates are provided
+    if (user.role !== "SUPER_ADMIN" && typeof latitude === "number" && typeof longitude === "number") {
+      user.lastLoginLocation = {
+        type: "Point",
+        coordinates: [longitude, latitude],
+      };
+    }
+
     await user.save({ validateBeforeSave: false });
 
     // Set refresh token cookie
     setRefreshCookie(res, refreshToken);
+
+    // Audit Log success
+    await auditLogService.log(user._id, "USER_LOGIN_SUCCESS", ipAddress, userAgent, { email, role: user.role });
 
     return { user, accessToken };
   }
@@ -155,19 +216,24 @@ class AuthService {
    * Log out — clear the refresh token from DB and cookie.
    * @param {string} userId
    * @param {import('express').Response} res
+   * @param {string} ipAddress
+   * @param {string} userAgent
    */
-  async logout(userId, res) {
-    await User.findByIdAndUpdate(userId, { refreshToken: "" });
+  async logout(userId, res, ipAddress = "", userAgent = "") {
+    await User.findByIdAndUpdate(userId, { refreshTokenHash: "" });
     clearRefreshCookie(res);
+    await auditLogService.log(userId, "USER_LOGOUT", ipAddress, userAgent);
   }
 
   /**
    * Refresh the access token using the refresh token from the cookie.
    * @param {string} token - Refresh token from cookie
    * @param {import('express').Response} res
+   * @param {string} ipAddress
+   * @param {string} userAgent
    * @returns {{ accessToken }}
    */
-  async refreshAccessToken(token, res) {
+  async refreshAccessToken(token, res, ipAddress = "", userAgent = "") {
     if (!token) {
       throw ApiError.unauthorized("No refresh token provided");
     }
@@ -181,16 +247,18 @@ class AuthService {
     }
 
     // Find user and check that the stored token matches
-    const user = await User.findById(decoded.id).select("+refreshToken");
-    if (!user || user.refreshToken !== token) {
+    const user = await User.findById(decoded.id).select("+refreshTokenHash");
+    const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
+    if (!user || user.refreshTokenHash !== tokenHash) {
       throw ApiError.unauthorized("Invalid refresh token");
     }
 
     // Issue new tokens (rotate refresh token for security)
-    const accessToken = generateAccessToken(user._id);
+    const accessToken = generateAccessToken(user._id, user.role);
     const newRefreshToken = generateRefreshToken(user._id);
+    const newHash = crypto.createHash("sha256").update(newRefreshToken).digest("hex");
 
-    user.refreshToken = newRefreshToken;
+    user.refreshTokenHash = newHash;
     await user.save({ validateBeforeSave: false });
 
     setRefreshCookie(res, newRefreshToken);
@@ -216,15 +284,7 @@ class AuthService {
     // Build reset URL (frontend would consume this)
     const resetURL = `${env.CORS_ORIGIN}/reset-password/${resetToken}`;
 
-    await sendEmail({
-      to: user.email,
-      subject: "Egg Source — Password Reset (valid for 10 minutes)",
-      text:
-        `Hi ${user.firstName},\n\n` +
-        `You requested a password reset. Use the link below to set a new password:\n\n` +
-        `${resetURL}\n\n` +
-        `If you didn't request this, please ignore this email.\n`,
-    });
+    await emailService.sendPasswordResetEmail(user.email, user.firstName, resetURL);
   }
 
   /**
@@ -369,15 +429,7 @@ class AuthService {
 
     // Send verification email
     const verificationURL = `${env.CORS_ORIGIN}/verify-email/${verificationToken}`;
-    await sendEmail({
-      to: user.email,
-      subject: "Egg Source — Verify Your Email Address",
-      text:
-        `Hi ${user.firstName},\n\n` +
-        `Please verify your email by clicking the link below:\n\n` +
-        `${verificationURL}\n\n` +
-        `This link will expire in 24 hours.\n`,
-    });
+    await emailService.sendVerificationEmail(user.email, user.firstName, verificationURL);
   }
 }
 

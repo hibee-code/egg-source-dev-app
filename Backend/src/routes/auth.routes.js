@@ -2,6 +2,7 @@ const { Router } = require("express");
 const authController = require("../controllers/auth.controller");
 const { protect } = require("../middleware/auth.middleware");
 const validate = require("../middleware/validate.middleware");
+const { authRateLimiter } = require("../middleware/rateLimiter.middleware");
 const {
   registerSchema,
   loginSchema,
@@ -16,7 +17,7 @@ const router = Router();
 
 // ── Public routes ─────────────────────────────────────────
 router.post("/register", validate(registerSchema), authController.register);
-router.post("/login", validate(loginSchema), authController.login);
+router.post("/login", authRateLimiter, validate(loginSchema), authController.login);
 router.post("/refresh-token", authController.refreshToken);
 router.get("/verify-email/:token", authController.verifyEmail);
 router.post(

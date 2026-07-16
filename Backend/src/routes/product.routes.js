@@ -18,8 +18,8 @@ router.get("/:id", productController.getProductById);
 // Protected routes
 router.use(protect);
 
-// Restricted routes (only FARM_OWNER and ADMIN can create/modify products)
-router.use(restrictTo(ROLES.FARM_OWNER, ROLES.ADMIN));
+// Restricted routes (only FARM_OWNER and SUPER_ADMIN can create/modify products)
+router.use(restrictTo(ROLES.FARM_OWNER, ROLES.SUPER_ADMIN));
 
 router.post("/", validate(createProductSchema), productController.createProduct);
 router.patch("/:id", validate(updateProductSchema), productController.updateProduct);
