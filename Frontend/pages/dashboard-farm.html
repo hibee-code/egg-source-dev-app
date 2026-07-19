@@ -3,12 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Farm Dashboard — Egg Source</title>
+  <title>Farm Dashboard — Egg Connect</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/assets/css/tokens.css">
   <link rel="stylesheet" href="/css/style.css">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#1f4d0a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="apple-touch-icon" href="/assets/images/logo-egg.png">
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
   <style>
     /* Premium Dashboard additions for modern SaaS feel */
@@ -374,13 +379,16 @@
       color: #fff !important;
       box-shadow: 0 4px 10px rgba(232, 160, 32, 0.2);
     }
-    /* Clickable booking rows styling */
-    .clickable-row {
+    /* Status trigger interactive badge styling */
+    .status-trigger {
       cursor: pointer;
-      transition: background-color 0.15s ease;
+      transition: all 0.2s ease;
+      display: inline-block;
     }
-    .clickable-row:hover {
-      background-color: var(--color-surface-soft) !important;
+    .status-trigger:hover {
+      transform: translateY(-1px) scale(1.05);
+      filter: brightness(0.92);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
     }
   </style>
 </head>

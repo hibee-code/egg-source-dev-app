@@ -60,7 +60,7 @@ function initHelpModal() {
         <div style="border-top: 1px solid var(--color-border); padding-top: 16px; margin-top: 4px;">
           <h4 style="margin: 0 0 6px; font-weight: 600; color: var(--color-text);">Need further assistance?</h4>
           <p style="font-size: 0.85rem; color: var(--color-text-muted); margin: 0 0 16px; line-height: 1.4;">Our dedicated support desk is available 24/7. Send us a message and we will respond instantly.</p>
-          <a href="mailto:support@eggsource.dev" class="btn btn-primary" style="width: 100%; text-align: center; justify-content: center; display: flex; align-items: center; gap: 8px;">
+          <a href="mailto:support@eggconnect.app" class="btn btn-primary" style="width: 100%; text-align: center; justify-content: center; display: flex; align-items: center; gap: 8px;">
             <i data-lucide="mail" style="width: 16px; height: 16px;"></i> Send an Email Inquiry
           </a>
         </div>
@@ -137,36 +137,33 @@ export function renderNavbar(options = {}) {
   
   const isDashboardPage = window.location.pathname.includes('dashboard-');
   let navActions = '';
-  if (isLoggedIn) {
+  if (isAuthPage) {
+    navActions = '';
+  } else if (isLoggedIn) {
     navActions = isDashboardPage
       ? ''
       : `<a class="btn btn-primary btn-pill" href="${dashboardHref}" style="padding: 10px 24px; font-weight: 600; font-size: 0.92rem; box-shadow: 0 4px 14px rgba(31, 77, 10, 0.2); transition: var(--transition); display: inline-flex; align-items: center; gap: 8px;">Go to Dashboard <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i></a>`;
   } else {
-    const params = new URLSearchParams(window.location.search);
-    const activeTab = isAuthPage
-      ? (params.get('tab') === 'register' ? 'signup' : 'signin')
-      : 'signup';
-
-    if (activeTab === 'signin') {
-      navActions = `
-        <a class="btn btn-primary btn-pill" href="/pages/auth.html?tab=login" style="padding: 10px 24px; font-weight: 600; font-size: 0.92rem; box-shadow: 0 4px 14px rgba(31, 77, 10, 0.2); transition: var(--transition); display: inline-flex; align-items: center; gap: 8px;">Sign In <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i></a>
-        <a class="btn btn-ghost btn-pill" href="/pages/auth.html?tab=register" style="border: none; padding: 10px 22px; font-weight: 600; font-size: 0.92rem; color: var(--color-text);">Sign Up</a>
-      `;
-    } else {
-      navActions = `
-        <a class="btn btn-ghost btn-pill" href="/pages/auth.html?tab=login" style="border: none; padding: 10px 22px; font-weight: 600; font-size: 0.92rem; color: var(--color-text);">Sign In</a>
-        <a class="btn btn-primary btn-pill" href="/pages/auth.html?tab=register" style="padding: 10px 24px; font-weight: 600; font-size: 0.92rem; box-shadow: 0 4px 14px rgba(31, 77, 10, 0.2); transition: var(--transition); display: inline-flex; align-items: center; gap: 8px;">Sign Up <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i></a>
-      `;
-    }
+    navActions = `
+      <a class="btn btn-ghost btn-pill" href="/pages/auth.html?tab=login" style="border: none; padding: 10px 22px; font-weight: 600; font-size: 0.92rem; color: var(--color-text);">Sign In</a>
+      <a class="btn btn-primary btn-pill" href="/pages/auth.html?tab=register" style="padding: 10px 24px; font-weight: 600; font-size: 0.92rem; box-shadow: 0 4px 14px rgba(31, 77, 10, 0.2); transition: var(--transition); display: inline-flex; align-items: center; gap: 8px;">Sign Up <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i></a>
+    `;
   }
+
+  const logoHtml = isDashboardPage
+    ? `<div class="logo" style="display: flex; align-items: center; gap: 8px; text-decoration: none;">
+        <img src="/assets/images/logo-egg.svg" alt="Egg Connect Logo" class="logo-icon">
+        <span>Egg <span style="color: var(--color-accent);">Connect</span></span>
+      </div>`
+    : `<a class="logo" href="/index.html" style="cursor: pointer; display: flex; align-items: center; gap: 8px; text-decoration: none;">
+        <img src="/assets/images/logo-egg.svg" alt="Egg Connect Logo" class="logo-icon">
+        <span>Egg <span style="color: var(--color-accent);">Connect</span></span>
+      </a>`;
 
   root.innerHTML = `
     <header>
       <div class="navbar-inner">
-        <a class="logo" href="/index.html" style="cursor: pointer; display: flex; align-items: center; gap: 8px; text-decoration: none;">
-          <img src="/assets/images/logo-egg.png" alt="Egg Source Logo" class="logo-icon">
-          <span>Egg <span>Source</span></span>
-        </a>
+        ${logoHtml}
         ${navLinks}
         <div class="navbar-actions">
           ${navActions}
@@ -233,24 +230,24 @@ export function renderSidebar(options = {}) {
       { key: 'orders', label: 'Orders', icon: ICONS.orders, href: `${baseHref}#orders` },
       { key: 'analytics', label: 'Analytics', icon: ICONS.analytics, href: `${baseHref}#analytics` },
       { key: 'profile', label: 'Profile', icon: ICONS.profile, href: `${baseHref}#profile` },
-      { key: 'help', label: 'Help & Support', icon: ICONS.help, href: 'mailto:help@eggsource.dev' },
+      { key: 'help', label: 'Help & Support', icon: ICONS.help, href: 'mailto:help@eggconnect.app' },
     ];
   }
 
-  let brand = 'Egg Source / Buyer';
+  let brand = 'Egg Connect / Buyer';
   let buttonLabel = 'Browse Farms';
   let buttonHref = '/pages/marketplace.html';
 
   if (role === 'farm') {
-    brand = 'Egg Source / Seller';
+    brand = 'Egg Connect / Seller';
     buttonLabel = '+ Post Listing';
   } else if (role === 'admin') {
-    brand = 'Egg Source / Admin';
+    brand = 'Egg Connect / Admin';
     buttonLabel = 'Manage Invitations';
     buttonHref = `${baseHref}#invitations`;
   }
 
-  const user = Auth.getUser() || { firstName: 'Egg', lastName: 'Source', role: 'CUSTOMER', email: '' };
+  const user = Auth.getUser() || { firstName: 'Egg', lastName: 'Connect', role: 'CUSTOMER', email: '' };
   const initials = `${user.firstName[0] || 'E'}${user.lastName[0] || 'S'}`;
   
   let roleLabel = 'Verified Buyer';
@@ -361,3 +358,92 @@ export function renderSidebar(options = {}) {
     window.lucide.createIcons();
   }
 }
+
+// Register Service Worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(reg => console.log('Service Worker registered:', reg.scope))
+      .catch(err => console.error('Service Worker registration failed:', err));
+  });
+}
+
+// Mobile-only PWA Installation Prompt Logic
+let deferredPrompt = null;
+const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  if (isMobileDevice) {
+    deferredPrompt = e;
+    showMobileInstallBanner();
+  }
+});
+
+function showMobileInstallBanner() {
+  if (document.getElementById('mobile-pwa-banner')) return;
+
+  const banner = document.createElement('div');
+  banner.id = 'mobile-pwa-banner';
+  banner.style.position = 'fixed';
+  banner.style.bottom = '16px';
+  banner.style.left = '16px';
+  banner.style.right = '16px';
+  banner.style.backgroundColor = '#1f4d0a';
+  banner.style.color = '#ffffff';
+  banner.style.padding = '14px 18px';
+  banner.style.borderRadius = '12px';
+  banner.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.05)';
+  banner.style.zIndex = '999999';
+  banner.style.display = 'flex';
+  banner.style.alignItems = 'center';
+  banner.style.justifyContent = 'space-between';
+  banner.style.fontFamily = 'Inter, sans-serif';
+  banner.style.animation = 'slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1)';
+
+  banner.innerHTML = `
+    <div style="display: flex; align-items: center; gap: 12px; flex-grow: 1;">
+      <img src="/assets/images/logo-egg-192.png" alt="Logo" style="width: 40px; height: 40px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2);">
+      <div>
+        <h4 style="margin: 0; font-size: 14px; font-weight: 700;">Egg Connect</h4>
+        <p style="margin: 2px 0 0; font-size: 11px; opacity: 0.85;">Install app for a seamless experience</p>
+      </div>
+    </div>
+    <div style="display: flex; gap: 8px;">
+      <button id="pwa-close-btn" style="background: transparent; border: none; color: #ffffff; font-size: 12px; font-weight: 500; cursor: pointer; padding: 6px 10px;">Dismiss</button>
+      <button id="pwa-install-btn" style="background: #ffffff; color: #1f4d0a; border: none; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; padding: 6px 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">Install</button>
+    </div>
+  `;
+
+  if (!document.getElementById('pwa-banner-style')) {
+    const style = document.createElement('style');
+    style.id = 'pwa-banner-style';
+    style.textContent = `
+      @keyframes slideUp {
+        from { transform: translateY(120%); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  document.body.appendChild(banner);
+
+  document.getElementById('pwa-close-btn').addEventListener('click', () => {
+    banner.remove();
+  });
+
+  document.getElementById('pwa-install-btn').addEventListener('click', () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then((choiceResult) => {
+        if (choiceResult.outcome === 'accepted') {
+          console.log('User accepted the PWA install prompt');
+        }
+        deferredPrompt = null;
+        banner.remove();
+      });
+    }
+  });
+}
+

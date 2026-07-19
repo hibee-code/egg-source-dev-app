@@ -246,11 +246,19 @@ const renderBookingRowMarkup = (b, includeAddress = false) => {
   const productName = b.productId?.productName || 'Supply';
 
   if (includeAddress) {
-    const addr = b.deliveryAddress 
-      ? `${b.deliveryAddress.street || ''}, ${b.deliveryAddress.city || ''}, ${b.deliveryAddress.state || ''}`
-      : 'Pickup at Farm';
+    let addr = '';
+    if (b.deliveryMethod === 'pickup') {
+      const farmAddress = farmData 
+        ? `${farmData.address || ''}, ${farmData.lga || ''}, ${farmData.state || ''}`.replace(/^,\s*|,\s*$/g, '').trim() 
+        : '';
+      addr = `Self Pickup (Farm: ${farmAddress || 'Location'})`;
+    } else {
+      addr = b.deliveryAddress 
+        ? `${b.deliveryAddress.street || ''}, ${b.deliveryAddress.city || ''}, ${b.deliveryAddress.state || ''}`
+        : 'No delivery address provided';
+    }
     return `
-      <tr class="clickable-row" data-booking-id="${b._id}">
+      <tr data-booking-id="${b._id}">
         <td><strong style="font-size: 0.8rem; color: var(--color-primary);">${b._id.substring(18)}</strong></td>
         <td>
           <div style="font-weight: 600;">${buyerName}</div>
@@ -261,14 +269,14 @@ const renderBookingRowMarkup = (b, includeAddress = false) => {
         <td style="font-size: 0.82rem; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${addr}</td>
         <td><span class="table-pill ${methodClass}">${methodLabel}</span></td>
         <td><strong style="color: var(--color-primary);">${Format.currency(b.totalAmount)}</strong></td>
-        <td><span class="table-pill ${statusClass}">${b.status}</span></td>
+        <td><span class="table-pill ${statusClass} status-trigger" data-booking-id="${b._id}" style="cursor: pointer;">${b.status}</span></td>
         <td>${actionHtml}</td>
       </tr>
     `;
   }
 
   return `
-    <tr class="clickable-row" data-booking-id="${b._id}">
+    <tr data-booking-id="${b._id}">
       <td><strong style="font-size: 0.8rem; color: var(--color-primary);">${b._id.substring(18)}</strong></td>
       <td>
         <div style="font-weight: 600;">${buyerName}</div>
@@ -278,7 +286,7 @@ const renderBookingRowMarkup = (b, includeAddress = false) => {
       <td>${b.quantity}</td>
       <td><span class="table-pill ${methodClass}">${methodLabel}</span></td>
       <td><strong style="color: var(--color-primary);">${Format.currency(b.totalAmount)}</strong></td>
-      <td><span class="table-pill ${statusClass}">${b.status}</span></td>
+      <td><span class="table-pill ${statusClass} status-trigger" data-booking-id="${b._id}" style="cursor: pointer;">${b.status}</span></td>
       <td>${actionHtml}</td>
     </tr>
   `;
@@ -467,11 +475,10 @@ const attachBookingActionListeners = (container) => {
     });
   });
 
-  // Attach click listener on each clickable row to open details modal
-  container.querySelectorAll('.clickable-row').forEach((row) => {
-    row.addEventListener('click', (e) => {
-      if (e.target.closest('button') || e.target.closest('a')) return;
-      const bookingId = row.dataset.bookingId;
+  // Attach click listener on each status trigger to open details modal
+  container.querySelectorAll('.status-trigger').forEach((trigger) => {
+    trigger.addEventListener('click', (e) => {
+      const bookingId = trigger.dataset.bookingId;
       if (bookingId) {
         showOrderDetailsModal(bookingId);
       }
@@ -614,8 +621,40 @@ const renderLowStockAlerts = (products) => {
   }
 };
 
+const showSellerSkeletons = () => {
+  const table1 = document.querySelector('#farm-inventory tbody');
+  const table2 = document.querySelector('#farm-bookings-table tbody');
+  const table3 = document.querySelector('#requests-full-table tbody');
+  const container = document.getElementById('products-cards-container');
+
+  const getSkeletonRow = (cols) => `
+    <tr>
+      <td colspan="${cols}">
+        <div class="skeleton skeleton-row"></div>
+      </td>
+    </tr>
+  `;
+
+  if (table1) table1.innerHTML = Array(3).fill(0).map(() => getSkeletonRow(6)).join('');
+  if (table2) table2.innerHTML = Array(3).fill(0).map(() => getSkeletonRow(8)).join('');
+  if (table3) table3.innerHTML = Array(3).fill(0).map(() => getSkeletonRow(9)).join('');
+
+  if (container) {
+    container.innerHTML = Array(3).fill(0).map(() => `
+      <div class="skeleton-card">
+        <div class="skeleton" style="height: 120px; width: 100%; border-radius: var(--radius-card);"></div>
+        <div class="skeleton skeleton-title"></div>
+        <div class="skeleton skeleton-text"></div>
+        <div class="skeleton skeleton-text-short"></div>
+        <div class="skeleton skeleton-btn"></div>
+      </div>
+    `).join('');
+  }
+};
+
 // 6. Fetch all database data and re-render current views
 const fetchAndRenderData = async () => {
+  showSellerSkeletons();
   try {
     // 1. Get/Create Poultry Farm details for owner
     const poultriesRes = await PoultryAPI.getAll();

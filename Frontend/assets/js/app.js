@@ -446,7 +446,7 @@ class EggSourceApp {
       </div>
       <div class="hero-card">
         <h3>1.7K+ happy buyers</h3>
-        <p>Local businesses and households trust Egg Source for fresh inventory.</p>
+        <p>Local businesses and households trust Egg Connect for fresh inventory.</p>
       </div>
       <div class="hero-card">
         <h3>24/7 support</h3>
@@ -637,7 +637,7 @@ class EggSourceApp {
     savedFarms.innerHTML = '<p style="color: var(--muted);">No saved farms yet.</p>';
     notificationList.innerHTML = `
       <div class="notification-card">
-        <strong>Welcome to Egg Source</strong>
+        <strong>Welcome to Egg Connect</strong>
         <p>Your farm orders will appear here after you book your first farm product.</p>
       </div>
     `;

@@ -208,7 +208,26 @@ const getStatusClass = (status) => {
   }
 };
 
+const showTableSkeletons = () => {
+  const table1 = document.querySelector('#buyer-bookings tbody');
+  const table2 = document.querySelector('#full-orders-table tbody');
+  const table3 = document.querySelector('#inventory-tracker-table tbody');
+
+  const getSkeletonRow = (cols) => `
+    <tr>
+      <td colspan="${cols}">
+        <div class="skeleton skeleton-row"></div>
+      </td>
+    </tr>
+  `;
+
+  if (table1) table1.innerHTML = Array(3).fill(0).map(() => getSkeletonRow(5)).join('');
+  if (table2) table2.innerHTML = Array(3).fill(0).map(() => getSkeletonRow(7)).join('');
+  if (table3) table3.innerHTML = Array(3).fill(0).map(() => getSkeletonRow(4)).join('');
+};
+
 const fetchAndRenderData = async () => {
+  showTableSkeletons();
   try {
     const res = await BookingAPI.getMyBookings();
     allBookings = res.data?.bookings || [];

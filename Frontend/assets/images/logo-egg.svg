@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <!-- Definitions for Gradients, Filters, and Masks -->
+  <defs>
+    <!-- Forest Green to Light Green Gradient for Left Agricultural Shell -->
+    <linearGradient id="leftGreenGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#123005" />
+      <stop offset="40%" stop-color="#1F4D0A" />
+      <stop offset="100%" stop-color="#3A8818" />
+    </linearGradient>
+
+    <!-- Amber Gold to Yellow Gradient for Right Buyer/Market Shell -->
+    <linearGradient id="rightGoldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F5B041" />
+      <stop offset="60%" stop-color="#E8A020" />
+      <stop offset="100%" stop-color="#B7770B" />
+    </linearGradient>
+
+    <!-- Soft Glow Filter for connection points -->
+    <filter id="glowEffect" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+
+    <!-- Mask to split the egg with a clean, transparent S-curve gap -->
+    <mask id="eggSplitMask">
+      <!-- Keep everything white -->
+      <rect x="0" y="0" width="512" height="512" fill="#FFFFFF" />
+      <!-- Cut out the S-curve separator in black -->
+      <path d="M 256, 25 C 310, 180, 202, 332, 256, 487" fill="none" stroke="#000000" stroke-width="22" stroke-linecap="round" />
+    </mask>
+  </defs>
+
+  <!-- BACKGROUND DECORATIVE ELEMENTS -->
+  <!-- Subtle circular grid line -->
+  <circle cx="256" cy="256" r="236" fill="none" stroke="#2E6B12" stroke-width="1.5" stroke-opacity="0.1" />
+  
+  <!-- Outer Connection Dash Ring -->
+  <path d="M 256,28 A 228,228 0 1,1 255.9,28" fill="none" stroke="#E8A020" stroke-width="2" stroke-dasharray="10,8" opacity="0.18" />
+
+  <!-- EGG BODY WITH TRANSPARENT GAP -->
+  <g mask="url(#eggSplitMask)">
+    <!-- LEFT HALF-SHELL (Agricultural/Farmer) -->
+    <!-- Perfect half-egg contour clipped by mask -->
+    <path d="M 256, 40
+             C 130, 40, 70, 190, 70, 310
+             C 70, 420, 150, 470, 256, 470
+             Z"
+          fill="url(#leftGreenGrad)" />
+
+    <!-- RIGHT HALF-SHELL (Marketplace/Buyer) -->
+    <!-- Perfect half-egg contour clipped by mask -->
+    <path d="M 256, 40
+             C 382, 40, 442, 190, 442, 310
+             C 442, 420, 362, 470, 256, 470
+             Z"
+          fill="url(#rightGoldGrad)" />
+  </g>
+
+  <!-- DIGITAL NETWORK CONNECTORS (Drawn over the gap) -->
+  <g>
+    <!-- Bridge Line following the S-curve path -->
+    <path d="M 276, 142 C 265, 200, 247, 290, 236, 370" fill="none" stroke="#E8A020" stroke-width="6" opacity="0.4" />
+    <path d="M 276, 142 C 265, 200, 247, 290, 236, 370" fill="none" stroke="#ffffff" stroke-width="2" stroke-dasharray="6,6" opacity="0.9" />
+
+    <!-- Top Connection Hub: Farmer Side (Green Outer, White Core) -->
+    <!-- Positioned near the upper curve -->
+    <g filter="url(#glowEffect)">
+      <circle cx="276" cy="142" r="22" fill="#1F4D0A" stroke="#ffffff" stroke-width="2.5" />
+      <circle cx="276" cy="142" r="8" fill="#ffffff" />
+    </g>
+
+    <!-- Center Connection Hub: The Connect Core (Gold Outer, White Core) -->
+    <!-- Positioned exactly at the center pivot -->
+    <g filter="url(#glowEffect)">
+      <circle cx="256" cy="256" r="28" fill="#E8A020" stroke="#ffffff" stroke-width="3" />
+      <circle cx="256" cy="256" r="10" fill="#ffffff" />
+    </g>
+
+    <!-- Bottom Connection Hub: Buyer Side (Gold/Amber Outer, White Core) -->
+    <!-- Positioned near the lower curve -->
+    <g filter="url(#glowEffect)">
+      <circle cx="236" cy="370" r="22" fill="#E8A020" stroke="#ffffff" stroke-width="2.5" />
+      <circle cx="236" cy="370" r="8" fill="#ffffff" />
+    </g>
+  </g>
+</svg>

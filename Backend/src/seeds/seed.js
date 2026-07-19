@@ -16,13 +16,13 @@ const seedData = async () => {
     await Product.deleteMany({});
 
     // 3. Create or Find Seed Owner (FARM_OWNER)
-    let owner = await User.findOne({ email: "farmowner@eggsource.com" });
+    let owner = await User.findOne({ email: "farmowner@eggconnect.com" });
     if (!owner) {
       logger.info("Creating default seed farm owner...");
       owner = await User.create({
         firstName: "Seed",
         lastName: "Farm Owner",
-        email: "farmowner@eggsource.com",
+        email: "farmowner@eggconnect.com",
         password: "Password123!", // pre-save will hash this
         role: "FARM_OWNER",
         phone: "+2348000000000",

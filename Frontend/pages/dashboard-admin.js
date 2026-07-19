@@ -19,7 +19,7 @@ let farmsList = [];
 
 // Populate Profile Info
 const populateAdminProfile = () => {
-  const user = Auth.getUser() || { firstName: 'Platform', lastName: 'Admin', email: 'admin@eggsource.dev' };
+  const user = Auth.getUser() || { firstName: 'Platform', lastName: 'Admin', email: 'admin@eggconnect.app' };
   const initials = `${user.firstName[0] || 'P'}${user.lastName[0] || 'A'}`;
   
   // Sidebar avatar & details
@@ -763,3 +763,92 @@ const initPage = () => {
 };
 
 window.addEventListener('DOMContentLoaded', initPage);
+
+// Register Service Worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(reg => console.log('Service Worker registered:', reg.scope))
+      .catch(err => console.error('Service Worker registration failed:', err));
+  });
+}
+
+// Mobile-only PWA Installation Prompt Logic
+let deferredPrompt = null;
+const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  if (isMobileDevice) {
+    deferredPrompt = e;
+    showMobileInstallBanner();
+  }
+});
+
+function showMobileInstallBanner() {
+  if (document.getElementById('mobile-pwa-banner')) return;
+
+  const banner = document.createElement('div');
+  banner.id = 'mobile-pwa-banner';
+  banner.style.position = 'fixed';
+  banner.style.bottom = '16px';
+  banner.style.left = '16px';
+  banner.style.right = '16px';
+  banner.style.backgroundColor = '#1f4d0a';
+  banner.style.color = '#ffffff';
+  banner.style.padding = '14px 18px';
+  banner.style.borderRadius = '12px';
+  banner.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.05)';
+  banner.style.zIndex = '999999';
+  banner.style.display = 'flex';
+  banner.style.alignItems = 'center';
+  banner.style.justifyContent = 'space-between';
+  banner.style.fontFamily = 'Inter, sans-serif';
+  banner.style.animation = 'slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1)';
+
+  banner.innerHTML = `
+    <div style="display: flex; align-items: center; gap: 12px; flex-grow: 1;">
+      <img src="/assets/images/logo-egg-192.png" alt="Logo" style="width: 40px; height: 40px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2);">
+      <div>
+        <h4 style="margin: 0; font-size: 14px; font-weight: 700;">Egg Connect</h4>
+        <p style="margin: 2px 0 0; font-size: 11px; opacity: 0.85;">Install app for a seamless experience</p>
+      </div>
+    </div>
+    <div style="display: flex; gap: 8px;">
+      <button id="pwa-close-btn" style="background: transparent; border: none; color: #ffffff; font-size: 12px; font-weight: 500; cursor: pointer; padding: 6px 10px;">Dismiss</button>
+      <button id="pwa-install-btn" style="background: #ffffff; color: #1f4d0a; border: none; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; padding: 6px 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">Install</button>
+    </div>
+  `;
+
+  if (!document.getElementById('pwa-banner-style')) {
+    const style = document.createElement('style');
+    style.id = 'pwa-banner-style';
+    style.textContent = `
+      @keyframes slideUp {
+        from { transform: translateY(120%); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  document.body.appendChild(banner);
+
+  document.getElementById('pwa-close-btn').addEventListener('click', () => {
+    banner.remove();
+  });
+
+  document.getElementById('pwa-install-btn').addEventListener('click', () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then((choiceResult) => {
+        if (choiceResult.outcome === 'accepted') {
+          console.log('User accepted the PWA install prompt');
+        }
+        deferredPrompt = null;
+        banner.remove();
+      });
+    }
+  });
+}
+

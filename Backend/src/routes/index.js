@@ -9,7 +9,7 @@ const router = Router();
 router.get("/health", (_req, res) => {
   res.status(200).json({
     success: true,
-    message: "Egg Source API is running",
+    message: "Egg Connect API is running",
     timestamp: new Date().toISOString(),
   });
 });

@@ -6,7 +6,7 @@ const seedSuperAdmin = async () => {
   try {
     const adminExists = await User.findOne({ role: "SUPER_ADMIN" });
     if (!adminExists) {
-      const email = env.INITIAL_ADMIN_EMAIL || "admin@eggsource.dev";
+      const email = env.INITIAL_ADMIN_EMAIL || "admin@eggconnect.app";
       const password = env.INITIAL_ADMIN_PASSWORD || "AdminPass123!";
 
       await User.create({

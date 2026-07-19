@@ -3,12 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Auth — Egg Source</title>
+  <title>Auth — Egg Connect</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/assets/css/tokens.css">
   <link rel="stylesheet" href="/css/style.css">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#1f4d0a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="apple-touch-icon" href="/assets/images/logo-egg.png">
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
 </head>
 <body class="page-auth">
@@ -36,15 +41,13 @@
         <div class="auth-card">
           <!-- Logo Container -->
           <div class="auth-logo-box">
-            <div class="logo-circle">
-              <i data-lucide="egg"></i>
-            </div>
+            <img src="/assets/images/logo-egg.svg" alt="Egg Connect Logo" style="width: 64px; height: 64px; object-fit: contain;">
           </div>
 
           <!-- Login Container Header -->
           <div id="login-header-group">
             <h2 class="auth-title">Welcome Back</h2>
-            <p class="auth-subtitle">Access your Egg Source account</p>
+            <p class="auth-subtitle">Access your Egg Connect account</p>
           </div>
 
           <!-- Register Container Header (Hidden by default) -->
@@ -144,11 +147,7 @@
             <button id="register-submit" type="submit" class="btn btn-gradient" style="width:100%;">Create Account</button>
           </form>
 
-          <div class="auth-footer">
-            <a href="#">Help</a>
-            <a href="#">Privacy</a>
-            <a href="mailto:contact@eggsource.dev">Contact Support</a>
-          </div>
+
         </div>
       </section>
     </div>

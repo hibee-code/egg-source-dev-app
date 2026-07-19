@@ -436,6 +436,19 @@ const applyFilters = async (page = 1) => {
   Loading.show(btn, 'Searching...');
   currentPage = page;
 
+  const grid = $('#marketplace-results-grid');
+  if (grid) {
+    grid.innerHTML = Array(6).fill(0).map(() => `
+      <div class="skeleton-card">
+        <div class="skeleton" style="height: 160px; width: 100%; border-radius: var(--radius-card);"></div>
+        <div class="skeleton skeleton-title"></div>
+        <div class="skeleton skeleton-text"></div>
+        <div class="skeleton skeleton-text-short"></div>
+        <div class="skeleton skeleton-btn"></div>
+      </div>
+    `).join('');
+  }
+
   try {
     const selectedTypeBtn = document.querySelector('.type-pill.active');
     const farmType = selectedTypeBtn ? selectedTypeBtn.dataset.type : '';

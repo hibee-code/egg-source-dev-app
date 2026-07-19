@@ -118,7 +118,7 @@ const submitRegistration = async (event) => {
 
   try {
     const response = await AdminAPI.acceptInvitation(token, payload);
-    Toast.success("Registration complete! Welcome to Egg Source.");
+    Toast.success("Registration complete! Welcome to Egg Connect.");
     
     // Store credentials
     Auth.setToken(response.data.accessToken);
