@@ -1,6 +1,8 @@
 const { Router } = require("express");
 const adminController = require("../controllers/admin.controller");
 const { protect, restrictTo } = require("../middleware/auth.middleware");
+const validate = require("../middleware/validate.middleware");
+const { updateUserStatusSchema } = require("../validators/admin.validator");
 
 const router = Router();
 
@@ -10,7 +12,11 @@ router.use(protect);
 router.use(restrictTo("*"));
 
 router.get("/users", adminController.getUsers);
-router.patch("/users/:id/status", adminController.updateUserStatus);
+router.patch(
+  "/users/:id/status",
+  validate(updateUserStatusSchema),
+  adminController.updateUserStatus
+);
 router.get("/audit-logs", adminController.getAuditLogs);
 router.get("/stats", adminController.getDashboardStats);
 

@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terms of Service — Egg Connect</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/tokens.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#1f4d0a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="apple-touch-icon" href="/assets/images/logo-egg.png">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
+  <style>
+    .legal-container {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 0 24px;
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 40px;
+    }
+    .legal-sidebar {
+      position: sticky;
+      top: 100px;
+      height: fit-content;
+    }
+    .legal-nav {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .legal-nav-link {
+      color: var(--color-text-muted);
+      text-decoration: none;
+      font-size: 0.92rem;
+      font-weight: 500;
+      transition: color var(--transition);
+      display: block;
+      padding: 6px 0;
+      border-left: 2px solid transparent;
+      padding-left: 14px;
+    }
+    .legal-nav-link:hover, .legal-nav-link.active {
+      color: var(--color-primary);
+      border-left-color: var(--color-primary);
+    }
+    .legal-content-card {
+      background: var(--color-card);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-card);
+      padding: 40px;
+      box-shadow: var(--shadow-card);
+    }
+    .legal-header {
+      margin-bottom: 32px;
+      border-bottom: 1px solid var(--color-border);
+      padding-bottom: 24px;
+    }
+    .legal-title {
+      font-size: 2.25rem;
+      font-weight: 800;
+      color: var(--color-text);
+      margin: 0 0 12px;
+    }
+    .legal-subtitle {
+      color: var(--color-text-muted);
+      font-size: 0.95rem;
+      margin: 0;
+    }
+    .legal-section {
+      margin-bottom: 40px;
+    }
+    .legal-section h2 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--color-text);
+      margin: 0 0 16px;
+      scroll-margin-top: 100px;
+    }
+    .legal-section p {
+      color: var(--color-text-muted);
+      line-height: 1.7;
+      font-size: 0.95rem;
+      margin: 0 0 16px;
+    }
+    .legal-section ul {
+      color: var(--color-text-muted);
+      line-height: 1.7;
+      font-size: 0.95rem;
+      margin: 0 0 16px;
+      padding-left: 20px;
+    }
+    .legal-section li {
+      margin-bottom: 8px;
+    }
+    .law-badge {
+      background: rgba(31, 77, 10, 0.08);
+      border: 1px solid rgba(31, 77, 10, 0.15);
+      color: var(--color-primary);
+      padding: 12px 18px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      margin-bottom: 32px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .law-badge i {
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    @media (max-width: 992px) {
+      .legal-container {
+        grid-template-columns: 1fr;
+        margin: 24px auto;
+      }
+      .legal-sidebar {
+        display: none;
+      }
+      .legal-content-card {
+        padding: 24px;
+      }
+    }
+  </style>
+</head>
+<body class="page-legal">
+  <div class="page-watermark"></div>
+  <div id="navbar-root"></div>
+  
+  <main class="page">
+    <div class="legal-container">
+      <!-- Sticky Navigation Table of Contents -->
+      <aside class="legal-sidebar">
+        <ul class="legal-nav">
+          <li><a href="#acceptance" class="legal-nav-link active">1. Acceptance of Terms</a></li>
+          <li><a href="#platform-model" class="legal-nav-link">2. Platform Model</a></li>
+          <li><a href="#user-accounts" class="legal-nav-link">3. Accounts & Verification</a></li>
+          <li><a href="#escrow-protection" class="legal-nav-link">4. Escrow Protection</a></li>
+          <li><a href="#listings" class="legal-nav-link">5. Listings & Pricing</a></li>
+          <li><a href="#user-conduct" class="legal-nav-link">6. User Conduct</a></li>
+          <li><a href="#liability" class="legal-nav-link">7. Limitation of Liability</a></li>
+          <li><a href="#disputes" class="legal-nav-link">8. Disputes & Arbitration</a></li>
+          <li><a href="#termination" class="legal-nav-link">9. Modifications</a></li>
+        </ul>
+      </aside>
+
+      <!-- Main Legal Content -->
+      <section class="legal-content-card">
+        <div class="legal-header">
+          <h1 class="legal-title">Terms of Service</h1>
+          <p class="legal-subtitle">Last Updated: July 19, 2026</p>
+        </div>
+
+        <div class="law-badge">
+          <i data-lucide="scale" style="width: 20px; height: 20px;"></i>
+          <span>This agreement is governed by the laws of the Federal Republic of Nigeria and complies with the Federal Competition and Consumer Protection Act (FCCPA).</span>
+        </div>
+
+        <div id="acceptance" class="legal-section">
+          <h2>1. Acceptance of Terms</h2>
+          <p>Welcome to Egg Connect ("the Platform"). By accessing or using our websites, services, directories, and mobile-responsive applications, you agree to comply with and be bound by these Terms of Service. If you do not agree to these terms, please do not use the Platform.</p>
+          <p>These terms constitute a legally binding agreement between you (whether as a Buyer, Farm Owner, or Agent) and Egg Connect.</p>
+        </div>
+
+        <div id="platform-model" class="legal-section">
+          <h2>2. The Marketplace Platform Model</h2>
+          <p>Egg Connect is an online marketplace directory that facilitates transactions between wholesale or commercial egg buyers and verified local poultry producers. You acknowledge and agree that:</p>
+          <ul>
+            <li>Egg Connect is not a poultry farm, egg producer, or logistics carrier. We do not own, sell, inspect, or store physical egg inventories listed on the platform.</li>
+            <li>Any booking, purchase agreement, delivery schedule, or payment negotiation is a direct contract between the buyer and the respective seller.</li>
+            <li>We perform compliance verification checks on farm owners; however, we do not guarantee the biological health, hatch date, grade size, or fresh quality of listed poultry products.</li>
+          </ul>
+        </div>
+
+        <div id="user-accounts" class="legal-section">
+          <h2>3. User Accounts and Verification</h2>
+          <p>To use our booking and escrow services, you must register for an account. You agree to:</p>
+          <ul>
+            <li>Provide accurate, current, and complete information during registration.</li>
+            <li>Maintain the security of your credentials and immediately notify us of any unauthorized account access.</li>
+            <li>Complete our identity and farm verification processes when registering as a Farm Owner, which may require uploading government identification and CAC registration records if applicable.</li>
+          </ul>
+        </div>
+
+        <div id="escrow-protection" class="legal-section">
+          <h2>4. Escrow Protection Terms</h2>
+          <p>To protect buyers and sellers, Egg Connect operates an Escrow Protection system:</p>
+          <ul>
+            <li><strong>Securing Funds:</strong> Buyers secure bookings by depositing the purchase price into an authorized, neutral Escrow account.</li>
+            <li><strong>Fulfillment Verification:</strong> Funds are securely held and are only released to the seller after the buyer confirms successful receipt of the egg batch at pickup/delivery, or when the contract terms are met.</li>
+            <li><strong>Disputes:</strong> If a delivery is delayed, short-filled, or defective, either party can trigger a transaction dispute. Funds will remain locked in escrow until the dispute is resolved amicably or via arbitration.</li>
+          </ul>
+        </div>
+
+        <div id="listings" class="legal-section">
+          <h2>5. Listings, Bookings, and Pricing</h2>
+          <p>Sellers are responsible for the accuracy of their listings. All egg listings must specify current stock size, crates quantity, pricing per crate, and collection details. Listings must not contain misleading product metrics. Egg Connect reserves the right to suspend or remove any listings that violate user guidelines or receive recurring buyer complaints.</p>
+        </div>
+
+        <div id="user-conduct" class="legal-section">
+          <h2>6. Acceptable Use and Cyber-Safety</h2>
+          <p>In accordance with the Cybercrimes (Prohibition, Prevention, etc.) Act 2015, you agree not to:</p>
+          <ul>
+            <li>Publish false, fraudulent, or deceptive listings.</li>
+            <li>Attempt to bypass our escrow protection system by conducting off-platform payments for bookings initialized on Egg Connect.</li>
+            <li>Introduce malicious code, Trojans, or attempt database injections on our secure server layers.</li>
+            <li>Harass, threaten, or defraud other users of the platform.</li>
+          </ul>
+        </div>
+
+        <div id="liability" class="legal-section">
+          <h2>7. Limitation of Liability</h2>
+          <p>To the maximum extent permitted by Nigerian law, Egg Connect and its directors, employees, or agents shall not be liable for any indirect, incidental, special, consequential, or punitive damages. This includes loss of profits, loss of livestock, transit damage, spoilage of egg inventory, or escrow transaction delays arising out of your use of the Platform.</p>
+        </div>
+
+        <div id="disputes" class="legal-section">
+          <h2>8. Dispute Resolution and Governing Law</h2>
+          <p>These terms and all transactions on Egg Connect are governed by and construed in accordance with the laws of the Federal Republic of Nigeria.</p>
+          <p>Any dispute, claim, or controversy arising out of these Terms shall first be referred to amicable negotiation. If unresolved within thirty (30) days, the dispute shall be referred to and resolved by binding arbitration in Lagos, Nigeria, in accordance with the **Arbitration and Mediation Act 2023**. The language of arbitration shall be English.</p>
+        </div>
+
+        <div id="termination" class="legal-section">
+          <h2>9. Modifications to Terms</h2>
+          <p>We reserve the right, at our sole discretion, to modify or replace these Terms of Service at any time. We will provide notice of material updates by posting the updated terms on this page and updating the "Last Updated" timestamp. Continued use of the platform after changes are posted constitutes acceptance of the new terms.</p>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script type="module" src="/components/layout/navbar.js"></script>
+  <script>
+    // Smooth navigation highlighting on scroll
+    document.addEventListener('DOMContentLoaded', () => {
+      const sections = document.querySelectorAll('.legal-section');
+      const navLinks = document.querySelectorAll('.legal-nav-link');
+
+      window.addEventListener('scroll', () => {
+        let current = '';
+        sections.forEach(section => {
+          const sectionTop = section.offsetTop;
+          if (pageYOffset >= sectionTop - 120) {
+            current = section.getAttribute('id');
+          }
+        });
+
+        navLinks.forEach(link => {
+          link.classList.remove('active');
+          if (link.getAttribute('href').substring(1) === current) {
+            link.classList.add('active');
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>

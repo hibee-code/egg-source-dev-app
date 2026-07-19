@@ -3,12 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Egg Source — Find Fresh Eggs Near You</title>
+  <title>Egg Connect — Find Fresh Eggs Near You</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/assets/css/tokens.css">
   <link rel="stylesheet" href="/css/style.css">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#1f4d0a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="apple-touch-icon" href="/assets/images/logo-egg.png">
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
 </head>
 <body class="page-home">
@@ -112,8 +117,8 @@
       <div class="footer-grid">
         <div class="footer-brand-column">
           <div class="logo" style="display: inline-flex; align-items: center; gap: 8px; font-family: 'Outfit', sans-serif; font-size: 1.4rem; font-weight: 800; color: #fff; margin-bottom: 16px;">
-            <img src="/assets/images/logo-egg.png" alt="Egg Source Logo" style="width: 32px; height: 32px; object-fit: contain; filter: brightness(0) invert(1);">
-            <span>Egg <span style="color: var(--color-accent);">Source</span></span>
+            <img src="/assets/images/logo-egg.svg" alt="Egg Connect Logo" style="width: 32px; height: 32px; object-fit: contain; filter: brightness(0) invert(1);">
+            <span>Egg <span style="color: var(--color-accent);">Connect</span></span>
           </div>
           <p style="color: var(--color-text-muted); line-height: 1.6; font-size: 0.92rem; max-width: 260px; margin: 0;">
             Fresh poultry sourcing made easy. Connecting verified producers and buyers through secure escrow transactions.
@@ -121,32 +126,32 @@
         </div>
         <div>
           <h3 style="font-size: 0.95rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #fff; margin-bottom: 20px; margin-top: 0;">Product</h3>
-          <a href="/pages/marketplace.html" style="color: var(--color-text-muted); text-decoration: none; display: block; margin-bottom: 12px; font-size: 0.92rem; transition: color var(--transition);">Marketplace</a>
-          <a href="/pages/marketplace.html" style="color: var(--color-text-muted); text-decoration: none; display: block; margin-bottom: 12px; font-size: 0.92rem; transition: color var(--transition);">Sourcing Directory</a>
-          <a href="#" style="color: var(--color-text-muted); text-decoration: none; display: block; margin-bottom: 12px; font-size: 0.92rem; transition: color var(--transition);">Escrow Protection</a>
-          <a href="#" style="color: var(--color-text-muted); text-decoration: none; display: block; margin-bottom: 12px; font-size: 0.92rem; transition: color var(--transition);">Booking Manager</a>
+          <span style="color: var(--color-text-muted); display: block; margin-bottom: 12px; font-size: 0.92rem;">Marketplace</span>
+          <span style="color: var(--color-text-muted); display: block; margin-bottom: 12px; font-size: 0.92rem;">Sourcing Directory</span>
+          <span style="color: var(--color-text-muted); display: block; margin-bottom: 12px; font-size: 0.92rem;">Escrow Protection</span>
+          <span style="color: var(--color-text-muted); display: block; margin-bottom: 12px; font-size: 0.92rem;">Booking Manager</span>
         </div>
         <div>
           <h3 style="font-size: 0.95rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #fff; margin-bottom: 20px; margin-top: 0;">Community</h3>
-          <a href="#" style="color: var(--color-text-muted); text-decoration: none; display: block; margin-bottom: 12px; font-size: 0.92rem; transition: color var(--transition);">Farms Network</a>
-          <a href="#" style="color: var(--color-text-muted); text-decoration: none; display: block; margin-bottom: 12px; font-size: 0.92rem; transition: color var(--transition);">Buyer Hubs</a>
-          <a href="#" style="color: var(--color-text-muted); text-decoration: none; display: block; margin-bottom: 12px; font-size: 0.92rem; transition: color var(--transition);">Partner Program</a>
+          <span style="color: var(--color-text-muted); display: block; margin-bottom: 12px; font-size: 0.92rem;">Farms Network</span>
+          <span style="color: var(--color-text-muted); display: block; margin-bottom: 12px; font-size: 0.92rem;">Buyer Hubs</span>
+          <span style="color: var(--color-text-muted); display: block; margin-bottom: 12px; font-size: 0.92rem;">Partner Program</span>
         </div>
         <div>
           <h3 style="font-size: 0.95rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #fff; margin-bottom: 20px; margin-top: 0;">Company</h3>
-          <a href="#" style="color: var(--color-text-muted); text-decoration: none; display: block; margin-bottom: 12px; font-size: 0.92rem; transition: color var(--transition);">About Us</a>
-          <a href="#" style="color: var(--color-text-muted); text-decoration: none; display: block; margin-bottom: 12px; font-size: 0.92rem; transition: color var(--transition);">Careers</a>
-          <a href="mailto:support@eggsource.dev" style="color: var(--color-text-muted); text-decoration: none; display: block; margin-bottom: 12px; font-size: 0.92rem; transition: color var(--transition);">Contact Support</a>
+          <span style="color: var(--color-text-muted); display: block; margin-bottom: 12px; font-size: 0.92rem;">About Us</span>
+          <span style="color: var(--color-text-muted); display: block; margin-bottom: 12px; font-size: 0.92rem;">Careers</span>
+          <span style="color: var(--color-text-muted); display: block; margin-bottom: 12px; font-size: 0.92rem;">Contact Support</span>
         </div>
         <div>
           <h3 style="font-size: 0.95rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #fff; margin-bottom: 20px; margin-top: 0;">Legal</h3>
-          <a href="#" style="color: var(--color-text-muted); text-decoration: none; display: block; margin-bottom: 12px; font-size: 0.92rem; transition: color var(--transition);">Privacy Policy</a>
-          <a href="#" style="color: var(--color-text-muted); text-decoration: none; display: block; margin-bottom: 12px; font-size: 0.92rem; transition: color var(--transition);">Terms of Service</a>
-          <a href="#" style="color: var(--color-text-muted); text-decoration: none; display: block; margin-bottom: 12px; font-size: 0.92rem; transition: color var(--transition);">Cookie Policy</a>
+          <a href="/pages/privacy.html" style="color: var(--color-text-muted); text-decoration: none; display: block; margin-bottom: 12px; font-size: 0.92rem; transition: color var(--transition);">Privacy Policy</a>
+          <a href="/pages/terms.html" style="color: var(--color-text-muted); text-decoration: none; display: block; margin-bottom: 12px; font-size: 0.92rem; transition: color var(--transition);">Terms of Service</a>
+          <span style="color: var(--color-text-muted); display: block; margin-bottom: 12px; font-size: 0.92rem;">Cookie Policy</span>
         </div>
       </div>
       <div class="footer-bottom" style="margin-top: 48px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 24px; display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; color: var(--color-text-muted);">
-        <span>© 2026 Egg Source. All rights reserved.</span>
+        <span>© 2026 Egg Connect. All rights reserved.</span>
         <span>Built for farmers, by poultry sourcing specialists</span>
       </div>
     </footer>

@@ -1,5 +1,5 @@
 /**
- * User roles for the Egg Source platform.
+ * User roles for the Egg Connect platform.
  */
 const ROLES = Object.freeze({
   SUPER_ADMIN: "SUPER_ADMIN",

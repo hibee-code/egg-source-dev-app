@@ -19,7 +19,7 @@ class EmailService {
 
   /**
    * General template wrapper for standardizing visual branding.
-   * Uses Egg Source green accents (#1f4d0a) and slate colors.
+   * Uses Egg Connect green accents (#1f4d0a) and slate colors.
    */
   _getHtmlLayout(title, contentHtml) {
     return `
@@ -122,14 +122,14 @@ class EmailService {
         <div class="wrapper">
           <div class="container">
             <div class="header">
-              <div class="logo-text">ES <span>Egg Source</span></div>
+              <div class="logo-text">EC <span>Egg Connect</span></div>
             </div>
             <div class="content">
               ${contentHtml}
             </div>
             <div class="footer">
-              <p>This is an automated system notification from Egg Source.</p>
-              <p>&copy; ${new Date().getFullYear()} Egg Source Dev Platform. All rights reserved.</p>
+              <p>This is an automated system notification from Egg Connect.</p>
+              <p>&copy; ${new Date().getFullYear()} Egg Connect Dev Platform. All rights reserved.</p>
             </div>
           </div>
         </div>
@@ -180,14 +180,14 @@ class EmailService {
    */
   async sendFarmOwnerInvitation(to, businessName, inviteLink, isResend = false) {
     const subject = isResend
-      ? `Egg Source — Invited to join as Farm Owner (Resent)`
-      : `Egg Source — Invited to join as Farm Owner`;
+      ? `Egg Connect — Invited to join as Farm Owner (Resent)`
+      : `Egg Connect — Invited to join as Farm Owner`;
 
-    const title = isResend ? "Invitation Resent" : "Invitation to Join Egg Source";
+    const title = isResend ? "Invitation Resent" : "Invitation to Join Egg Connect";
 
     const contentHtml = `
       <h1>Hello,</h1>
-      <p>You have been invited to register your poultry farm <strong>"${businessName}"</strong> on the <strong>Egg Source</strong> marketplace as a Farm Owner.</p>
+      <p>You have been invited to register your poultry farm <strong>"${businessName}"</strong> on the <strong>Egg Connect</strong> marketplace as a Farm Owner.</p>
       <p>By onboarding, you will gain access to direct buyer transactions, order requests, and inventory tracking tools.</p>
       <p>Please click the button below to complete your registration and activate your seller account:</p>
       <div class="btn-container">
@@ -204,7 +204,7 @@ class EmailService {
 
     const text = `Hi there,
 
-You have been invited to register your farm "${businessName}" on Egg Source as a Farm Owner.
+You have been invited to register your farm "${businessName}" on Egg Connect as a Farm Owner.
 
 Please click the link below to complete your registration and activate your account:
 ${inviteLink}
@@ -212,7 +212,7 @@ ${inviteLink}
 This invitation link is single-use and will expire in 24 hours.
 
 Best regards,
-Egg Source Team`;
+Egg Connect Team`;
 
     return this._send({
       to,
@@ -226,12 +226,12 @@ Egg Source Team`;
    * Send verification email to customers and partners.
    */
   async sendVerificationEmail(to, name, verificationLink) {
-    const subject = "Egg Source — Verify Your Email Address";
+    const subject = "Egg Connect — Verify Your Email Address";
     const title = "Verify Your Email";
 
     const contentHtml = `
       <h1>Hi ${name},</h1>
-      <p>Thank you for signing up on <strong>Egg Source</strong>! We are excited to have you join our digital egg-sourcing marketplace.</p>
+      <p>Thank you for signing up on <strong>Egg Connect</strong>! We are excited to have you join our digital egg-sourcing marketplace.</p>
       <p>To confirm your email address and activate your account, please click the verification button below:</p>
       <div class="btn-container">
         <a href="${verificationLink}" target="_blank" class="btn">Verify Email Address</a>
@@ -247,14 +247,14 @@ Egg Source Team`;
 
     const text = `Hi ${name},
 
-Welcome to Egg Source! Please verify your email by clicking the link below:
+Welcome to Egg Connect! Please verify your email by clicking the link below:
 
 ${verificationLink}
 
 This link will expire in 24 hours.
 
 Best regards,
-Egg Source Team`;
+Egg Connect Team`;
 
     return this._send({
       to,
@@ -268,12 +268,12 @@ Egg Source Team`;
    * Send password reset verification links.
    */
   async sendPasswordResetEmail(to, name, resetLink) {
-    const subject = "Egg Source — Password Reset Request";
+    const subject = "Egg Connect — Password Reset Request";
     const title = "Password Reset Request";
 
     const contentHtml = `
       <h1>Hi ${name},</h1>
-      <p>We received a request to reset the password for your <strong>Egg Source</strong> account.</p>
+      <p>We received a request to reset the password for your <strong>Egg Connect</strong> account.</p>
       <p>To set a new password, click the button below:</p>
       <div class="btn-container">
         <a href="${resetLink}" target="_blank" class="btn">Reset Password</a>
@@ -296,7 +296,7 @@ ${resetLink}
 This link is valid for 10 minutes. If you didn't request this, please ignore this email.
 
 Best regards,
-Egg Source Team`;
+Egg Connect Team`;
 
     return this._send({
       to,

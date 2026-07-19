@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy — Egg Connect</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/tokens.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#1f4d0a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="apple-touch-icon" href="/assets/images/logo-egg.png">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
+  <style>
+    .legal-container {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 0 24px;
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 40px;
+    }
+    .legal-sidebar {
+      position: sticky;
+      top: 100px;
+      height: fit-content;
+    }
+    .legal-nav {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .legal-nav-link {
+      color: var(--color-text-muted);
+      text-decoration: none;
+      font-size: 0.92rem;
+      font-weight: 500;
+      transition: color var(--transition);
+      display: block;
+      padding: 6px 0;
+      border-left: 2px solid transparent;
+      padding-left: 14px;
+    }
+    .legal-nav-link:hover, .legal-nav-link.active {
+      color: var(--color-primary);
+      border-left-color: var(--color-primary);
+    }
+    .legal-content-card {
+      background: var(--color-card);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-card);
+      padding: 40px;
+      box-shadow: var(--shadow-card);
+    }
+    .legal-header {
+      margin-bottom: 32px;
+      border-bottom: 1px solid var(--color-border);
+      padding-bottom: 24px;
+    }
+    .legal-title {
+      font-size: 2.25rem;
+      font-weight: 800;
+      color: var(--color-text);
+      margin: 0 0 12px;
+    }
+    .legal-subtitle {
+      color: var(--color-text-muted);
+      font-size: 0.95rem;
+      margin: 0;
+    }
+    .legal-section {
+      margin-bottom: 40px;
+    }
+    .legal-section h2 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--color-text);
+      margin: 0 0 16px;
+      scroll-margin-top: 100px;
+    }
+    .legal-section p {
+      color: var(--color-text-muted);
+      line-height: 1.7;
+      font-size: 0.95rem;
+      margin: 0 0 16px;
+    }
+    .legal-section ul {
+      color: var(--color-text-muted);
+      line-height: 1.7;
+      font-size: 0.95rem;
+      margin: 0 0 16px;
+      padding-left: 20px;
+    }
+    .legal-section li {
+      margin-bottom: 8px;
+    }
+    .law-badge {
+      background: rgba(31, 77, 10, 0.08);
+      border: 1px solid rgba(31, 77, 10, 0.15);
+      color: var(--color-primary);
+      padding: 12px 18px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      margin-bottom: 32px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .law-badge i {
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    @media (max-width: 992px) {
+      .legal-container {
+        grid-template-columns: 1fr;
+        margin: 24px auto;
+      }
+      .legal-sidebar {
+        display: none;
+      }
+      .legal-content-card {
+        padding: 24px;
+      }
+    }
+  </style>
+</head>
+<body class="page-legal">
+  <div class="page-watermark"></div>
+  <div id="navbar-root"></div>
+  
+  <main class="page">
+    <div class="legal-container">
+      <!-- Sticky Navigation Table of Contents -->
+      <aside class="legal-sidebar">
+        <ul class="legal-nav">
+          <li><a href="#introduction" class="legal-nav-link active">1. Introduction</a></li>
+          <li><a href="#data-collected" class="legal-nav-link">2. Data We Collect</a></li>
+          <li><a href="#processing-purpose" class="legal-nav-link">3. Processing Purposes</a></li>
+          <li><a href="#legal-basis" class="legal-nav-link">4. Legal Grounds</a></li>
+          <li><a href="#security" class="legal-nav-link">5. Data Security</a></li>
+          <li><a href="#rights" class="legal-nav-link">6. Data Subject Rights</a></li>
+          <li><a href="#transfers" class="legal-nav-link">7. Cross-Border Transfers</a></li>
+          <li><a href="#retention" class="legal-nav-link">8. Data Retention</a></li>
+          <li><a href="#contact" class="legal-nav-link">9. Support & Contact</a></li>
+        </ul>
+      </aside>
+
+      <!-- Main Legal Content -->
+      <section class="legal-content-card">
+        <div class="legal-header">
+          <h1 class="legal-title">Privacy Policy</h1>
+          <p class="legal-subtitle">Last Updated: July 19, 2026</p>
+        </div>
+
+        <div class="law-badge">
+          <i data-lucide="shield-check" style="width: 20px; height: 20px;"></i>
+          <span>This privacy policy is designed in strict compliance with the <strong>Nigeria Data Protection Act (NDPA) 2023</strong> and the <strong>Nigeria Data Protection Regulation (NDPR) 2019</strong> as audited by the Nigeria Data Protection Commission (NDPC).</span>
+        </div>
+
+        <div id="introduction" class="legal-section">
+          <h2>1. Introduction</h2>
+          <p>Welcome to Egg Connect. Egg Connect ("we," "us," or "our") respects your privacy and is committed to protecting your personal data in compliance with the laws of the Federal Republic of Nigeria. This Privacy Policy describes how we collect, use, process, and protect your personal information when you access our mobile and web applications and use our egg sourcing, verification, and escrow protection services.</p>
+          <p>By registering an account, purchasing eggs, or listing poultry products on Egg Connect, you consent to the processing of your personal data as outlined in this policy.</p>
+        </div>
+
+        <div id="data-collected" class="legal-section">
+          <h2>2. Personal Data We Collect</h2>
+          <p>We collect information that identifies or can be reasonably associated with you. This includes:</p>
+          <ul>
+            <li><strong>Identity & Account Details:</strong> Full name, email address, telephone number, user role (Buyer, Farm Owner, Administrator), and verification documents (such as government-issued IDs for farm owners).</li>
+            <li><strong>Poultry Farm Profile Details:</strong> Farm name, state, local government area (LGA), physical address, inventory descriptions, production scale, and location coordinate metrics.</li>
+            <li><strong>Transactional Records:</strong> Listing details, booking requests, transactional histories, invoice records, and escrow transaction states.</li>
+            <li><strong>Technical Data:</strong> IP address, device model, operating system, browser configuration, and application interaction metrics.</li>
+          </ul>
+        </div>
+
+        <div id="processing-purpose" class="legal-section">
+          <h2>3. Purposes for Processing Data</h2>
+          <p>We process your personal data for clear, specific, and lawful purposes under Nigerian law, including:</p>
+          <ul>
+            <li>Facilitating the connection between commercial egg buyers and verified poultry farms.</li>
+            <li>Operating and managing our secure booking and escrow protection transaction system.</li>
+            <li>Verifying the identity of farm operators to prevent fraudulent listings.</li>
+            <li>Sending critical transactional updates, invitation links, OTP notifications, and security alerts.</li>
+            <li>Complying with regulatory obligations under the Cybercrimes Act, FCCPA guidelines, and tax laws.</li>
+          </ul>
+        </div>
+
+        <div id="legal-basis" class="legal-section">
+          <h2>4. Legal Grounds for Processing</h2>
+          <p>Under Section 25 of the NDPA 2023, we process your information based on the following legal grounds:</p>
+          <ul>
+            <li><strong>Consent:</strong> You have given clear consent for us to process your data for specific operations.</li>
+            <li><strong>Contract Fulfillment:</strong> Processing is necessary to execute the contract/order agreement between you (buyer or seller) and Egg Connect.</li>
+            <li><strong>Legal Obligation:</strong> Processing is necessary to comply with financial, cyber-safety, or statutory audit requirements in Nigeria.</li>
+            <li><strong>Legitimate Interest:</strong> Processing supports our service delivery, security audit trail logs, and optimization of user layouts.</li>
+          </ul>
+        </div>
+
+        <div id="security" class="legal-section">
+          <h2>5. Data Security and Safeguards</h2>
+          <p>Egg Connect implements robust technical, organizational, and physical security measures to protect your personal data against unauthorized access, alteration, disclosure, or destruction. We utilize industry-standard TLS encryption for data in transit, secure database hashing algorithms (e.g. bcrypt for password storage), server-level audit trails, and strict role-based access controllers (RBAC).</p>
+        </div>
+
+        <div id="rights" class="legal-section">
+          <h2>6. Your Rights as a Data Subject</h2>
+          <p>Pursuant to the NDPA 2023, you hold the following rights regarding your personal information:</p>
+          <ul>
+            <li><strong>Right of Access:</strong> You can request confirmation of and access to the personal data we hold about you.</li>
+            <li><strong>Right to Rectification:</strong> You can request immediate correction of inaccurate or incomplete personal records.</li>
+            <li><strong>Right to Erasure ("Right to be Forgotten"):</strong> You can request the deletion of your account and personal data, subject to regulatory transaction-retention mandates.</li>
+            <li><strong>Right to Object/Restrict:</strong> You can object to the processing of your data for direct marketing or request restrictions on processing during dispute investigations.</li>
+            <li><strong>Right to Data Portability:</strong> You can request to receive your profile and listing details in a structured, machine-readable format.</li>
+            <li><strong>Right to Lodge a Complaint:</strong> You have the right to lodge a complaint with the Nigeria Data Protection Commission (NDPC).</li>
+          </ul>
+        </div>
+
+        <div id="transfers" class="legal-section">
+          <h2>7. Cross-Border Data Transfers</h2>
+          <p>Your personal data is primary hosted on secure cloud infrastructure located within Nigeria or in jurisdictions that guarantee an adequate level of data protection in compliance with Section 41 of the NDPA 2023. Any international transfer of data complies with NDPC audited safeguard mechanisms.</p>
+        </div>
+
+        <div id="retention" class="legal-section">
+          <h2>8. Data Retention</h2>
+          <p>We retain your personal data only for as long as necessary to fulfill the purposes described in this policy, satisfy legal audit logs requirements, or resolve transactional escrow disputes. Upon expiration of the retention period, data is securely anonymized or permanently deleted.</p>
+        </div>
+
+        <div id="contact" class="legal-section">
+          <h2>9. Support, Inquiries and DPO</h2>
+          <p>If you have questions regarding this Privacy Policy, wish to exercise any of your data rights, or contact our Data Protection Officer, please reach out to us:</p>
+          <p style="margin-bottom: 0;">
+            <strong>Egg Connect Privacy Office</strong><br>
+            Email: <a href="mailto:support@eggconnect.app" style="color: var(--color-primary); text-decoration: none;">support@eggconnect.app</a><br>
+            Legal Division: Lagos, Nigeria.
+          </p>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script type="module" src="/components/layout/navbar.js"></script>
+  <script>
+    // Smooth navigation highlighting on scroll
+    document.addEventListener('DOMContentLoaded', () => {
+      const sections = document.querySelectorAll('.legal-section');
+      const navLinks = document.querySelectorAll('.legal-nav-link');
+
+      window.addEventListener('scroll', () => {
+        let current = '';
+        sections.forEach(section => {
+          const sectionTop = section.offsetTop;
+          if (pageYOffset >= sectionTop - 120) {
+            current = section.getAttribute('id');
+          }
+        });
+
+        navLinks.forEach(link => {
+          link.classList.remove('active');
+          if (link.getAttribute('href').substring(1) === current) {
+            link.classList.add('active');
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>

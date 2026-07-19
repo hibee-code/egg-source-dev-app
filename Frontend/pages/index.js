@@ -3,7 +3,7 @@ import { Format, Toast, $ } from '/assets/js/utils.js';
 import { PoultryAPI } from '/assets/js/api.js';
 
 const testimonials = [
-  { quote: 'Egg Source made it easy to compare poultry farms and place bookings fast.', name: 'Sade Ogun', role: 'Retail Buyer' },
+  { quote: 'Egg Connect made it easy to compare poultry farms and place bookings fast.', name: 'Sade Ogun', role: 'Retail Buyer' },
   { quote: 'As a farmer, I now reach more buyers with reliable orders and better pricing.', name: 'Tunde Adebayo', role: 'Farm Owner' },
   { quote: 'The marketplace design helped our brand look professional to buyers nationwide.', name: 'Nkechi Okechukwu', role: 'Supply Chain Lead' },
 ];
