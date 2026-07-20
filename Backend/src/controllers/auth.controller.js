@@ -54,15 +54,15 @@ const login = catchAsync(async (req, res) => {
   );
 
   const redirects = {
-    SUPER_ADMIN: "/pages/dashboard-admin.html",
-    FARM_OWNER: "/pages/dashboard-farm.html",
-    CUSTOMER: "/pages/dashboard-buyer.html",
+    SUPER_ADMIN: "/dashboard-admin",
+    FARM_OWNER: "/dashboard-farm",
+    CUSTOMER: "/dashboard-buyer",
   };
 
   sendSuccess(res, 200, "Login successful", {
     user,
     accessToken,
-    redirectUrl: redirects[user.role] || "/pages/dashboard-buyer.html",
+    redirectUrl: redirects[user.role] || "/dashboard-buyer",
   });
 });
 

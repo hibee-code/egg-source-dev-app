@@ -61,11 +61,24 @@ app.use("/api/search", searchRoutes);
 app.use("/api/bookings", bookingRoutes);
 
 // ── Serve static frontend assets ──────────────────────────
-app.use(express.static(path.join(__dirname, "../../Frontend")));
+const FRONTEND_DIR = path.join(__dirname, "../../Frontend");
+app.use(express.static(FRONTEND_DIR));
 
-// ── Root SPA fallback route ────────────────────────────────
+// ── Clean Page Routes ──────────────────────────────────────
+app.get("/", (_req, res) => res.sendFile(path.join(FRONTEND_DIR, "index.html")));
+app.get(["/login", "/register", "/auth"], (_req, res) => res.sendFile(path.join(FRONTEND_DIR, "pages/auth.html")));
+app.get("/marketplace", (_req, res) => res.sendFile(path.join(FRONTEND_DIR, "pages/marketplace.html")));
+app.get("/farm-detail", (_req, res) => res.sendFile(path.join(FRONTEND_DIR, "pages/farm-detail.html")));
+app.get(["/dashboard-buyer", "/dashboard/buyer"], (_req, res) => res.sendFile(path.join(FRONTEND_DIR, "pages/dashboard-buyer.html")));
+app.get(["/dashboard-farm", "/dashboard/farm"], (_req, res) => res.sendFile(path.join(FRONTEND_DIR, "pages/dashboard-farm.html")));
+app.get(["/dashboard-admin", "/dashboard/admin"], (_req, res) => res.sendFile(path.join(FRONTEND_DIR, "pages/dashboard-admin.html")));
+app.get("/privacy", (_req, res) => res.sendFile(path.join(FRONTEND_DIR, "pages/privacy.html")));
+app.get("/terms", (_req, res) => res.sendFile(path.join(FRONTEND_DIR, "pages/terms.html")));
+app.get(["/register-invite", "/invite"], (_req, res) => res.sendFile(path.join(FRONTEND_DIR, "pages/register-invite.html")));
+
+// ── Root SPA fallback route for unrecognized paths ─────────
 app.get(/^(?!\/api).*$/, (_req, res) => {
-  res.sendFile(path.join(__dirname, "../../Frontend/index.html"));
+  res.sendFile(path.join(FRONTEND_DIR, "index.html"));
 });
 
 // ── 404 handler ───────────────────────────────────────────

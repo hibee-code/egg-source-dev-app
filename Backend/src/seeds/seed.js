@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const connectDB = require("../config/db");
+const seedSuperAdmin = require("../config/seed");
 const User = require("../models/user.model");
 const Poultry = require("../models/poultry.model");
 const Product = require("../models/product.model");
@@ -10,7 +11,10 @@ const seedData = async () => {
     // 1. Connect to Database
     await connectDB();
 
-    // 2. Clear Existing Data
+    // 2. Seed Super Admin Account
+    await seedSuperAdmin();
+
+    // 3. Clear Existing Data
     logger.info("Clearing existing poultry and product data...");
     await Poultry.deleteMany({});
     await Product.deleteMany({});

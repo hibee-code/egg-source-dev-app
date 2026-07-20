@@ -43,7 +43,7 @@ class InvitationService {
     });
 
     // Invitation link
-    const invitationLink = `${env.CORS_ORIGIN}/pages/register-invite.html?token=${token}`;
+    const invitationLink = `${env.CORS_ORIGIN}/register-invite?token=${token}`;
 
     // Send onboarding invitation email
     await emailService.sendFarmOwnerInvitation(email, businessName, invitationLink, false);
@@ -84,7 +84,7 @@ class InvitationService {
     invitation.invitedBy = adminId;
     await invitation.save();
 
-    const invitationLink = `${env.CORS_ORIGIN}/pages/register-invite.html?token=${token}`;
+    const invitationLink = `${env.CORS_ORIGIN}/register-invite?token=${token}`;
 
     await emailService.sendFarmOwnerInvitation(invitation.email, invitation.businessName, invitationLink, true);
 
