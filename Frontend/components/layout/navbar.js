@@ -137,16 +137,25 @@ export function renderNavbar(options = {}) {
   
   const isDashboardPage = window.location.pathname.includes('dashboard');
   let navActions = '';
+  let drawerActions = '';
   if (isAuthPage) {
     navActions = '';
+    drawerActions = '';
   } else if (isLoggedIn) {
     navActions = isDashboardPage
       ? ''
       : `<a class="btn btn-primary btn-pill" href="${dashboardHref}" style="padding: 10px 24px; font-weight: 600; font-size: 0.92rem; box-shadow: 0 4px 14px rgba(31, 77, 10, 0.2); transition: var(--transition); display: inline-flex; align-items: center; gap: 8px;">Go to Dashboard <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i></a>`;
+    drawerActions = isDashboardPage
+      ? ''
+      : `<a class="btn btn-primary mobile-drawer-btn" href="${dashboardHref}">Go to Dashboard <i data-lucide="arrow-right" style="width: 16px; height: 16px; margin-left: 6px;"></i></a>`;
   } else {
     navActions = `
       <a class="btn btn-ghost btn-pill" href="/login" style="border: none; padding: 10px 22px; font-weight: 600; font-size: 0.92rem; color: var(--color-text);">Sign In</a>
       <a class="btn btn-primary btn-pill" href="/register" style="padding: 10px 24px; font-weight: 600; font-size: 0.92rem; box-shadow: 0 4px 14px rgba(31, 77, 10, 0.2); transition: var(--transition); display: inline-flex; align-items: center; gap: 8px;">Sign Up <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i></a>
+    `;
+    drawerActions = `
+      <a class="btn btn-secondary mobile-drawer-btn" href="/login" style="background: rgba(31, 77, 10, 0.06); color: var(--color-primary); border: 1px solid rgba(31, 77, 10, 0.15);">Sign In</a>
+      <a class="btn btn-primary mobile-drawer-btn" href="/register" style="box-shadow: 0 4px 14px rgba(31, 77, 10, 0.25);">Sign Up <i data-lucide="arrow-right" style="width: 16px; height: 16px; margin-left: 6px;"></i></a>
     `;
   }
 
@@ -190,7 +199,7 @@ export function renderNavbar(options = {}) {
         <a class="mobile-drawer-link" href="/about#contact">Contact</a>
       </nav>
       <div class="mobile-drawer-actions">
-        ${navActions}
+        ${drawerActions}
       </div>
     </div>
   `;
@@ -468,32 +477,34 @@ function showMobileInstallBanner() {
   const banner = document.createElement('div');
   banner.id = 'mobile-pwa-banner';
   banner.style.position = 'fixed';
-  banner.style.bottom = '16px';
-  banner.style.left = '16px';
-  banner.style.right = '16px';
+  banner.style.bottom = 'max(14px, env(safe-area-inset-bottom) + 10px)';
+  banner.style.left = '12px';
+  banner.style.right = '12px';
   banner.style.backgroundColor = '#1f4d0a';
   banner.style.color = '#ffffff';
-  banner.style.padding = '14px 18px';
-  banner.style.borderRadius = '12px';
-  banner.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.05)';
+  banner.style.padding = '12px 14px';
+  banner.style.borderRadius = '14px';
+  banner.style.boxShadow = '0 12px 28px rgba(0, 0, 0, 0.35)';
   banner.style.zIndex = '999999';
   banner.style.display = 'flex';
   banner.style.alignItems = 'center';
   banner.style.justifyContent = 'space-between';
-  banner.style.fontFamily = 'Inter, sans-serif';
+  banner.style.gap = '10px';
+  banner.style.boxSizing = 'border-box';
+  banner.style.fontFamily = 'Inter, system-ui, -apple-system, sans-serif';
   banner.style.animation = 'slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1)';
 
   banner.innerHTML = `
-    <div style="display: flex; align-items: center; gap: 12px; flex-grow: 1;">
-      <img src="/assets/images/logo-egg-192.png" alt="Logo" style="width: 40px; height: 40px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2);">
-      <div>
-        <h4 style="margin: 0; font-size: 14px; font-weight: 700;">Egg Connect</h4>
-        <p style="margin: 2px 0 0; font-size: 11px; opacity: 0.85;">Install app for a seamless experience</p>
+    <div style="display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1;">
+      <img src="/assets/images/logo-egg-192.png" alt="Egg Connect Logo" style="width: 38px; height: 38px; border-radius: 8px; flex-shrink: 0; background: #ffffff; padding: 2px; box-sizing: border-box;">
+      <div style="min-width: 0; overflow: hidden;">
+        <h4 style="margin: 0; font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #ffffff;">Egg Connect</h4>
+        <p style="margin: 1px 0 0; font-size: 11px; opacity: 0.88; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: rgba(255,255,255,0.9);">Install app for instant access</p>
       </div>
     </div>
-    <div style="display: flex; gap: 8px;">
-      <button id="pwa-close-btn" style="background: transparent; border: none; color: #ffffff; font-size: 12px; font-weight: 500; cursor: pointer; padding: 6px 10px;">Dismiss</button>
-      <button id="pwa-install-btn" style="background: #ffffff; color: #1f4d0a; border: none; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; padding: 6px 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">Install</button>
+    <div style="display: flex; align-items: center; gap: 6px; flex-shrink: 0;">
+      <button id="pwa-close-btn" style="background: rgba(255,255,255,0.14); border: none; color: #ffffff; font-size: 12px; font-weight: 600; cursor: pointer; padding: 7px 12px; border-radius: 8px; white-space: nowrap; flex-shrink: 0;">Dismiss</button>
+      <button id="pwa-install-btn" style="background: #ffffff; color: #1f4d0a; border: none; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; padding: 7px 14px; white-space: nowrap; flex-shrink: 0; box-shadow: 0 2px 6px rgba(0,0,0,0.15);">Install</button>
     </div>
   `;
 
