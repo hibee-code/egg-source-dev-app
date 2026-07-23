@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About Egg Connect — Leading Poultry Sourcing Marketplace</title>
+
+  <!-- Primary Meta Tags -->
+  <meta name="title" content="About Egg Connect — Leading Poultry Sourcing Marketplace">
+  <meta name="description" content="Learn how Egg Connect is revolutionizing poultry sourcing across Nigeria by connecting verified farms and wholesale egg buyers with direct bookings.">
+  <meta name="keywords" content="About EggConnect, poultry marketplace, Nigeria farm direct, verified egg suppliers, egg crate bookings">
+  <meta name="author" content="EggConnect">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://eggconnect.app/about">
+
+  <!-- Favicon & PWA Icons -->
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/logo-egg.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/assets/images/logo-egg-192.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/logo-egg.png">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#1f4d0a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+
+  <!-- Open Graph / Facebook / WhatsApp / LinkedIn / Telegram -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://eggconnect.app/about">
+  <meta property="og:site_name" content="Egg Connect">
+  <meta property="og:title" content="About Egg Connect — Leading Poultry Sourcing Marketplace">
+  <meta property="og:description" content="Connecting verified poultry producers with commercial egg buyers across Nigeria with transparent pricing and direct crate bookings.">
+  <meta property="og:image" content="https://eggconnect.app/assets/images/og-banner.png">
+  <meta property="og:image:secure_url" content="https://eggconnect.app/assets/images/og-banner.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="About Egg Connect Banner">
+
+  <!-- Twitter Card Metadata -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@eggconnect_app">
+  <meta name="twitter:creator" content="@eggconnect_app">
+  <meta name="twitter:title" content="About Egg Connect — Leading Poultry Sourcing Marketplace">
+  <meta name="twitter:description" content="Connecting verified poultry producers with commercial egg buyers across Nigeria with transparent pricing and direct crate bookings.">
+  <meta name="twitter:image" content="https://eggconnect.app/assets/images/og-banner.png">
+  <meta name="twitter:image:alt" content="About Egg Connect Banner">
+
+  <!-- CSS & Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/tokens.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
+  <style>
+    .about-hero {
+      background: linear-gradient(180deg, rgba(31,77,10,0.14), rgba(31,77,10,0.02)), url('/assets/images/hero_bg.png') center/cover no-repeat;
+      border-radius: 32px;
+      padding: 64px 40px;
+      box-shadow: 0 24px 64px rgba(31, 77, 10, 0.12);
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+    }
+    .about-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top left, rgba(255,255,255,0.18), transparent 35%);
+      pointer-events: none;
+    }
+    .about-hero > * {
+      position: relative;
+      z-index: 1;
+    }
+    .about-hero h1 {
+      font-size: clamp(2.5rem, 4vw, 4rem);
+      margin: 0 0 16px;
+      line-height: 1.05;
+    }
+    .about-hero p {
+      max-width: 720px;
+      margin: 0;
+      line-height: 1.8;
+      color: rgba(255,255,255,0.92);
+      font-size: 1.05rem;
+    }
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1.25fr 0.75fr;
+      gap: 32px;
+      margin-top: 36px;
+    }
+    .about-panel {
+      background: var(--color-card);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-card);
+      padding: 32px;
+    }
+    .about-panel h2 {
+      margin-top: 0;
+      font-size: clamp(1.6rem, 2.4vw, 2rem);
+      color: var(--color-text);
+    }
+    .about-panel p,
+    .about-panel li {
+      color: var(--color-text-muted);
+      line-height: 1.78;
+      font-size: 1rem;
+    }
+    .about-panel ul {
+      padding-left: 20px;
+      margin: 16px 0 0;
+      list-style: disc inside;
+    }
+    .about-card {
+      display: grid;
+      gap: 18px;
+      min-height: 220px;
+      border-radius: 24px;
+      padding: 28px;
+      background: linear-gradient(180deg, rgba(248,249,241,0.95), rgba(231,238,223,0.95));
+      border: 1px solid rgba(31,77,10,0.08);
+      box-shadow: 0 14px 40px rgba(31, 77, 10, 0.08);
+    }
+    .about-card h3 {
+      margin: 0;
+      font-size: 1.2rem;
+      color: var(--color-primary);
+    }
+    .about-card p {
+      margin: 0;
+      color: var(--color-text);
+    }
+    @media (max-width: 992px) {
+      .about-hero { padding: 40px 24px; }
+      .about-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body class="page-about">
+  <div class="page-watermark"></div>
+  <div id="navbar-root"></div>
+  <main class="page">
+    <section class="about-hero">
+      <span class="hero__eyebrow">About Egg Connect</span>
+      <h1>Built to make poultry sourcing simple, trusted, and efficient.</h1>
+      <p>Egg Connect is a premium marketplace for verified poultry farms and buyers. We combine clear discoverability, dependable booking, and trusted farm verification so agricultural businesses can scale with confidence.</p>
+    </section>
+
+    <section class="about-grid">
+      <div class="about-panel">
+        <h2>What we stand for</h2>
+        <p>Egg Connect is designed for farmers, buyers, and supply chain partners who need a modern, reliable platform for fresh poultry sourcing. Our mission is to reduce friction, increase transparency, and make every transaction feel secure from farm gate to buyer.</p>
+        <ul>
+          <li>Verified farm listings with accurate production details.</li>
+          <li>Secure booking flow with clear pricing and farm contact.</li>
+          <li>Mobile-friendly marketplace built for fast decision-making.</li>
+          <li>Responsive support and accessible farm discovery tools.</li>
+        </ul>
+      </div>
+      <aside class="about-card">
+        <h3>Egg Connect helps you:</h3>
+        <p>Save time searching for trusted egg suppliers, compare options at a glance, and book orders with a platform designed for clarity and confidence.</p>
+      </aside>
+    </section>
+
+    <section class="about-grid" style="margin-top: 32px;">
+      <div class="about-panel">
+        <h2>How it works</h2>
+        <p>Start by browsing verified farms, choose the best egg quality and price, and complete your booking in a few easy steps. Our platform keeps the process clear so you can focus on managing volume and quality.</p>
+      </div>
+      <aside class="about-card">
+        <h3>Built for the marketplace</h3>
+        <p>Everything is designed to feel polished and fast on mobile, tablet, or desktop — with clean layout, strong hierarchy, and subtle motion for a premium experience.</p>
+      </aside>
+    </section>
+
+    <section class="about-panel" style="margin-top: 32px;">
+      <h2 id="contact">Contact & support</h2>
+      <p>If you'd like to learn more, partner with Egg Connect, or get support for your farm or buying needs, reach out to our team:</p>
+      <p><strong>Email:</strong> <a href="mailto:support@eggconnect.app" style="color: var(--color-primary);">support@eggconnect.app</a></p>
+      <p><strong>Headquarters:</strong> Lagos, Nigeria</p>
+    </section>
+  </main>
+  <footer class="footer">
+    <div class="footer-grid">
+      <div class="footer-brand-column">
+        <div class="logo" style="display:inline-flex; align-items:center; gap:10px; color:#fff; font-weight:700;">
+          <img src="/assets/images/logo-egg.svg" alt="Egg Connect" style="width:32px; height:32px; filter:brightness(0) invert(1);">
+          <span>Egg <span style="color:var(--color-accent);">Connect</span></span>
+        </div>
+        <p>Premium poultry sourcing that connects verified farms and buyers with clarity and trust.</p>
+      </div>
+      <div>
+        <h3>Explore</h3>
+        <a href="/">Home</a>
+        <a href="/marketplace">Marketplace</a>
+        <a href="/why">WHY EggConnect</a>
+        <a href="/about">About</a>
+      </div>
+      <div>
+        <h3>Company</h3>
+        <a href="/privacy">Privacy Policy</a>
+        <a href="/terms">Terms</a>
+        <a href="mailto:support@eggconnect.app">Support</a>
+      </div>
+      <div>
+        <h3>Resources</h3>
+        <a href="/register-invite">Invite</a>
+        <a href="/farm-detail">Farm Detail</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Egg Connect. All rights reserved.</span>
+      <span>Made for farmers and buyers with simple marketplace design.</span>
+    </div>
+  </footer>
+  <script type="module">
+    import { renderNavbar } from '/components/layout/navbar.js';
+    renderNavbar();
+  </script>
+</body>
+</html>

@@ -180,7 +180,7 @@ const submitBooking = async (event) => {
     await BookingAPI.create(payload);
     Toast.success('Booking confirmed. Redirecting to dashboard...');
     setTimeout(() => {
-      window.location.href = '/pages/dashboard-buyer.html';
+      window.location.href = '/dashboard-buyer';
     }, 1200);
   } catch (err) {
     Toast.error(err.message || 'Booking failed');

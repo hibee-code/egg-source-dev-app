@@ -47,7 +47,7 @@ const setTab = (tab) => {
     registerHeader.classList.toggle('hidden', tab !== 'register');
   }
 
-  const newUrl = `${window.location.pathname}?tab=${tab === 'register' ? 'register' : 'login'}`;
+  const newUrl = tab === 'register' ? '/register' : '/login';
   window.history.replaceState(null, '', newUrl);
 
   renderNavbar();
@@ -84,7 +84,7 @@ const submitLogin = async (event) => {
     const response = await AuthAPI.login(payload);
     Auth.setToken(response.data.accessToken);
     Auth.setUser(response.data.user);
-    const destination = response.data.redirectUrl || '/pages/dashboard-buyer.html';
+    const destination = response.data.redirectUrl || '/dashboard-buyer';
     window.location.href = destination;
   } catch (err) {
     Toast.error(err.message || 'Login failed');
@@ -128,7 +128,7 @@ const submitRegister = async (event) => {
     const response = await AuthAPI.register(payload);
     Auth.setToken(response.data.accessToken);
     Auth.setUser(response.data.user);
-    window.location.href = '/pages/dashboard-buyer.html';
+    window.location.href = '/dashboard-buyer';
   } catch (err) {
     Toast.error(err.message || 'Registration failed');
   } finally {
@@ -144,8 +144,9 @@ const initPage = () => {
   $('#tab-login').addEventListener('click', () => setTab('login'));
   $('#tab-register').addEventListener('click', () => setTab('register'));
   
+  const path = window.location.pathname;
   const params = new URLSearchParams(window.location.search);
-  const initialTab = params.get('tab') === 'register' ? 'register' : 'login';
+  const initialTab = (path === '/register' || params.get('tab') === 'register') ? 'register' : 'login';
   setTab(initialTab);
 
   updateRoleCards();

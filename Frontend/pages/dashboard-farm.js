@@ -850,7 +850,7 @@ const initPage = async () => {
   const user = Auth.getUser();
   if (!Auth.requireAuth()) return;
   if (!['FARM_OWNER', 'ADMIN'].includes(user.role)) {
-    window.location.href = '/pages/dashboard-buyer.html';
+    window.location.href = '/dashboard-buyer';
     return;
   }
 

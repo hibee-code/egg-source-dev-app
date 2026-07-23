@@ -6,7 +6,7 @@ import { Loading, Toast, $ } from '/assets/js/utils.js';
 const guardAccess = () => {
   const user = Auth.getUser();
   if (!user || user.role !== 'SUPER_ADMIN') {
-    window.location.href = '/pages/auth.html';
+    window.location.href = '/login';
   }
 };
 
@@ -277,7 +277,7 @@ const loadInvitations = async () => {
       statusText = 'Expired';
     }
 
-    const inviteLink = `${window.location.origin}/pages/register-invite.html?token=${invite.rawToken || ''}`;
+    const inviteLink = `${window.location.origin}/register-invite?token=${invite.rawToken || ''}`;
 
     const actionButtons = isAccepted || isRevoked
       ? `<span style="color: var(--color-slate-500); font-size: 0.8rem;">None</span>`
@@ -312,7 +312,7 @@ const loadInvitations = async () => {
         toggleInviteModal(true);
         $('#invite-form-container').classList.add('hidden');
         
-        const inviteLink = `${window.location.origin}/pages/register-invite.html?token=${res.data.rawToken || ''}`;
+        const inviteLink = `${window.location.origin}/register-invite?token=${res.data.rawToken || ''}`;
         $('#invite-success-url').value = inviteLink;
         $('#invite-success-text').innerText = "The invitation link has been successfully regenerated and sent to the owner's email. You can also copy the secure registration link below.";
         
@@ -491,7 +491,7 @@ const submitInvitationForm = async (event) => {
     // Switch to success view in modal
     $('#invite-form-container').classList.add('hidden');
     
-    const inviteLink = `${window.location.origin}/pages/register-invite.html?token=${res.data.rawToken || ''}`;
+    const inviteLink = `${window.location.origin}/register-invite?token=${res.data.rawToken || ''}`;
     $('#invite-success-url').value = inviteLink;
     $('#invite-success-text').innerText = "The invitation has been successfully sent to the owner's email. You can also copy the secure registration link below.";
     

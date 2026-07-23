@@ -1,6 +1,10 @@
-const CACHE_NAME = "egg-connect-cache-v1";
+const CACHE_NAME = "egg-connect-cache-v2";
 const STATIC_ASSETS = [
   "/",
+  "/home",
+  "/login",
+  "/register",
+  "/marketplace",
   "/index.html",
   "/css/style.css",
   "/assets/css/tokens.css",
