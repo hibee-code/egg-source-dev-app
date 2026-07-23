@@ -27,6 +27,13 @@
 
   --transition: all 0.25s ease;
   --page-max: 1280px;
+  /* Animation tokens */
+  --anim-duration: 420ms;
+  --anim-ease: cubic-bezier(0.16, 0.84, 0.24, 1);
+  --anim-stagger: 90ms;
+  --anim-fade-up-distance: 12px;
+  --anim-scale-start: 0.995;
+  --reduced-motion: 0; /* 0 = allow motion, 1 = reduce */
 }
 
 * {

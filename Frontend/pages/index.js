@@ -25,7 +25,7 @@ const renderFarmCard = (farm) => {
             <div style="color: var(--color-text-muted); font-size: 0.95rem;">From</div>
             <strong>${Format.currency(farm.pricePerCrate || 4200)}</strong>
           </div>
-          <a class="btn btn-secondary btn-pill" href="/pages/farm-detail.html?farmId=${farm._id}">View Profile</a>
+          <a class="btn btn-secondary btn-pill" href="/farm-detail?farmId=${farm._id}">View Profile</a>
         </div>
       </div>
     </article>
@@ -35,8 +35,8 @@ const renderFarmCard = (farm) => {
 const renderTestimonials = () => {
   const container = $('#testimonials-grid');
   if (!container) return;
-  container.innerHTML = testimonials.map((item) => `
-    <article class="testimonial-card">
+  container.innerHTML = testimonials.map((item, idx) => `
+    <article class="testimonial-card animate-on-enter" data-delay="${(idx + 1) * 100}">
       <p>"${item.quote}"</p>
       <div class="testimonial-meta">
         <div class="avatar-circle" style="background:${Format.avatarColor(item.name)}">${Format.initials(item.name)}</div>
@@ -47,6 +47,14 @@ const renderTestimonials = () => {
       </div>
     </article>
   `).join('');
+  // Apply staggered transition delays
+  requestAnimationFrame(() => {
+    const cards = container.querySelectorAll('.testimonial-card.animate-on-enter');
+    cards.forEach((c) => {
+      const d = Number(c.dataset.delay || 0);
+      c.style.transitionDelay = `${d}ms`;
+    });
+  });
 };
 
 const renderFeatured = async () => {
@@ -73,12 +81,82 @@ const initForm = () => {
   heroForm?.addEventListener('submit', (event) => {
     event.preventDefault();
   });
+  const heroBtn = heroForm?.querySelector('button');
+  if (heroBtn) {
+    heroBtn.addEventListener('click', () => {
+      try {
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({ event: 'hero_cta_click', label: 'start_sourcing' });
+      } catch (e) {
+        console.log('analytics: hero_cta_click');
+      }
+      window.location.href = '/marketplace';
+    });
+  }
 };
 
 const initPage = () => {
   renderNavbar();
   initForm();
   renderTestimonials();
+  initAnimations();
+};
+
+/**
+ * Animations + count-up
+ */
+const initAnimations = () => {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      const el = entry.target;
+      if (entry.isIntersecting) {
+        const delay = el.dataset?.delay ? Number(el.dataset.delay) : 0;
+        el.style.transition = `opacity var(--anim-duration, 420ms) var(--anim-ease, ease), transform var(--anim-duration, 420ms) var(--anim-ease, ease)`;
+        setTimeout(() => el.classList.add('is-visible'), delay);
+        observer.unobserve(el);
+      }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+
+  document.querySelectorAll('.animate-on-enter').forEach((el) => observer.observe(el));
+
+  // Count up implementation
+  const animateCountUp = (el, opts = {}) => {
+    if (!el) return;
+    if (el.dataset._counted) return;
+    const target = parseFloat(el.dataset.count || '0');
+    const decimals = Number(el.dataset.decimals || 0);
+    const duration = Number(el.dataset.duration || 1200);
+    const start = performance.now();
+    const startVal = 0;
+    const step = (now) => {
+      const t = Math.min(1, (now - start) / duration);
+      const current = startVal + (target - startVal) * t;
+      el.textContent = Number(current).toFixed(decimals);
+      if (t < 1) {
+        requestAnimationFrame(step);
+      } else {
+        el.textContent = Number(target).toFixed(decimals);
+        el.dataset._counted = '1';
+      }
+    };
+    requestAnimationFrame(step);
+  };
+
+  // Observe stats and trigger count-up when visible
+  const stats = document.querySelectorAll('.stat-value');
+  if (stats.length) {
+    const statsObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const el = entry.target;
+          animateCountUp(el, { duration: 1200 });
+          statsObserver.unobserve(el);
+        }
+      });
+    }, { threshold: 0.35 });
+    stats.forEach((s) => statsObserver.observe(s));
+  }
 };
 
 window.addEventListener('DOMContentLoaded', initPage);

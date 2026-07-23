@@ -216,7 +216,7 @@ const renderCard = (farm) => {
         <div class="product-card__price" style="margin-top: 12px; margin-bottom: 12px; font-size: 1.25rem; font-weight: var(--font-weight-bold); color: var(--color-primary);">${Format.currency(farm.pricePerCrate || 4200)}</div>
         <div style="margin-top: auto; display: flex; align-items: center; justify-content: space-between; gap: 12px;">
           ${chip}
-          <a class="btn btn-secondary btn-pill" href="/pages/farm-detail.html?farmId=${farm._id}">View Details</a>
+          <a class="btn btn-secondary btn-pill" href="/farm-detail?farmId=${farm._id}">View Details</a>
         </div>
       </div>
     </article>

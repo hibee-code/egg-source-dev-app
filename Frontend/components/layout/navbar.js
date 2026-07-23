@@ -112,30 +112,30 @@ export function renderNavbar(options = {}) {
   const token = Auth.getToken();
   const isLoggedIn = !!(token && user);
 
-  let dashboardHref = '/pages/dashboard-buyer.html';
+  let dashboardHref = '/dashboard-buyer';
   if (isLoggedIn) {
     if (user.role === 'SUPER_ADMIN') {
-      dashboardHref = '/pages/dashboard-admin.html';
+      dashboardHref = '/dashboard-admin';
     } else if (user.role === 'FARM_OWNER') {
-      dashboardHref = '/pages/dashboard-farm.html';
+      dashboardHref = '/dashboard-farm';
     }
   }
 
   const isSellerOrAdmin = isLoggedIn && (user.role === 'SUPER_ADMIN' || user.role === 'FARM_OWNER');
-  const isAuthPage = window.location.pathname.endsWith('auth.html');
-  const isHomePage = window.location.pathname === '/' || window.location.pathname.endsWith('index.html') || window.location.pathname === '';
+  const isAuthPage = window.location.pathname === '/auth' || window.location.pathname === '/login' || window.location.pathname === '/register' || window.location.pathname.endsWith('auth.html');
 
-  // Remove Marketplace/Home links for admin or seller roles, on auth page, on home page, or if explicitly requested to hide them
-  const navLinks = isSellerOrAdmin || isAuthPage || isHomePage || hideNavLinks
+  const navLinks = isSellerOrAdmin || isAuthPage || hideNavLinks
     ? ''
     : searchBar
       ? `<div class="navbar-search-pill"><input id="navbar-search-input" type="search" placeholder="Search farms or categories" aria-label="Search farms" /></div>`
       : `<ul class="navbar-links">
-          <li><a class="navbar-link" href="/index.html">Home</a></li>
-          <li><a class="navbar-link" href="/pages/marketplace.html">Marketplace</a></li>
+          <li><a class="navbar-link" href="/">Home</a></li>
+          <li><a class="navbar-link" href="/about">About</a></li>
+          <li><a class="navbar-link" href="/why">WHY EggConnect</a></li>
+          <li><a class="navbar-link" href="/about#contact">Contact</a></li>
         </ul>`;
   
-  const isDashboardPage = window.location.pathname.includes('dashboard-');
+  const isDashboardPage = window.location.pathname.includes('dashboard');
   let navActions = '';
   if (isAuthPage) {
     navActions = '';
@@ -145,8 +145,8 @@ export function renderNavbar(options = {}) {
       : `<a class="btn btn-primary btn-pill" href="${dashboardHref}" style="padding: 10px 24px; font-weight: 600; font-size: 0.92rem; box-shadow: 0 4px 14px rgba(31, 77, 10, 0.2); transition: var(--transition); display: inline-flex; align-items: center; gap: 8px;">Go to Dashboard <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i></a>`;
   } else {
     navActions = `
-      <a class="btn btn-ghost btn-pill" href="/pages/auth.html?tab=login" style="border: none; padding: 10px 22px; font-weight: 600; font-size: 0.92rem; color: var(--color-text);">Sign In</a>
-      <a class="btn btn-primary btn-pill" href="/pages/auth.html?tab=register" style="padding: 10px 24px; font-weight: 600; font-size: 0.92rem; box-shadow: 0 4px 14px rgba(31, 77, 10, 0.2); transition: var(--transition); display: inline-flex; align-items: center; gap: 8px;">Sign Up <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i></a>
+      <a class="btn btn-ghost btn-pill" href="/login" style="border: none; padding: 10px 22px; font-weight: 600; font-size: 0.92rem; color: var(--color-text);">Sign In</a>
+      <a class="btn btn-primary btn-pill" href="/register" style="padding: 10px 24px; font-weight: 600; font-size: 0.92rem; box-shadow: 0 4px 14px rgba(31, 77, 10, 0.2); transition: var(--transition); display: inline-flex; align-items: center; gap: 8px;">Sign Up <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i></a>
     `;
   }
 
@@ -155,22 +155,91 @@ export function renderNavbar(options = {}) {
         <img src="/assets/images/logo-egg.svg" alt="Egg Connect Logo" class="logo-icon">
         <span>Egg <span style="color: var(--color-accent);">Connect</span></span>
       </div>`
-    : `<a class="logo" href="/index.html" style="cursor: pointer; display: flex; align-items: center; gap: 8px; text-decoration: none;">
+    : `<a class="logo" href="/" style="cursor: pointer; display: flex; align-items: center; gap: 8px; text-decoration: none;">
         <img src="/assets/images/logo-egg.svg" alt="Egg Connect Logo" class="logo-icon">
         <span>Egg <span style="color: var(--color-accent);">Connect</span></span>
       </a>`;
 
   root.innerHTML = `
-    <header>
+    <header id="site-header" class="site-header" style="position: sticky; top: 0; z-index: 9999; background: rgba(255,255,255,0.94); border-bottom: 1px solid rgba(31,77,10,0.06); backdrop-filter: blur(8px); transition: all 220ms var(--anim-ease);">
       <div class="navbar-inner">
         ${logoHtml}
         ${navLinks}
         <div class="navbar-actions">
           ${navActions}
         </div>
+        <button id="mobile-menu-toggle" class="mobile-menu-toggle" aria-label="Open Navigation Menu">
+          <i data-lucide="menu"></i>
+        </button>
       </div>
     </header>
+
+    <!-- Mobile Drawer Menu -->
+    <div id="mobile-drawer-overlay" class="mobile-drawer-overlay"></div>
+    <div id="mobile-drawer" class="mobile-drawer">
+      <div class="mobile-drawer-header">
+        ${logoHtml}
+        <button id="mobile-drawer-close" class="mobile-drawer-close" aria-label="Close menu">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <nav class="mobile-drawer-nav">
+        <a class="mobile-drawer-link" href="/">Home</a>
+        <a class="mobile-drawer-link" href="/about">About</a>
+        <a class="mobile-drawer-link" href="/why">WHY EggConnect</a>
+        <a class="mobile-drawer-link" href="/about#contact">Contact</a>
+      </nav>
+      <div class="mobile-drawer-actions">
+        ${navActions}
+      </div>
+    </div>
   `;
+
+  // Mobile Drawer Toggle Logic
+  const menuToggleBtn = document.getElementById('mobile-menu-toggle');
+  const drawerCloseBtn = document.getElementById('mobile-drawer-close');
+  const mobileDrawer = document.getElementById('mobile-drawer');
+  const drawerOverlay = document.getElementById('mobile-drawer-overlay');
+
+  const openDrawer = () => {
+    if (mobileDrawer && drawerOverlay) {
+      mobileDrawer.classList.add('is-active');
+      drawerOverlay.classList.add('is-active');
+      document.body.style.overflow = 'hidden';
+    }
+  };
+
+  const closeDrawer = () => {
+    if (mobileDrawer && drawerOverlay) {
+      mobileDrawer.classList.remove('is-active');
+      drawerOverlay.classList.remove('is-active');
+      document.body.style.overflow = '';
+    }
+  };
+
+  if (menuToggleBtn) menuToggleBtn.addEventListener('click', openDrawer);
+  if (drawerCloseBtn) drawerCloseBtn.addEventListener('click', closeDrawer);
+  if (drawerOverlay) drawerOverlay.addEventListener('click', closeDrawer);
+
+  // Collapse / shrink header on scroll for better UX on long pages
+  const headerEl = document.getElementById('site-header');
+  if (headerEl) {
+    let lastScrollY = window.scrollY || 0;
+    const onScroll = debounce(() => {
+      const currentY = window.scrollY || 0;
+      // only enable shrink after a small threshold
+      if (currentY > 80 && currentY > lastScrollY) {
+        headerEl.classList.add('shrink');
+      } else if (currentY < lastScrollY || currentY <= 80) {
+        headerEl.classList.remove('shrink');
+      }
+      lastScrollY = currentY;
+    }, 60);
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    // ensure correct initial state on load
+    window.addEventListener('load', () => { onScroll(); });
+  }
 
   if (searchBar) {
     const searchInput = document.getElementById('navbar-search-input');
@@ -180,6 +249,19 @@ export function renderNavbar(options = {}) {
       }, 350));
     }
   }
+
+  const setActiveNavLinks = () => {
+    const currentPath = window.location.pathname.replace(/\/$/, '') || '/';
+    document.querySelectorAll('.navbar-link, .mobile-drawer-link').forEach((link) => {
+      const linkPath = link.getAttribute('href').split('#')[0].replace(/\/$/, '') || '/';
+      if (linkPath === currentPath) {
+        link.classList.add('active');
+      } else {
+        link.classList.remove('active');
+      }
+    });
+  };
+  setActiveNavLinks();
 
   // Bind help triggers
   initHelpModal();
@@ -200,11 +282,11 @@ export function renderSidebar(options = {}) {
   const root = document.getElementById('sidebar-root');
   if (!root) return;
 
-  let baseHref = '/pages/dashboard-buyer.html';
+  let baseHref = '/dashboard-buyer';
   if (role === 'farm') {
-    baseHref = '/pages/dashboard-farm.html';
+    baseHref = '/dashboard-farm';
   } else if (role === 'admin') {
-    baseHref = '/pages/dashboard-admin.html';
+    baseHref = '/dashboard-admin';
   }
 
   let items = [];
@@ -236,7 +318,7 @@ export function renderSidebar(options = {}) {
 
   let brand = 'Egg Connect / Buyer';
   let buttonLabel = 'Browse Farms';
-  let buttonHref = '/pages/marketplace.html';
+  let buttonHref = '/marketplace';
 
   if (role === 'farm') {
     brand = 'Egg Connect / Seller';
@@ -269,7 +351,7 @@ export function renderSidebar(options = {}) {
       </div>
       
       <div id="sidebar-profile-dropdown" class="dropdown-menu" style="left: 0; right: 0; top: calc(100% + 8px); width: auto; z-index: 1050; padding: 6px; box-shadow: var(--shadow-card); border: 1px solid var(--color-border); background: var(--color-card); border-radius: var(--radius-card);">
-        <a href="/index.html" class="dropdown-item" style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: var(--radius-btn); text-decoration: none; color: var(--color-text); font-size: 0.88rem; transition: var(--transition);">
+        <a href="/" class="dropdown-item" style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: var(--radius-btn); text-decoration: none; color: var(--color-text); font-size: 0.88rem; transition: var(--transition);">
           <i data-lucide="home" style="width: 16px; height: 16px; color: var(--color-text-muted);"></i> Go to Home Page
         </a>
         <div style="border-top: 1px solid var(--color-border); margin: 6px 0;"></div>

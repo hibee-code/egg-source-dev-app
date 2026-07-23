@@ -126,7 +126,7 @@ const submitRegistration = async (event) => {
     
     // Redirect to Seller Dashboard
     setTimeout(() => {
-      window.location.href = '/pages/dashboard-farm.html';
+      window.location.href = '/dashboard-farm';
     }, 1500);
   } catch (err) {
     Toast.error(err.message || "Registration failed. Try again.");

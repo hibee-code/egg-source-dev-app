@@ -11,11 +11,9 @@ process.on("uncaughtException", (err) => {
 });
 
 // ── Connect to database and start server ──────────────────
-const seedSuperAdmin = require("./config/seed");
 
 const startServer = async () => {
   await connectDB();
-  await seedSuperAdmin();
 
   const server = app.listen(env.PORT, () => {
     logger.info(

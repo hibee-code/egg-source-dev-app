@@ -25,7 +25,7 @@ export const Auth = {
     const token = this.getToken();
     const user = this.getUser();
     if (!token || !user) {
-      window.location.href = '/pages/auth.html';
+      window.location.href = '/login';
       return false;
     }
     return true;
@@ -33,16 +33,16 @@ export const Auth = {
   redirectIfLoggedIn() {
     const user = this.getUser();
     if (!user) return;
-    let target = '/pages/dashboard-buyer.html';
+    let target = '/dashboard-buyer';
     if (user.role === 'SUPER_ADMIN') {
-      target = '/pages/dashboard-admin.html';
+      target = '/dashboard-admin';
     } else if (user.role === 'FARM_OWNER') {
-      target = '/pages/dashboard-farm.html';
+      target = '/dashboard-farm';
     }
     window.location.href = target;
   },
   logout() {
     this.clear();
-    window.location.href = '/pages/auth.html';
+    window.location.href = '/login';
   },
 };
