@@ -1,10 +1,12 @@
-const CACHE_NAME = "egg-connect-cache-v2";
+const CACHE_NAME = "egg-connect-cache-v3";
 const STATIC_ASSETS = [
   "/",
   "/home",
   "/login",
   "/register",
   "/marketplace",
+  "/why",
+  "/about",
   "/index.html",
   "/css/style.css",
   "/assets/css/tokens.css",
@@ -16,6 +18,10 @@ const STATIC_ASSETS = [
   "/assets/images/logo-egg.svg",
   "/assets/images/logo-egg.png",
   "/assets/images/logo-egg-192.png",
+  "/assets/images/logo-egg-512.png",
+  "/assets/images/logo-egg-maskable-192.png",
+  "/assets/images/logo-egg-maskable-512.png",
+  "/assets/images/apple-touch-icon.png",
   "/pages/auth.html"
 ];
 
