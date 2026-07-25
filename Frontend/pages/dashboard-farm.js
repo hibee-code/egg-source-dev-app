@@ -77,7 +77,7 @@ const renderDashboardBookings = (bookings) => {
 
   table.innerHTML = displayBookings.length
     ? displayBookings.map((b) => renderBookingRowMarkup(b)).join('')
-    : `<tr><td colspan="8" style="color: var(--color-text-muted); padding: 24px 0; text-align: center;">No bookings matching filter "${currentBookingFilter}".</td></tr>`;
+    : '<tr><td colspan="8" style="color: var(--color-text-muted); padding: 24px 0; text-align: center; font-weight: 500;">No bookings found.</td></tr>';
 
   attachBookingActionListeners(table);
 };
@@ -214,7 +214,7 @@ const renderRequestsFull = (bookings) => {
 
   table.innerHTML = bookings.length
     ? bookings.map((b) => renderBookingRowMarkup(b, true)).join('')
-    : '<tr><td colspan="9" style="color: var(--color-text-muted); padding: 24px 0; text-align: center;">No customer booking requests found.</td></tr>';
+    : '<tr><td colspan="9" style="color: var(--color-text-muted); padding: 24px 0; text-align: center; font-weight: 500;">No bookings found.</td></tr>';
 
   attachBookingActionListeners(table);
 };
@@ -655,6 +655,7 @@ const showSellerSkeletons = () => {
 // 6. Fetch all database data and re-render current views
 const fetchAndRenderData = async () => {
   showSellerSkeletons();
+  const startTime = Date.now();
   try {
     // 1. Get/Create Poultry Farm details for owner
     const poultriesRes = await PoultryAPI.getAll();
@@ -665,9 +666,13 @@ const fetchAndRenderData = async () => {
     });
 
     if (!ownerFarms.length) {
-      // Owner has no farm - let's prompt them to create one in the Profile tab
-      const nameEl = document.getElementById('farm-owner-name');
-      if (nameEl) nameEl.textContent = 'Setup Poultry Farm Profile';
+      // Only show wizard if onboarding has not just been completed
+      if (typeof window.__onboardingComplete === 'undefined' || !window.__onboardingComplete) {
+        // Owner has no farm - launch First-Time Seller Onboarding Wizard!
+        const nameEl = document.getElementById('farm-owner-name');
+        if (nameEl) nameEl.textContent = 'Setup Poultry Farm Profile';
+        openSellerOnboardingWizard();
+      }
       return;
     }
 
@@ -711,6 +716,16 @@ const fetchAndRenderData = async () => {
     if (activeReqEl) activeReqEl.textContent = activeReqsCount;
     if (capacityValEl) capacityValEl.textContent = `${totalInventoryUnits} Crates`;
     if (badgeCount) badgeCount.textContent = `${allBookings.length} Bookings`;
+  } catch (err) {
+    console.error('Error fetching farm dashboard data:', err);
+    allBookings = [];
+    allProducts = [];
+  } finally {
+    const elapsed = Date.now() - startTime;
+    const minDelay = 2000;
+    if (elapsed < minDelay) {
+      await new Promise((resolve) => setTimeout(resolve, minDelay - elapsed));
+    }
 
     // 5. Render tables and elements
     renderDashboardInventory(allProducts);
@@ -721,8 +736,6 @@ const fetchAndRenderData = async () => {
     renderWeeklySalesChart(allBookings);
     renderRecentActivities(allBookings, allProducts);
     renderLowStockAlerts(allProducts);
-  } catch (err) {
-    console.error('Error fetching farm dashboard data:', err);
   }
 };
 
@@ -1007,6 +1020,167 @@ const initPage = async () => {
   setupCollapsible('toggle-inventory-health-btn', 'inventory-health-wrapper', 'inventory-toggle-icon');
   setupCollapsible('toggle-recent-events-btn', 'recent-activities-wrapper', 'events-toggle-icon');
 
+  const onboardingForm = document.getElementById('seller-onboarding-form');
+  if (onboardingForm) {
+    onboardingForm.addEventListener('submit', handleSellerOnboardingSubmit);
+  }
+};
+
+const openSellerOnboardingWizard = () => {
+  const modal = document.getElementById('seller-onboarding-modal');
+  if (!modal) return;
+  modal.classList.remove('hidden');
+  // Ensure form is clean and button is always enabled when modal opens
+  const btn = document.getElementById('onboarding-submit-btn');
+  if (btn) {
+    btn.disabled = false;
+    btn.innerHTML = `<i data-lucide="rocket" style="width:18px;height:18px;"></i> Launch My Business Profile & Listings`;
+  }
+  if (window.lucide) window.lucide.createIcons();
+};
+
+const closeSellerOnboardingWizard = () => {
+  const modal = document.getElementById('seller-onboarding-modal');
+  if (modal) modal.classList.add('hidden');
+};
+
+// ── Seller Onboarding: Production-grade submit handler ────────────────────────
+const handleSellerOnboardingSubmit = async (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+
+  const btn = document.getElementById('onboarding-submit-btn');
+
+  // ── Guard: prevent double-submission ─────────────────────────────────
+  if (btn && btn.disabled) return;
+
+  // Save original button innerHTML so we can always restore it
+  const originalBtnHTML = btn ? btn.innerHTML : '';
+  const setLoading = () => {
+    if (!btn) return;
+    btn.disabled = true;
+    btn.innerHTML = `<span style="display:inline-flex;align-items:center;gap:8px;"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:spin 1s linear infinite"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Creating your seller profile...</span>`;
+  };
+  const resetBtn = () => {
+    if (!btn) return;
+    btn.disabled = false;
+    btn.innerHTML = originalBtnHTML;
+    if (window.lucide) window.lucide.createIcons();
+  };
+
+  // Inject spin keyframe if not already present
+  if (!document.getElementById('onboarding-spin-style')) {
+    const style = document.createElement('style');
+    style.id = 'onboarding-spin-style';
+    style.textContent = '@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }';
+    document.head.appendChild(style);
+  }
+
+  setLoading();
+
+  try {
+    // ── 1. Read and validate form values ─────────────────────────────────
+    const businessName = (document.getElementById('onboarding-business-name')?.value || '').trim();
+    const farmType     = document.getElementById('onboarding-seller-type')?.value || 'farmer';
+    const state        = (document.getElementById('onboarding-state')?.value || '').trim();
+    const lga          = (document.getElementById('onboarding-lga')?.value || '').trim();
+    const stockRaw     = document.getElementById('onboarding-stock')?.value;
+    const priceRaw     = document.getElementById('onboarding-price')?.value;
+
+    if (!businessName || !state || !lga) {
+      Toast.error('Please fill in all required fields before launching.');
+      resetBtn();
+      return;
+    }
+
+    const stockQuantity = Math.max(1, parseInt(stockRaw, 10) || 100);
+    const pricePerCrate = Math.max(100, parseFloat(priceRaw) || 3800);
+    const user          = Auth.getUser();
+
+    // ── 2. Create Poultry / Depot Profile via API ─────────────────────────
+    let newFarm = null;
+    try {
+      const poultryPayload = {
+        businessName,
+        farmType,
+        state,
+        lga,
+        address: `${lga}, ${state}`,
+        phoneNumber: user?.phone || '',
+        description: `${
+          farmType === 'depot' ? 'Egg Depot & Wholesale Distribution Center' : 'Direct Poultry Farm Producer'
+        } — ${businessName} is located in ${lga}, ${state}.`,
+        // default Lagos coords; field is optional in schema
+        longitude: 3.3792,
+        latitude: 6.5244,
+      };
+
+      const poultryRes = await PoultryAPI.create(poultryPayload);
+
+      // Defensively extract the farm document from any response shape
+      newFarm =
+        poultryRes?.data?.poultry ||
+        poultryRes?.data ||
+        poultryRes?.poultry ||
+        poultryRes;
+
+      if (!newFarm?._id) {
+        throw new Error('Server did not return a valid farm profile.');
+      }
+    } catch (poultryErr) {
+      console.error('[Onboarding] Step 1 – create farm failed:', poultryErr);
+      // If a farm with this business name already exists for this user, try to re-fetch
+      if (poultryErr.message?.toLowerCase().includes('already exists')) {
+        Toast.error('A farm with this name already exists. Update it from your Profile tab.');
+        resetBtn();
+        return;
+      }
+      throw poultryErr; // re-throw for outer handler
+    }
+
+    // ── 3. Create Initial Product Listing ────────────────────────────────
+    try {
+      const initialCategory = farmType === 'depot' ? 'Wholesale Eggs' : 'Farm Fresh Eggs';
+      await ProductAPI.create({
+        poultryId:     newFarm._id,
+        productName:   'Fresh Eggs (Grade A)',
+        category:      initialCategory,
+        pricePerCrate,
+        stockQuantity,
+        imageUrl:      'https://images.unsplash.com/photo-1516448424440-9dbca97779c1?auto=format&fit=crop&q=80&w=900',
+      });
+    } catch (productErr) {
+      // Non-fatal: farm was created. Log and continue to dashboard.
+      console.warn('[Onboarding] Step 2 – initial product listing failed (non-fatal):', productErr);
+    }
+
+    // ── 4. Success: close modal → navigate → reload dashboard data ─────────
+    Toast.success(`🎉 "${businessName}" is now live on Egg Connect!`);
+
+    // Mark onboarding as complete so fetchAndRenderData won't re-open the wizard
+    window.__onboardingComplete = true;
+
+    // Close modal first
+    closeSellerOnboardingWizard();
+
+    // Reset button (modal hidden, but good practice)
+    resetBtn();
+
+    // Short pause so toast is visible before view change
+    await new Promise((resolve) => setTimeout(resolve, 600));
+
+    // Navigate to dashboard tab and reload all data
+    window.location.hash = '#dashboard';
+    handleTabRouting();
+
+    // Full data refresh — this will now find the farm and render metrics
+    await fetchAndRenderData();
+
+  } catch (err) {
+    console.error('[Onboarding] Fatal error:', err);
+    Toast.error(err?.message || 'Failed to create seller profile. Please try again.');
+    resetBtn(); // Always restore button on any error
+  }
 };
 
 window.addEventListener('hashchange', handleTabRouting);

@@ -159,6 +159,7 @@ export function renderNavbar(options = {}) {
     `;
   }
 
+  // ── Logo HTML (dashboard pages: non-clickable div; public pages: link to /) ──
   const logoHtml = isDashboardPage
     ? `<div class="logo" style="display: flex; align-items: center; gap: 8px; text-decoration: none;">
         <img src="/assets/images/logo-egg.svg" alt="Egg Connect Logo" class="logo-icon">
@@ -168,6 +169,100 @@ export function renderNavbar(options = {}) {
         <img src="/assets/images/logo-egg.svg" alt="Egg Connect Logo" class="logo-icon">
         <span>Egg <span style="color: var(--color-accent);">Connect</span></span>
       </a>`;
+
+  // ── Build drawer content (dashboard-aware) ───────────────────────────────
+  let drawerNavHtml = '';
+  let drawerBottomHtml = drawerActions;
+
+  if (isDashboardPage && isLoggedIn) {
+    // Determine which role sidebar to mirror
+    let dashRole = 'buyer';
+    if (user.role === 'SUPER_ADMIN') dashRole = 'admin';
+    else if (user.role === 'FARM_OWNER') dashRole = 'farm';
+
+    let baseHref = '/dashboard-buyer';
+    if (dashRole === 'farm')  baseHref = '/dashboard-farm';
+    else if (dashRole === 'admin') baseHref = '/dashboard-admin';
+
+    let drawerItems = [];
+    if (dashRole === 'farm') {
+      drawerItems = [
+        { key: 'dashboard', label: 'Dashboard',          icon: ICONS.dashboard },
+        { key: 'profile',   label: 'Poultry Profile',    icon: ICONS.farm      },
+        { key: 'products',  label: 'Product Management', icon: ICONS.inventory },
+        { key: 'inventory', label: 'Inventory',          icon: ICONS.orders    },
+        { key: 'requests',  label: 'Booking Requests',   icon: ICONS.requests  },
+      ];
+    } else if (dashRole === 'admin') {
+      drawerItems = [
+        { key: 'dashboard',   label: 'Overview',          icon: ICONS.dashboard },
+        { key: 'users',       label: 'User Directory',    icon: ICONS.profile   },
+        { key: 'audit-logs',  label: 'System Audit Logs', icon: ICONS.calendar  },
+      ];
+    } else {
+      drawerItems = [
+        { key: 'dashboard', label: 'Dashboard', icon: ICONS.dashboard },
+        { key: 'inventory', label: 'Inventory', icon: ICONS.inventory },
+        { key: 'orders',    label: 'Orders',    icon: ICONS.orders    },
+        { key: 'analytics', label: 'Analytics', icon: ICONS.analytics },
+        { key: 'profile',   label: 'Profile',   icon: ICONS.profile   },
+      ];
+    }
+
+    const initials = `${user.firstName?.[0] || 'E'}${user.lastName?.[0] || 'C'}`;
+    let roleLabel = 'Verified Buyer';
+    if (dashRole === 'farm')  roleLabel = 'Premium Seller';
+    else if (dashRole === 'admin') roleLabel = 'System Admin';
+
+    const navItemsHtml = drawerItems.map(item => `
+      <a class="mobile-drawer-link dash-drawer-link" href="${baseHref}#${item.key}" data-tab="${item.key}"
+         style="display: flex; align-items: center; gap: 12px; padding: 13px 16px; border-radius: 8px;
+                text-decoration: none; color: var(--color-text); font-size: 0.93rem; font-weight: 500;
+                transition: background 0.15s ease; border: 1px solid transparent;">
+        <i data-lucide="${item.icon}" style="width: 18px; height: 18px; color: var(--color-primary); flex-shrink: 0;"></i>
+        <span>${item.label}</span>
+      </a>`).join('');
+
+    drawerNavHtml = `
+      <!-- User Identity Pill -->
+      <div style="display: flex; align-items: center; gap: 12px; padding: 14px 16px; margin-bottom: 8px;
+                  background: rgba(31,77,10,0.05); border-radius: 10px; border: 1px solid rgba(31,77,10,0.08);">
+        <div style="background: var(--color-primary); width: 40px; height: 40px; border-radius: 50%;
+                    display: grid; place-items: center; color: #fff; font-weight: 700; flex-shrink: 0; font-size: 0.9rem;">
+          ${initials}
+        </div>
+        <div style="min-width: 0; flex-grow: 1;">
+          <div style="font-weight: 600; font-size: 0.9rem; color: var(--color-text); white-space: nowrap;
+                      overflow: hidden; text-overflow: ellipsis;">${user.firstName} ${user.lastName}</div>
+          <div style="font-size: 0.75rem; color: var(--color-text-muted); margin-top: 2px;">${roleLabel}</div>
+        </div>
+      </div>
+      <!-- Dashboard Nav Links -->
+      ${navItemsHtml}
+      <div style="border-top: 1px solid var(--color-border); margin: 8px 0;"></div>
+      <a href="/" class="mobile-drawer-link"
+         style="display: flex; align-items: center; gap: 12px; padding: 13px 16px; border-radius: 8px;
+                text-decoration: none; color: var(--color-text); font-size: 0.93rem; font-weight: 500;">
+        <i data-lucide="home" style="width: 18px; height: 18px; color: var(--color-text-muted); flex-shrink: 0;"></i>
+        <span>Go to Home Page</span>
+      </a>`;
+
+    drawerBottomHtml = `
+      <button id="mobile-drawer-logout-btn"
+              style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px;
+                     padding: 13px 20px; border-radius: 10px; border: 1px solid rgba(220,38,38,0.2);
+                     background: rgba(220,38,38,0.05); color: #dc2626; font-size: 0.92rem;
+                     font-weight: 600; cursor: pointer;">
+        <i data-lucide="log-out" style="width: 17px; height: 17px;"></i> Logout
+      </button>`;
+  } else {
+    // Non-dashboard pages: standard public links
+    drawerNavHtml = `
+      <a class="mobile-drawer-link" href="/">Home</a>
+      <a class="mobile-drawer-link" href="/about">About</a>
+      <a class="mobile-drawer-link" href="/why">WHY EggConnect</a>
+      <a class="mobile-drawer-link" href="/about#contact">Contact</a>`;
+  }
 
   root.innerHTML = `
     <header id="site-header" class="site-header" style="position: sticky; top: 0; z-index: 9999; background: rgba(255,255,255,0.94); border-bottom: 1px solid rgba(31,77,10,0.06); backdrop-filter: blur(8px); transition: all 220ms var(--anim-ease);">
@@ -193,13 +288,10 @@ export function renderNavbar(options = {}) {
         </button>
       </div>
       <nav class="mobile-drawer-nav">
-        <a class="mobile-drawer-link" href="/">Home</a>
-        <a class="mobile-drawer-link" href="/about">About</a>
-        <a class="mobile-drawer-link" href="/why">WHY EggConnect</a>
-        <a class="mobile-drawer-link" href="/about#contact">Contact</a>
+        ${drawerNavHtml}
       </nav>
       <div class="mobile-drawer-actions">
-        ${drawerActions}
+        ${drawerBottomHtml}
       </div>
     </div>
   `;
@@ -229,6 +321,25 @@ export function renderNavbar(options = {}) {
   if (menuToggleBtn) menuToggleBtn.addEventListener('click', openDrawer);
   if (drawerCloseBtn) drawerCloseBtn.addEventListener('click', closeDrawer);
   if (drawerOverlay) drawerOverlay.addEventListener('click', closeDrawer);
+
+  // ── Dashboard drawer: logout button ──────────────────────────────────────
+  const drawerLogoutBtn = document.getElementById('mobile-drawer-logout-btn');
+  if (drawerLogoutBtn) {
+    drawerLogoutBtn.addEventListener('click', () => {
+      Auth.logout();
+    });
+  }
+
+  // ── Dashboard drawer: tab navigation links ────────────────────────────────
+  document.querySelectorAll('.dash-drawer-link[data-tab]').forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const tabKey = link.getAttribute('data-tab');
+      // Set the URL hash — all three dashboard JS files listen to hashchange
+      window.location.hash = tabKey;
+      closeDrawer();
+    });
+  });
 
   // Collapse / shrink header on scroll for better UX on long pages
   const headerEl = document.getElementById('site-header');
@@ -311,7 +422,6 @@ export function renderSidebar(options = {}) {
     items = [
       { key: 'dashboard', label: 'Overview', icon: ICONS.dashboard, href: `${baseHref}#dashboard` },
       { key: 'users', label: 'User Directory', icon: ICONS.profile, href: `${baseHref}#users` },
-      { key: 'invitations', label: 'Invitation Manager', icon: ICONS.requests, href: `${baseHref}#invitations` },
       { key: 'audit-logs', label: 'System Audit Logs', icon: ICONS.calendar, href: `${baseHref}#audit-logs` },
     ];
   } else {
@@ -334,8 +444,8 @@ export function renderSidebar(options = {}) {
     buttonLabel = '+ Post Listing';
   } else if (role === 'admin') {
     brand = 'Egg Connect / Admin';
-    buttonLabel = 'Manage Invitations';
-    buttonHref = `${baseHref}#invitations`;
+    buttonLabel = 'User Directory';
+    buttonHref = `${baseHref}#users`;
   }
 
   const user = Auth.getUser() || { firstName: 'Egg', lastName: 'Connect', role: 'CUSTOMER', email: '' };

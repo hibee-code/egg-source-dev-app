@@ -12,25 +12,25 @@
   "categories": ["shopping", "business"],
   "icons": [
     {
-      "src": "/assets/images/logo-egg-192.png",
+      "src": "/assets/images/logo-egg-pwa-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/assets/images/logo-egg-512.png",
+      "src": "/assets/images/logo-egg-pwa-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/assets/images/logo-egg-maskable-192.png",
+      "src": "/assets/images/logo-egg-pwa-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "/assets/images/logo-egg-maskable-512.png",
+      "src": "/assets/images/logo-egg-pwa-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"

@@ -387,8 +387,8 @@
     .badge-success { background: rgba(5,150,105,0.08); color: #059669; }
     .badge-expired { background: rgba(107,114,128,0.08); color: #6b7280; }
 
-    /* Mobile Sidebar Toggle Overlay */
-    @media (max-width: 768px) {
+    /* ── TABLET (≤1024px) ─────────────────────────────────────────────────── */
+    @media (max-width: 1024px) {
       .shadcn-sidebar {
         transform: translateX(-100%);
         width: var(--sidebar-width) !important;
@@ -399,11 +399,125 @@
       .main-wrapper {
         margin-left: 0 !important;
       }
+      .content-container {
+        padding: 24px 16px;
+      }
+    }
+
+    /* ── MOBILE (≤768px) ──────────────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      /* Sidebar: slide off-canvas, shown via hamburger toggle */
+      .shadcn-sidebar {
+        transform: translateX(-100%);
+        width: var(--sidebar-width) !important;
+        z-index: 50;
+      }
+      .shadcn-sidebar.mobile-open {
+        transform: translateX(0);
+        box-shadow: 4px 0 24px rgba(0,0,0,0.12);
+      }
+
+      /* Dark overlay behind open sidebar */
       .sidebar-overlay {
         position: fixed;
         inset: 0;
         background-color: rgba(0,0,0,0.4);
-        z-index: 35;
+        z-index: 45;
+      }
+
+      /* Main content: no left margin, full width */
+      .main-wrapper {
+        margin-left: 0 !important;
+        width: 100%;
+      }
+
+      /* Sticky header: tighten and prevent overflow */
+      .sticky-header {
+        padding: 0 12px;
+        gap: 8px;
+      }
+
+      /* Breadcrumbs: hide on very small to save space */
+      .breadcrumbs {
+        display: none;
+      }
+
+      /* Content container: tighten padding */
+      .content-container {
+        padding: 16px 12px;
+        max-width: 100%;
+      }
+
+      /* Stats cards: single column */
+      .stats-grid {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+      }
+
+      /* All tables inside cards: horizontal scroll wrapper */
+      .content-container .card,
+      .content-container > div {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      /* Prevent table cells from compressing */
+      table.table-list {
+        min-width: 600px;
+      }
+
+      /* Dropdown menu: ensure it's not clipped on mobile */
+      .dropdown-menu {
+        right: -8px;
+        width: 200px;
+      }
+
+      /* Header right: reduce gap */
+      .header-right { gap: 6px; }
+
+      /* Page section titles */
+      h1 { font-size: 1.4rem !important; }
+      h2 { font-size: 1.15rem !important; }
+      h3 { font-size: 1rem !important; }
+
+      /* Modals: full-screen sheet on mobile */
+      .modal-overlay {
+        padding: 0;
+        align-items: flex-end;
+      }
+      .modal-overlay > div {
+        width: 100% !important;
+        max-width: 100% !important;
+        max-height: 88vh;
+        overflow-y: auto;
+        border-radius: 20px 20px 0 0 !important;
+        margin: 0 !important;
+      }
+
+      /* Badge chips: prevent overflow on small cells */
+      .badge {
+        font-size: 0.7rem !important;
+        padding: 3px 7px !important;
+      }
+
+      /* Button groups: wrap on mobile */
+      .header-right .icon-btn { padding: 4px; }
+    }
+
+    /* ── SMALL MOBILE (≤480px) ────────────────────────────────────────────── */
+    @media (max-width: 480px) {
+      .sticky-header    { padding: 0 8px; height: 54px; }
+      .content-container { padding: 12px 8px; }
+
+      /* Sidebar user info: tighten */
+      .sidebar-user { padding: 12px 16px; }
+      .sidebar-logo span { font-size: 0.9rem; }
+
+      /* Avatar button: slightly smaller */
+      .avatar-circle {
+        width: 30px;
+        height: 30px;
+        font-size: 0.75rem;
       }
     }
   </style>
@@ -451,10 +565,6 @@
         <a href="#farms" class="menu-item">
           <i data-lucide="store" style="width: 18px; height: 18px;"></i>
           <span>Poultry Farms</span>
-        </a>
-        <a href="#invitations" class="menu-item">
-          <i data-lucide="clipboard-list" style="width: 18px; height: 18px;"></i>
-          <span>Invitation Manager</span>
         </a>
         <a href="#reports" class="menu-item">
           <i data-lucide="bar-chart-3" style="width: 18px; height: 18px;"></i>
@@ -630,57 +740,26 @@
           </div>
         </section>
 
-        <!-- VIEW: Invitation Manager -->
-        <section id="section-invitations" class="dashboard-view-panel hidden">
-          <div class="card" style="background: #fff; border-radius: 12px; border: 1px solid var(--color-slate-200); padding: 24px;">
-            
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-              <h3 style="margin: 0; font-size: 1.1rem; font-weight: 600;">Pending Invitations</h3>
-              <button id="invite-btn" class="btn btn-primary" style="display: flex; align-items: center; gap: 8px;">
-                <i data-lucide="plus" style="width: 18px; height: 18px;"></i> Create New Invitation
-              </button>
-            </div>
-
-            <!-- Invitations Table -->
-            <div class="table-responsive">
-              <table class="table" style="width: 100%; border-collapse: collapse;">
-                <thead>
-                  <tr style="border-bottom: 2px solid var(--color-slate-100); text-align: left;">
-                    <th style="padding: 12px; color: var(--color-slate-500); font-weight: 600;">Email</th>
-                    <th style="padding: 12px; color: var(--color-slate-500); font-weight: 600;">Business Name</th>
-                    <th style="padding: 12px; color: var(--color-slate-500); font-weight: 600;">Status</th>
-                    <th style="padding: 12px; color: var(--color-slate-500); font-weight: 600;">Expires At</th>
-                    <th style="padding: 12px; text-align: right; color: var(--color-slate-500); font-weight: 600;">Actions</th>
-                  </tr>
-                </thead>
-                <tbody id="invitations-tbody">
-                  <tr>
-                    <td colspan="5" style="text-align: center; padding: 30px; color: var(--color-slate-500);">Loading invitation list...</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-          </div>
-        </section>
-
         <!-- VIEW: System Audit Logs -->
         <section id="section-audit-logs" class="dashboard-view-panel hidden">
-          <div class="card" style="background: #fff; border-radius: 12px; border: 1px solid var(--color-slate-200); padding: 24px;">
+          <div class="card" style="background: #fff; border-radius: 12px; border: 1px solid var(--color-slate-200); padding: 24px; overflow: hidden;">
             
-            <h3 style="margin: 0 0 20px; font-size: 1.1rem; font-weight: 600;">Complete Platform Security Logs</h3>
+            <div style="margin-bottom: 20px;">
+              <h3 style="margin: 0; font-size: 1.15rem; font-weight: 700; color: var(--color-slate-900);">Complete Platform Security Logs</h3>
+              <p style="margin: 4px 0 0; color: var(--color-slate-500); font-size: 0.85rem;">Stateless activity logging and audit history</p>
+            </div>
 
-            <!-- Logs Table -->
-            <div class="table-responsive">
-              <table class="table" style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+            <!-- Responsive Logs Table Container -->
+            <div class="table-responsive" style="width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid var(--color-slate-100); border-radius: 8px;">
+              <table class="table" style="width: 100%; min-width: 850px; border-collapse: collapse; font-size: 0.875rem;">
                 <thead>
-                  <tr style="border-bottom: 2px solid var(--color-slate-100); text-align: left;">
-                    <th style="padding: 12px; color: var(--color-slate-500); font-weight: 600; width: 180px;">Timestamp</th>
-                    <th style="padding: 12px; color: var(--color-slate-500); font-weight: 600; width: 140px;">Severity</th>
-                    <th style="padding: 12px; color: var(--color-slate-500); font-weight: 600; width: 180px;">Action Event</th>
-                    <th style="padding: 12px; color: var(--color-slate-500); font-weight: 600;">User Account</th>
-                    <th style="padding: 12px; color: var(--color-slate-500); font-weight: 600; width: 140px;">IP Address</th>
-                    <th style="padding: 12px; color: var(--color-slate-500); font-weight: 600;">Agent / Metadata</th>
+                  <tr style="border-bottom: 2px solid var(--color-slate-200); background: var(--color-slate-50); text-align: left;">
+                    <th style="padding: 14px 16px; color: var(--color-slate-600); font-weight: 600; white-space: nowrap; min-width: 170px;">Timestamp</th>
+                    <th style="padding: 14px 16px; color: var(--color-slate-600); font-weight: 600; white-space: nowrap; width: 110px;">Severity</th>
+                    <th style="padding: 14px 16px; color: var(--color-slate-600); font-weight: 600; white-space: nowrap; min-width: 160px;">Action Event</th>
+                    <th style="padding: 14px 16px; color: var(--color-slate-600); font-weight: 600; white-space: nowrap; min-width: 220px;">User Account</th>
+                    <th style="padding: 14px 16px; color: var(--color-slate-600); font-weight: 600; white-space: nowrap; min-width: 130px;">IP Address</th>
+                    <th style="padding: 14px 16px; color: var(--color-slate-600); font-weight: 600; white-space: nowrap; min-width: 220px;">Agent / Metadata</th>
                   </tr>
                 </thead>
                 <tbody id="audit-logs-tbody">
@@ -909,50 +988,6 @@
           </div>
         </section>
       </main>
-    </div>
-  </div>
-
-  <!-- Invitation Modal Dialog -->
-  <div id="invite-modal" class="modal-overlay hidden" style="position: fixed; inset: 0; background: rgba(15,23,42,0.6); z-index: 1000; display: grid; place-items: center; backdrop-filter: blur(4px);">
-    <div class="modal-content" style="background: #ffffff; width: 100%; max-width: 480px; padding: 30px; border-radius: 12px; position: relative; border: 1px solid var(--color-slate-200); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);">
-      <button id="close-modal-btn" style="position: absolute; top: 20px; right: 20px; background: none; border: none; cursor: pointer; color: var(--color-slate-500);"><i data-lucide="x" style="width: 20px; height: 20px;"></i></button>
-      
-      <!-- Form Container -->
-      <div id="invite-form-container">
-        <h3 style="margin-top: 0; font-size: 1.25rem; font-weight: 700; color: var(--color-slate-900); display: flex; align-items: center; gap: 8px;"><i data-lucide="send" style="width: 20px; height: 20px; color: var(--color-primary);"></i> Send Invitation</h3>
-        <p style="font-size: 0.86rem; color: var(--color-slate-500); margin-bottom: 24px;">Invite a vetted Poultry Farm Owner to onboard. They will receive a secure token valid for 24 hours.</p>
-
-        <form id="invite-form" style="display: flex; flex-direction: column; gap: 16px;">
-          <div class="filter-group">
-            <label class="label label-pill" for="invite-email">Owner Email <span class="required-star">*</span></label>
-            <input id="invite-email" type="email" class="input-field input-pill" placeholder="e.g. owner@poultryfarm.com" required>
-          </div>
-
-          <div class="filter-group">
-            <label class="label label-pill" for="invite-business">Business / Farm Name <span class="required-star">*</span></label>
-            <input id="invite-business" type="text" class="input-field input-pill" placeholder="e.g. Sunshine Eggs Ltd" required>
-          </div>
-
-          <button id="submit-invite-btn" type="submit" class="btn btn-gradient" style="width: 100%; margin-top: 10px;">Send Secure Invitation</button>
-        </form>
-      </div>
-
-      <!-- Success State Container -->
-      <div id="invite-success-container" class="hidden" style="display: flex; flex-direction: column; gap: 16px;">
-        <div style="background: rgba(31, 77, 10, 0.05); border: 1px solid rgba(31, 77, 10, 0.1); border-radius: 8px; padding: 16px; text-align: center;">
-          <i data-lucide="check-circle" style="width: 48px; height: 48px; color: var(--color-primary); margin: 0 auto 12px; display: block;"></i>
-          <h4 style="margin: 0 0 6px; font-weight: 600; color: var(--color-slate-900);">Invitation Sent</h4>
-          <p id="invite-success-text" style="font-size: 0.85rem; color: var(--color-slate-500); margin: 0;">The invitation has been successfully sent to the owner's email. You can also copy the secure registration link below.</p>
-        </div>
-        <div class="filter-group">
-          <label class="label label-pill">Secure Registration Link</label>
-          <div style="display: flex; gap: 8px;">
-            <input id="invite-success-url" type="text" class="input-field input-pill" readonly style="flex-grow: 1; background: var(--color-slate-50); cursor: text;">
-            <button id="invite-copy-btn" class="btn btn-primary" style="flex-shrink: 0; padding: 0 16px;">Copy</button>
-          </div>
-        </div>
-        <button id="invite-done-btn" class="btn btn-gradient" style="width: 100%; margin-top: 10px;">Done</button>
-      </div>
     </div>
   </div>
 

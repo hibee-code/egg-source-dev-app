@@ -116,7 +116,7 @@
                 <span class="checkmark"></span>
                 <span class="checkbox-text">Remember me</span>
               </label>
-              <a href="#" class="forgot-pass-link">Forgot Password?</a>
+              <a href="/forgot-password" class="forgot-pass-link">Forgot Password?</a>
             </div>
 
             <button id="login-submit" type="submit" class="btn btn-gradient" style="width:100%;">Sign In</button>
@@ -145,13 +145,14 @@
               <input id="register-phone" type="tel" class="input-field input-pill" placeholder="Enter phone number" required>
             </div>
             
-            <div class="filter-group hidden">
-              <label class="label label-pill">Account Role <span class="required-star">*</span></label>
-              <div class="auth-roles">
-                <button type="button" class="role-card active" data-role="CUSTOMER">Buyer</button>
-              </div>
+            <div class="filter-group">
+              <label class="label label-pill" for="register-role">Account Type <span class="required-star">*</span></label>
+              <select id="register-role" class="select-field input-pill" required style="height: 46px; background-color: var(--color-card); font-weight: 600; cursor: pointer; color: var(--color-text);">
+                <option value="" disabled selected>- Select Account Type -</option>
+                <option value="CUSTOMER">Buyer</option>
+                <option value="FARM_OWNER">Seller</option>
+              </select>
             </div>
-            <input id="register-role" type="hidden" value="CUSTOMER">
             
             <div class="filter-group">
               <label class="label label-pill" for="register-password">Password <span class="required-star">*</span></label>
@@ -161,6 +162,7 @@
                   <i data-lucide="eye" style="width: 18px; height: 18px; display: block;"></i>
                 </button>
               </div>
+              <p style="font-size: 0.78rem; color: var(--color-text-muted); margin-top: 4px; margin-left: 4px;">Min 8 characters with 1 uppercase, 1 lowercase & 1 number.</p>
             </div>
             
             <div class="filter-group">
@@ -177,7 +179,7 @@
               <label class="checkbox-container">
                 <input type="checkbox" id="register-terms" required>
                 <span class="checkmark"></span>
-                <span class="checkbox-text">I accept policies inside the <a href="#" class="policy-link">Terms of Service</a> and <a href="#" class="policy-link">Privacy Policy</a></span>
+                <span class="checkbox-text">I accept policies inside the <a href="/terms" class="policy-link">Terms of Service</a> and <a href="/privacy" class="policy-link">Privacy Policy</a></span>
               </label>
             </div>
 

@@ -100,6 +100,10 @@ export const Pagination = {
   render(container, meta, onPageChange) {
     if (!container || !meta) return;
     const { page, totalPages } = meta;
+    if (!totalPages || totalPages <= 1) {
+      container.innerHTML = '';
+      return;
+    }
     const items = [];
     const addButton = (value, label = value, active = false, disabled = false) => {
       return `<button class="btn btn-secondary${active ? ' active' : ''}" data-page="${value}" ${disabled ? 'disabled' : ''}>${label}</button>`;

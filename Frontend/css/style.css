@@ -1120,18 +1120,48 @@ header .navbar-inner {
 }
 
 .sort-row {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 22px;
+  gap: 10px;
+  margin: 0;
+}
+
+.sort-row label {
+  margin: 0;
+  white-space: nowrap;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-text);
+  line-height: 1;
+}
+
+.sort-row select {
+  height: 42px;
+  padding: 8px 16px;
+  border-radius: 9999px;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-card);
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--color-text);
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: var(--transition);
+}
+
+.sort-row select:hover,
+.sort-row select:focus {
+  border-color: var(--color-primary);
+  outline: none;
 }
 
 .listing-header {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
 }
 
 .listing-header h1 {

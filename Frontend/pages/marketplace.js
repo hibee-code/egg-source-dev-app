@@ -203,7 +203,7 @@ const renderCard = (farm) => {
   return `
     <article class="product-card" data-id="${farm._id}">
       <div class="product-card__image">
-        <img src="${farm.imageUrl || 'https://images.unsplash.com/photo-1506976785307-8732e854ad03?auto=format&fit=crop&q=80&w=900'}" alt="${farm.businessName}" />
+        <img src="${farm.imageUrl || 'https://images.unsplash.com/photo-1506976785307-8732e854ad03?auto=format&fit=crop&q=80&w=900'}" alt="${farm.businessName}" draggable="false" />
         <div class="product-card__badge">${badge}</div>
       </div>
       <div class="product-card__body" style="display: flex; flex-direction: column; flex-grow: 1;">
@@ -216,7 +216,7 @@ const renderCard = (farm) => {
         <div class="product-card__price" style="margin-top: 12px; margin-bottom: 12px; font-size: 1.25rem; font-weight: var(--font-weight-bold); color: var(--color-primary);">${Format.currency(farm.pricePerCrate || 4200)}</div>
         <div style="margin-top: auto; display: flex; align-items: center; justify-content: space-between; gap: 12px;">
           ${chip}
-          <a class="btn btn-secondary btn-pill" href="/farm-detail?farmId=${farm._id}">View Details</a>
+          <a class="btn btn-secondary btn-pill" href="/farm-detail?farmId=${farm._id}" style="white-space: nowrap; flex-shrink: 0;">View Details</a>
         </div>
       </div>
     </article>

@@ -28,11 +28,19 @@ export const Auth = {
       window.location.href = '/login';
       return false;
     }
+    // ── OTP SUPPRESSED: isVerified check disabled until Resend integration is fixed.
+    // ── TODO: Uncomment when OTP is re-enabled.
+    // if (user.isVerified === false) {
+    //   window.location.href = `/verify-otp?email=${encodeURIComponent(user.email)}`;
+    //   return false;
+    // }
     return true;
   },
   redirectIfLoggedIn() {
     const user = this.getUser();
-    if (!user) return;
+    const token = this.getToken();
+    if (!user || !token) return;
+    if (user.isVerified === false) return;
     let target = '/dashboard-buyer';
     if (user.role === 'SUPER_ADMIN') {
       target = '/dashboard-admin';
