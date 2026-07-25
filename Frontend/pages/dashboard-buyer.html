@@ -118,16 +118,63 @@
         width: 100% !important;
       }
 
-      /* Stats grid: single column */
+      /* Stats grid: 2-column compact grid on mobile */
       .stats-grid {
-        grid-template-columns: 1fr !important;
+        grid-template-columns: repeat(2, 1fr) !important;
         gap: 12px !important;
+      }
+
+      .stats-card--dark,
+      .stats-card--full {
+        grid-column: 1 / -1 !important;
       }
 
       /* Dashboard home stacks to single column */
       .dashboard-main {
         grid-template-columns: 1fr !important;
         gap: 16px !important;
+      }
+
+      /* Sticky Mobile Bottom App Navigation Bar */
+      .mobile-bottom-nav {
+        display: flex !important;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 62px;
+        background: rgba(255, 255, 255, 0.96);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-top: 1px solid var(--color-border);
+        z-index: 9999;
+        justify-content: space-around;
+        align-items: center;
+        padding: 0 8px;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+      }
+
+      .mobile-bottom-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 3px;
+        color: var(--color-text-muted);
+        text-decoration: none;
+        font-size: 0.72rem;
+        font-weight: 500;
+        padding: 6px 12px;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+      }
+
+      .mobile-bottom-item.active {
+        color: var(--color-primary);
+        font-weight: 700;
+      }
+
+      .page {
+        padding-bottom: 80px !important;
       }
 
       /* Table wrappers: enable horizontal scroll, no overflow clip */
@@ -144,13 +191,13 @@
       }
 
       /* Section headings: reduce font on mobile */
-      h1 { font-size: 1.5rem !important; }
-      h2 { font-size: 1.2rem !important; }
+      h1 { font-size: 1.4rem !important; }
+      h2 { font-size: 1.15rem !important; }
       h3 { font-size: 1rem !important; }
 
       /* Stats card numbers */
       .stats-card p[style*="2rem"] {
-        font-size: 1.6rem !important;
+        font-size: 1.5rem !important;
       }
 
       /* Profile form: full width fields */
@@ -192,7 +239,7 @@
       }
 
       .stats-card {
-        padding: 16px !important;
+        padding: 14px !important;
       }
 
       /* Prevent button text wrapping */
@@ -220,26 +267,72 @@
       
       <!-- TAB: DASHBOARD -->
       <div id="tab-dashboard" class="tab-content">
-        <section style="margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+        <section style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
           <div>
-            <h1 style="margin: 0;">Buyer Dashboard</h1>
-            <p style="color: var(--color-text-muted); margin: 4px 0 0;">Welcome back, Egg Connect partner.</p>
+            <h1 style="margin: 0; font-size: 1.6rem; font-weight: 800; tracking: -0.02em;">Buyer Dashboard</h1>
+            <p style="color: var(--color-text-muted); margin: 4px 0 0; font-size: 0.9rem;">Welcome back, Egg Connect partner.</p>
           </div>
         </section>
 
-        <section class="stats-grid" style="margin-bottom: 24px;">
-          <div class="stats-card">
-            <div class="card-header"><h3>Total Bookings</h3><span class="chip chip--success">+12% ↑</span></div>
-            <p id="stat-total-bookings" style="font-size: 2rem; margin: 0; font-weight: bold;">0</p>
+        <!-- 2-Column Mobile Compact Metric Cards -->
+        <section class="stats-grid" style="margin-bottom: 20px;">
+          <div class="stats-card" style="padding: 16px; border-radius: 14px; background: var(--color-card); border: 1px solid var(--color-border); box-shadow: 0 4px 14px rgba(0,0,0,0.03);">
+            <div class="card-header" style="margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+              <h3 style="font-size: 0.82rem; font-weight: 600; color: var(--color-text-muted); margin: 0;">Total Bookings</h3>
+              <span class="chip chip--success" style="font-size: 0.7rem; padding: 2px 6px;">+12% ↑</span>
+            </div>
+            <p id="stat-total-bookings" style="font-size: 1.8rem; margin: 0; font-weight: 800; color: var(--color-primary);">0</p>
           </div>
-          <div class="stats-card">
-            <div class="card-header"><h3>In Transit</h3><span class="chip chip--orange">Pending</span></div>
-            <p id="stat-in-transit" style="font-size: 2rem; margin: 0; font-weight: bold;">0</p>
+
+          <div class="stats-card" style="padding: 16px; border-radius: 14px; background: var(--color-card); border: 1px solid var(--color-border); box-shadow: 0 4px 14px rgba(0,0,0,0.03);">
+            <div class="card-header" style="margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+              <h3 style="font-size: 0.82rem; font-weight: 600; color: var(--color-text-muted); margin: 0;">In Transit</h3>
+              <span class="chip chip--orange" style="font-size: 0.7rem; padding: 2px 6px;">Pending</span>
+            </div>
+            <p id="stat-in-transit" style="font-size: 1.8rem; margin: 0; font-weight: 800; color: var(--color-text);">0</p>
           </div>
-          <div class="stats-card stats-card--dark">
-            <h3>Premium Supplier Access</h3>
-            <p style="font-size: 0.9rem; margin-bottom: 12px; color: rgba(255,255,255,0.85);">Unlock trusted farms and priority inventory.</p>
-            <a class="btn btn-ghost" href="/marketplace" style="color: #fff; border-color: rgba(255,255,255,0.3);">Browse Farms</a>
+
+          <!-- Full Width Promo Card with High Contrast -->
+          <div class="stats-card stats-card--dark" style="grid-column: 1 / -1; background: linear-gradient(135deg, #1f4d0a 0%, #163807 100%); color: #ffffff !important; border-radius: 16px; padding: 20px; box-shadow: 0 8px 24px rgba(31, 77, 10, 0.18); border: 1px solid rgba(255,255,255,0.1);">
+            <h3 style="color: #ffffff !important; margin: 0 0 6px 0; font-size: 1.1rem; font-weight: 700;">Premium Supplier Access</h3>
+            <p style="font-size: 0.88rem; margin: 0 0 16px 0; color: rgba(255,255,255,0.9) !important; line-height: 1.4;">Unlock verified farms & priority inventory with price transparency.</p>
+            <a class="btn" href="/marketplace" style="background: #e8a020; color: #ffffff; border: none; font-weight: 700; padding: 10px 20px; border-radius: 10px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; font-size: 0.88rem; box-shadow: 0 4px 12px rgba(232, 160, 32, 0.35);">
+              <i data-lucide="store" style="width: 16px; height: 16px;"></i> Browse Farms
+            </a>
+          </div>
+        </section>
+
+        <!-- App Quick Actions Grid (Moniepoint/Kuda/Uber style) -->
+        <section style="margin-bottom: 24px;">
+          <div style="font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-muted); margin-bottom: 10px;">Quick Actions</div>
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
+            <a href="/marketplace" class="quick-action-card" style="display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 14px 6px; background: var(--color-card); border: 1px solid var(--color-border); border-radius: 14px; text-decoration: none; color: var(--color-text); text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.02); transition: transform 0.15s ease;">
+              <div style="width: 42px; height: 42px; border-radius: 12px; background: rgba(31, 77, 10, 0.08); color: var(--color-primary); display: grid; place-items: center;">
+                <i data-lucide="store" style="width: 20px; height: 20px;"></i>
+              </div>
+              <span style="font-size: 0.75rem; font-weight: 600; line-height: 1.2;">Browse</span>
+            </a>
+
+            <a href="#orders" class="quick-action-card select-tab-link" style="display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 14px 6px; background: var(--color-card); border: 1px solid var(--color-border); border-radius: 14px; text-decoration: none; color: var(--color-text); text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.02); transition: transform 0.15s ease;">
+              <div style="width: 42px; height: 42px; border-radius: 12px; background: rgba(211, 138, 24, 0.1); color: #d38a18; display: grid; place-items: center;">
+                <i data-lucide="package" style="width: 20px; height: 20px;"></i>
+              </div>
+              <span style="font-size: 0.75rem; font-weight: 600; line-height: 1.2;">Orders</span>
+            </a>
+
+            <a href="#analytics" class="quick-action-card select-tab-link" style="display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 14px 6px; background: var(--color-card); border: 1px solid var(--color-border); border-radius: 14px; text-decoration: none; color: var(--color-text); text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.02); transition: transform 0.15s ease;">
+              <div style="width: 42px; height: 42px; border-radius: 12px; background: rgba(37, 99, 235, 0.08); color: #2563eb; display: grid; place-items: center;">
+                <i data-lucide="bar-chart-3" style="width: 20px; height: 20px;"></i>
+              </div>
+              <span style="font-size: 0.75rem; font-weight: 600; line-height: 1.2;">Stats</span>
+            </a>
+
+            <a href="mailto:support@send.mahfuzmfb.com" class="quick-action-card" style="display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 14px 6px; background: var(--color-card); border: 1px solid var(--color-border); border-radius: 14px; text-decoration: none; color: var(--color-text); text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.02); transition: transform 0.15s ease;">
+              <div style="width: 42px; height: 42px; border-radius: 12px; background: rgba(16, 185, 129, 0.08); color: #10b981; display: grid; place-items: center;">
+                <i data-lucide="headphones" style="width: 20px; height: 20px;"></i>
+              </div>
+              <span style="font-size: 0.75rem; font-weight: 600; line-height: 1.2;">Support</span>
+            </a>
           </div>
         </section>
 
@@ -419,6 +512,26 @@
 
     </main>
   </div>
+
+  <!-- Mobile Bottom Sticky Navigation (Kuda/Moniepoint/Uber style) -->
+  <nav class="mobile-bottom-nav">
+    <a href="#dashboard" class="mobile-bottom-item select-tab-link active" data-tab="dashboard">
+      <i data-lucide="layout-dashboard"></i>
+      <span>Home</span>
+    </a>
+    <a href="#orders" class="mobile-bottom-item select-tab-link" data-tab="orders">
+      <i data-lucide="shopping-bag"></i>
+      <span>Orders</span>
+    </a>
+    <a href="#analytics" class="mobile-bottom-item select-tab-link" data-tab="analytics">
+      <i data-lucide="bar-chart-2"></i>
+      <span>Stats</span>
+    </a>
+    <a href="#profile" class="mobile-bottom-item select-tab-link" data-tab="profile">
+      <i data-lucide="user"></i>
+      <span>Profile</span>
+    </a>
+  </nav>
 
   <script type="module" src="/components/layout/navbar.js"></script>
   <script type="module" src="/pages/dashboard-buyer.js"></script>

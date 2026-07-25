@@ -52,11 +52,56 @@
       /* Main page content: no extra padding */
       .page { padding: 0 !important; }
 
-      /* Stats grids: single column */
-      .stats-grid,
+      /* Stats grids: 2-column compact grid on mobile */
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 12px !important;
+      }
       .grid-2col {
         grid-template-columns: 1fr !important;
         gap: 12px !important;
+      }
+
+      /* Sticky Mobile Bottom App Navigation Bar */
+      .mobile-bottom-nav {
+        display: flex !important;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 62px;
+        background: rgba(255, 255, 255, 0.96);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-top: 1px solid var(--color-border);
+        z-index: 9999;
+        justify-content: space-around;
+        align-items: center;
+        padding: 0 8px;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+      }
+
+      .mobile-bottom-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 3px;
+        color: var(--color-text-muted);
+        text-decoration: none;
+        font-size: 0.72rem;
+        font-weight: 500;
+        padding: 6px 12px;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+      }
+
+      .mobile-bottom-item.active {
+        color: var(--color-primary);
+        font-weight: 700;
+      }
+
+      .page {
+        padding-bottom: 80px !important;
       }
 
       /* Metric cards: tighten */
@@ -1256,6 +1301,26 @@
       </form>
     </div>
   </div>
+
+  <!-- Mobile Bottom Sticky Navigation (Kuda/Moniepoint/Uber style) -->
+  <nav class="mobile-bottom-nav">
+    <a href="#dashboard" class="mobile-bottom-item select-tab-link active" data-tab="dashboard">
+      <i data-lucide="layout-dashboard"></i>
+      <span>Home</span>
+    </a>
+    <a href="#products" class="mobile-bottom-item select-tab-link" data-tab="products">
+      <i data-lucide="package-search"></i>
+      <span>Products</span>
+    </a>
+    <a href="#requests" class="mobile-bottom-item select-tab-link" data-tab="requests">
+      <i data-lucide="inbox"></i>
+      <span>Requests</span>
+    </a>
+    <a href="#profile" class="mobile-bottom-item select-tab-link" data-tab="profile">
+      <i data-lucide="store"></i>
+      <span>Profile</span>
+    </a>
+  </nav>
 
   <script type="module" src="/components/layout/navbar.js"></script>
   <script type="module" src="/pages/dashboard-farm.js"></script>
