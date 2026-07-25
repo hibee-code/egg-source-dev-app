@@ -9,31 +9,21 @@ const env = require("../config/env");
  * @access  Public
  */
 const register = catchAsync(async (req, res) => {
-  const { user } = await authService.register(req.body);
-  const response = { user };
+  const { user, email, accessToken } = await authService.register(req.body, res);
 
-  if (env.isDevelopment) {
-    // Auto-verify user in dev mode so the login check passes
-    const User = require("../models/user.model");
-    await User.findByIdAndUpdate(user._id, { isVerified: true });
+  const redirects = {
+    SUPER_ADMIN: "/dashboard-admin",
+    FARM_OWNER: "/dashboard-farm",
+    CUSTOMER: "/dashboard-buyer",
+  };
 
-    try {
-      const loginResult = await authService.login(
-        req.body.email,
-        req.body.password,
-        res,
-        req.ip,
-        req.headers["user-agent"]
-      );
-      if (loginResult.accessToken) {
-        response.accessToken = loginResult.accessToken;
-      }
-    } catch (err) {
-      console.warn("Dev auto-login failed:", err.message);
-    }
-  }
-
-  sendSuccess(res, 201, "Registration successful", response);
+  sendSuccess(res, 201, "Account created successfully. Welcome to Egg Connect!", {
+    user,
+    email,
+    accessToken,
+    requiresVerification: false, // OTP suppressed — TODO: restore when Resend is live
+    redirectUrl: redirects[user.role] || "/dashboard-buyer",
+  });
 });
 
 /**
@@ -186,6 +176,46 @@ const resendVerification = catchAsync(async (req, res) => {
   );
 });
 
+/**
+ * @desc    Verify 6-digit OTP code sent via email
+ * @route   POST /api/v1/auth/verify-otp
+ * @access  Public
+ */
+const verifyOTP = catchAsync(async (req, res) => {
+  const { email, otp } = req.body;
+  const { user, accessToken } = await authService.verifyOTP(
+    email,
+    otp,
+    res,
+    req.ip,
+    req.headers["user-agent"]
+  );
+
+  const redirects = {
+    SUPER_ADMIN: "/dashboard-admin",
+    FARM_OWNER: "/dashboard-farm",
+    CUSTOMER: "/dashboard-buyer",
+  };
+
+  sendSuccess(res, 200, "Email verified successfully", {
+    user,
+    accessToken,
+    redirectUrl: redirects[user.role] || "/dashboard-buyer",
+  });
+});
+
+/**
+ * @desc    Resend a 6-digit OTP code
+ * @route   POST /api/v1/auth/resend-otp
+ * @access  Public
+ */
+const resendOTP = catchAsync(async (req, res) => {
+  const { email } = req.body;
+  await authService.resendOTP(email);
+
+  sendSuccess(res, 200, "A new 6-digit verification code has been sent to your email.");
+});
+
 module.exports = {
   register,
   login,
@@ -198,4 +228,6 @@ module.exports = {
   updateProfile,
   verifyEmail,
   resendVerification,
+  verifyOTP,
+  resendOTP,
 };

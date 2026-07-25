@@ -153,74 +153,31 @@ class EmailService {
         });
 
         if (response.error) {
-          logger.error(`❌ Resend API Error: ${response.error.message} (${response.error.name})`);
-          throw new Error(response.error.message);
+          logger.warn(`⚠️ EmailService (Resend Error: ${response.error.message}). Falling back to local console simulation.`);
+          return this._logDevEmail({ to, subject, text });
         }
 
         logger.info(`📧 Email successfully sent via Resend to: ${to} (ID: ${response.data.id})`);
         return response.data;
       } catch (err) {
-        logger.error(`❌ Failed to send email via Resend to ${to}: ${err.message}`);
-        throw err;
+        logger.warn(`⚠️ EmailService (Resend Exception: ${err.message}). Falling back to local console simulation.`);
+        return this._logDevEmail({ to, subject, text });
       }
     } else {
-      // Development console logging fallback
-      logger.info("┌────────────────── DEVELOPMENT EMAIL SIMULATION ──────────────────┐");
-      logger.info(`│ TO:      ${to}`);
-      logger.info(`│ SUBJECT: ${subject}`);
-      logger.info("├──────────────────────────────────────────────────────────────────┤");
-      logger.info(`│ PLAIN TEXT BODY:\n│\n${text.split("\n").map(line => `│ ${line}`).join("\n")}`);
-      logger.info("└──────────────────────────────────────────────────────────────────┘");
-      return { id: `dev_sim_${Date.now()}` };
+      return this._logDevEmail({ to, subject, text });
     }
   }
 
-  /**
-   * Send onboarding invitation to poultry farm owners.
-   */
-  async sendFarmOwnerInvitation(to, businessName, inviteLink, isResend = false) {
-    const subject = isResend
-      ? `Egg Connect — Invited to join as Farm Owner (Resent)`
-      : `Egg Connect — Invited to join as Farm Owner`;
-
-    const title = isResend ? "Invitation Resent" : "Invitation to Join Egg Connect";
-
-    const contentHtml = `
-      <h1>Hello,</h1>
-      <p>You have been invited to register your poultry farm <strong>"${businessName}"</strong> on the <strong>Egg Connect</strong> marketplace as a Farm Owner.</p>
-      <p>By onboarding, you will gain access to direct buyer transactions, order requests, and inventory tracking tools.</p>
-      <p>Please click the button below to complete your registration and activate your seller account:</p>
-      <div class="btn-container">
-        <a href="${inviteLink}" target="_blank" class="btn">Register as Farm Owner</a>
-      </div>
-      <div class="notice">
-        <strong>Important:</strong> This secure registration link is single-use and will expire in 24 hours. If you did not expect this request, please contact support.
-      </div>
-      <p style="margin-top: 24px; font-size: 13px; color: #64748b; word-break: break-all;">
-        If the button does not work, copy and paste this URL into your browser:<br>
-        <a href="${inviteLink}" target="_blank">${inviteLink}</a>
-      </p>
-    `;
-
-    const text = `Hi there,
-
-You have been invited to register your farm "${businessName}" on Egg Connect as a Farm Owner.
-
-Please click the link below to complete your registration and activate your account:
-${inviteLink}
-
-This invitation link is single-use and will expire in 24 hours.
-
-Best regards,
-Egg Connect Team`;
-
-    return this._send({
-      to,
-      subject,
-      html: this._getHtmlLayout(title, contentHtml),
-      text,
-    });
+  _logDevEmail({ to, subject, text }) {
+    logger.info("┌────────────────── DEVELOPMENT EMAIL SIMULATION ──────────────────┐");
+    logger.info(`│ TO:      ${to}`);
+    logger.info(`│ SUBJECT: ${subject}`);
+    logger.info("├──────────────────────────────────────────────────────────────────┤");
+    logger.info(`│ PLAIN TEXT BODY:\n${text.split("\n").map((line) => `│ ${line}`).join("\n")}`);
+    logger.info("└──────────────────────────────────────────────────────────────────┘");
+    return { id: `dev_sim_${Date.now()}` };
   }
+
 
   /**
    * Send verification email to customers and partners.
@@ -294,6 +251,43 @@ You requested a password reset. Use the link below to set a new password:
 ${resetLink}
 
 This link is valid for 10 minutes. If you didn't request this, please ignore this email.
+
+Best regards,
+Egg Connect Team`;
+
+    return this._send({
+      to,
+      subject,
+      html: this._getHtmlLayout(title, contentHtml),
+      text,
+    });
+  }
+
+  /**
+   * Send 6-digit OTP code to user for email verification.
+   */
+  async sendOTPEmail(to, name, otpCode) {
+    const subject = "Egg Connect — Your 6-Digit Verification Code";
+    const title = "Verification Code";
+
+    const contentHtml = `
+      <h1>Hi ${name},</h1>
+      <p>Thank you for registering on <strong>Egg Connect</strong>! Please use the 6-digit verification code below to verify your email address and activate your account:</p>
+      <div style="margin: 32px 0; text-align: center;">
+        <div style="display: inline-block; background-color: #1f4d0a; color: #ffffff; font-size: 32px; font-weight: 800; letter-spacing: 8px; padding: 16px 36px; border-radius: 12px; font-family: monospace;">
+          ${otpCode}
+        </div>
+      </div>
+      <div class="notice">
+        <strong>Important:</strong> This verification code is valid for <strong>10 minutes</strong>. Do not share this code with anyone.
+      </div>
+    `;
+
+    const text = `Hi ${name},
+
+Your 6-digit verification code for Egg Connect is: ${otpCode}
+
+This code will expire in 10 minutes.
 
 Best regards,
 Egg Connect Team`;

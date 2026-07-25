@@ -5,6 +5,7 @@ const ApiError = require("../utils/ApiError");
 const emailService = require("./email.service");
 const env = require("../config/env");
 const auditLogService = require("./auditLog.service");
+const logger = require("../utils/logger");
 
 /**
  * Generate a signed JWT access token.
@@ -18,24 +19,18 @@ const getPermissionsForRole = (role) => {
     FARM_OWNER: [
       "poultry:read",
       "poultry:write",
-      "product:read",
-      "product:write",
+      "inventory:read",
+      "inventory:write",
       "booking:read",
-      "booking:write:fulfillment",
+      "booking:manage",
     ],
-    CUSTOMER: [
-      "poultry:read",
-      "product:read",
-      "booking:read:own",
-      "booking:write:own",
-    ],
+    CUSTOMER: ["poultry:read", "inventory:read", "booking:create", "booking:read"],
   };
   return mapping[role] || [];
 };
 
 const generateAccessToken = (id, role) => {
-  const permissions = getPermissionsForRole(role);
-  return jwt.sign({ id, role, permissions }, env.JWT_SECRET, {
+  return jwt.sign({ id, role, permissions: getPermissionsForRole(role) }, env.JWT_SECRET, {
     expiresIn: env.JWT_EXPIRES_IN,
   });
 };
@@ -91,12 +86,20 @@ class AuthService {
    * @param {Object} data - { firstName, lastName, email, password, role?, phone? }
    * @returns {{ user }}
    */
-  async register(data) {
+  async register(data, res) {
     // Check for existing user
     const existingUser = await User.findOne({ email: data.email });
     if (existingUser) {
+      // ── OTP SUPPRESSED: Previously handled unverified re-registration with OTP resend.
+      // ── Since isVerified is now always true on creation, all existing users are verified.
+      // ── TODO: Restore the unverified branch below when OTP is re-enabled.
+      // if (!existingUser.isVerified) { ... }
+
       throw ApiError.conflict("An account with this email already exists");
     }
+
+    const allowedRoles = ["CUSTOMER", "FARM_OWNER"];
+    const assignedRole = (data.role && allowedRoles.includes(data.role)) ? data.role : "CUSTOMER";
 
     // Create user (password hashed by pre-save hook)
     const userPayload = {
@@ -104,28 +107,49 @@ class AuthService {
       lastName: data.lastName,
       email: data.email,
       password: data.password,
-      role: "CUSTOMER", // Unified self-registration role is CUSTOMER
+      role: assignedRole,
       phone: data.phone || "",
+      // ── OTP SUPPRESSED: Auto-verify users until Resend email integration is fixed.
+      // ── TODO: Set back to `false` and re-enable OTP block below once Resend is live.
+      isVerified: true,
     };
 
+    // Save signup geolocation if provided by the browser
     if (typeof data.latitude === "number" && typeof data.longitude === "number") {
-      userPayload.lastLoginLocation = {
+      const geoPoint = {
         type: "Point",
         coordinates: [data.longitude, data.latitude],
       };
+      userPayload.lastLoginLocation = geoPoint;
+      userPayload.signupLocation = geoPoint; // Permanent signup location for map display
     }
 
     const user = await User.create(userPayload);
 
-    // Generate verification token
-    const verificationToken = user.createVerificationToken();
+    // ── OTP BLOCK SUPPRESSED — uncomment when Resend API key is live ──────────
+    // const otpCode = user.createOTP();
+    // await user.save({ validateBeforeSave: false });
+    // logger.info(`🔑 [OTP GENERATED for ${user.email}]: ${otpCode}`);
+    // try {
+    //   await emailService.sendOTPEmail(user.email, user.firstName, otpCode);
+    // } catch (emailErr) {
+    //   logger.warn(`OTP email dispatch warning: ${emailErr.message}`);
+    // }
+    // ── END OTP BLOCK ─────────────────────────────────────────────────────────
+
+    logger.info(`✅ [USER REGISTERED - AUTO-VERIFIED]: ${user.email} | Role: ${user.role}`);
+
+    // ── OTP SUPPRESSED: Issue login tokens immediately upon registration.
+    // ── TODO: Remove this token block when OTP is re-enabled (token should only issue after OTP verify).
+    const accessToken = generateAccessToken(user._id, user.role);
+    const refreshToken = generateRefreshToken(user._id);
+    const tokenHash = crypto.createHash("sha256").update(refreshToken).digest("hex");
+    user.refreshTokenHash = tokenHash;
     await user.save({ validateBeforeSave: false });
+    setRefreshCookie(res, refreshToken);
+    // ── END SUPPRESSED TOKEN BLOCK ─────────────────────────────────────────────
 
-    // Send verification email
-    const verificationURL = `${env.CORS_ORIGIN}/verify-email/${verificationToken}`;
-    await emailService.sendVerificationEmail(user.email, user.firstName, verificationURL);
-
-    return { user };
+    return { user, email: user.email, accessToken };
   }
 
   /**
@@ -158,11 +182,12 @@ class AuthService {
       throw ApiError.forbidden("Your account has been deactivated. Contact support.");
     }
 
-    // Check if email is verified
-    if (!user.isVerified) {
-      await auditLogService.log(user._id, "USER_LOGIN_UNVERIFIED", ipAddress, userAgent, { email }, "WARNING");
-      throw ApiError.forbidden("Please verify your email address to log in.");
-    }
+    // ── OTP SUPPRESSED: isVerified check bypassed until Resend integration is fixed.
+    // ── TODO: Uncomment the block below when OTP email flow is re-enabled.
+    // if (!user.isVerified) {
+    //   await auditLogService.log(user._id, "USER_LOGIN_UNVERIFIED", ipAddress, userAgent, { email }, "WARNING");
+    //   throw ApiError.forbidden("Please verify your email address to log in.");
+    // }
 
     // Verify password
     const isMatch = await user.comparePassword(password);
@@ -430,6 +455,79 @@ class AuthService {
     // Send verification email
     const verificationURL = `${env.CORS_ORIGIN}/verify-email/${verificationToken}`;
     await emailService.sendVerificationEmail(user.email, user.firstName, verificationURL);
+  }
+
+  /**
+   * Verify user using 6-digit OTP code and issue access token upon success.
+   */
+  async verifyOTP(email, otp, res, ipAddress = "", userAgent = "") {
+    const user = await User.findOne({ email }).select("+otpCode +otpExpires");
+    if (!user) {
+      throw ApiError.badRequest("Invalid email or verification code");
+    }
+
+    if (user.isVerified) {
+      const accessToken = generateAccessToken(user._id, user.role);
+      const refreshToken = generateRefreshToken(user._id);
+      const tokenHash = crypto.createHash("sha256").update(refreshToken).digest("hex");
+      user.refreshTokenHash = tokenHash;
+      await user.save({ validateBeforeSave: false });
+      setRefreshCookie(res, refreshToken);
+      return { user, accessToken };
+    }
+
+    if (!user.otpCode || !user.otpExpires || user.otpExpires < Date.now()) {
+      throw ApiError.badRequest("Verification code has expired. Please request a new code.");
+    }
+
+    const hashedOTP = crypto.createHash("sha256").update(otp).digest("hex");
+    if (hashedOTP !== user.otpCode) {
+      throw ApiError.badRequest("Incorrect 6-digit verification code");
+    }
+
+    // Mark user verified and clear OTP fields
+    user.isVerified = true;
+    user.otpCode = undefined;
+    user.otpExpires = undefined;
+
+    // Issue login tokens
+    const accessToken = generateAccessToken(user._id, user.role);
+    const refreshToken = generateRefreshToken(user._id);
+    const tokenHash = crypto.createHash("sha256").update(refreshToken).digest("hex");
+    user.refreshTokenHash = tokenHash;
+
+    await user.save({ validateBeforeSave: false });
+    setRefreshCookie(res, refreshToken);
+
+    await auditLogService.log(user._id, "USER_OTP_VERIFIED", ipAddress, userAgent, { email, role: user.role });
+
+    return { user, accessToken };
+  }
+
+  /**
+   * Resend a fresh 6-digit OTP code to user.
+   */
+  async resendOTP(email) {
+    const user = await User.findOne({ email });
+    if (!user) {
+      // Silent return to avoid enumeration
+      return;
+    }
+
+    if (user.isVerified) {
+      throw ApiError.badRequest("This email is already verified. You can sign in directly.");
+    }
+
+    const otpCode = user.createOTP();
+    await user.save({ validateBeforeSave: false });
+    logger.info(`🔑 [OTP RESENT for ${user.email}]: ${otpCode}`);
+
+    try {
+      await emailService.sendOTPEmail(user.email, user.firstName, otpCode);
+    } catch (emailErr) {
+      logger.warn(`Resend OTP email dispatch warning: ${emailErr.message}`);
+    }
+    return { email: user.email, otpCode };
   }
 }
 

@@ -93,6 +93,20 @@ const userSchema = new mongoose.Schema(
       },
     },
 
+    // Permanent signup location — captured via browser Geolocation API at registration.
+    // Used to display the seller/buyer's location on Google Maps for other users.
+    signupLocation: {
+      type: {
+        type: String,
+        enum: ["Point"],
+        default: "Point",
+      },
+      coordinates: {
+        type: [Number], // [longitude, latitude]
+        default: [0, 0],
+      },
+    },
+
     // ── Auth tokens (never returned in queries) ──
     passwordResetToken: {
       type: String,
@@ -114,6 +128,14 @@ const userSchema = new mongoose.Schema(
       type: Date,
       select: false,
     },
+    otpCode: {
+      type: String,
+      select: false,
+    },
+    otpExpires: {
+      type: Date,
+      select: false,
+    },
   },
   {
     timestamps: true,
@@ -126,6 +148,8 @@ const userSchema = new mongoose.Schema(
         delete ret.passwordResetExpires;
         delete ret.verificationToken;
         delete ret.verificationTokenExpires;
+        delete ret.otpCode;
+        delete ret.otpExpires;
         delete ret.__v;
         return ret;
       },
@@ -136,6 +160,7 @@ const userSchema = new mongoose.Schema(
 // ── Indexes ──────────────────────────────────────────────
 userSchema.index({ role: 1 });
 userSchema.index({ lastLoginLocation: "2dsphere" });
+userSchema.index({ signupLocation: "2dsphere" });
 
 // ── Pre-save: hash password ─────────────────────────────
 userSchema.pre("save", async function () {
@@ -207,6 +232,25 @@ userSchema.methods.createVerificationToken = function () {
   this.verificationTokenExpires = Date.now() + 24 * 60 * 60 * 1000;
 
   return token;
+};
+
+/**
+ * Generate a 6-digit OTP code (unhashed) and store the
+ * hashed version + expiry on the user document.
+ * @returns {string} The plain-text 6-digit OTP code (to send via email)
+ */
+userSchema.methods.createOTP = function () {
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+  this.otpCode = crypto
+    .createHash("sha256")
+    .update(otp)
+    .digest("hex");
+
+  // OTP valid for 10 minutes
+  this.otpExpires = Date.now() + 10 * 60 * 1000;
+
+  return otp;
 };
 
 const User = mongoose.model("User", userSchema);

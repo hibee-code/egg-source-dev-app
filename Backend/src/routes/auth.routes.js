@@ -11,6 +11,8 @@ const {
   changePasswordSchema,
   updateProfileSchema,
   resendVerificationSchema,
+  verifyOTPSchema,
+  resendOTPSchema,
 } = require("../validators/auth.validator");
 
 const router = Router();
@@ -18,6 +20,8 @@ const router = Router();
 // ── Public routes ─────────────────────────────────────────
 router.post("/register", validate(registerSchema), authController.register);
 router.post("/login", authRateLimiter, validate(loginSchema), authController.login);
+router.post("/verify-otp", validate(verifyOTPSchema), authController.verifyOTP);
+router.post("/resend-otp", validate(resendOTPSchema), authController.resendOTP);
 router.post("/refresh-token", authController.refreshToken);
 router.get("/verify-email/:token", authController.verifyEmail);
 router.post(

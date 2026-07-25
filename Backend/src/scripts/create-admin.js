@@ -6,10 +6,9 @@ const run = async () => {
   try {
     await connectDB();
     await seedSuperAdmin();
-    logger.info('✅ create-admin: Super admin created or already exists.');
     process.exit(0);
   } catch (err) {
-    logger.error('❌ create-admin failed:', err.message);
+    logger.error(`❌ ${err.message}`);
     process.exit(1);
   }
 };
