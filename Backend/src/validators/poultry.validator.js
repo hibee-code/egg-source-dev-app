@@ -10,21 +10,14 @@ const createPoultrySchema = Joi.object({
   lga: Joi.string().trim().required().messages({
     "any.required": "LGA is required",
   }),
-  address: Joi.string().trim().required().messages({
-    "any.required": "Address is required",
-  }),
-  phoneNumber: Joi.string().trim().required().messages({
-    "any.required": "Phone number is required",
-  }),
+  address: Joi.string().trim().allow("").optional().default("Main Office / Operations Address"),
+  phoneNumber: Joi.string().trim().allow("").optional().default(""),
   description: Joi.string().trim().allow("").optional(),
-  deliveryAvailable: Joi.boolean().optional(),
+  farmType: Joi.string().valid("farmer", "depot").optional().default("farmer"),
+  deliveryAvailable: Joi.boolean().optional().default(true),
   rating: Joi.number().min(0).max(5).optional(),
-  longitude: Joi.number().min(-180).max(180).required().messages({
-    "any.required": "Longitude is required",
-  }),
-  latitude: Joi.number().min(-90).max(90).required().messages({
-    "any.required": "Latitude is required",
-  }),
+  longitude: Joi.number().min(-180).max(180).optional().default(3.3792),
+  latitude: Joi.number().min(-90).max(90).optional().default(6.5244),
 });
 
 const updatePoultrySchema = Joi.object({

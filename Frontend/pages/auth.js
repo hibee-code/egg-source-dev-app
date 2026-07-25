@@ -112,6 +112,13 @@ const submitRegister = async (event) => {
       return;
     }
 
+    const role = $('#register-role')?.value;
+    if (!role) {
+      Toast.error('Please select an Account Type (Buyer or Seller)');
+      Loading.hide(btn);
+      return;
+    }
+
     const payload = {
       firstName: $('#register-firstname').value.trim(),
       lastName: $('#register-lastname').value.trim(),
@@ -121,14 +128,38 @@ const submitRegister = async (event) => {
       confirmPassword: confirm,
       role: $('#register-role').value,
     };
+
+    // Attach browser geolocation if previously captured
     if (userCoordinates) {
       payload.latitude = userCoordinates.latitude;
       payload.longitude = userCoordinates.longitude;
     }
+
     const response = await AuthAPI.register(payload);
-    Auth.setToken(response.data.accessToken);
-    Auth.setUser(response.data.user);
-    window.location.href = '/dashboard-buyer';
+    const data = response.data;
+
+    // ── OTP SUPPRESSED: Save access token and route to dashboard directly.
+    // ── TODO: When OTP is re-enabled, restore redirect to /verify-otp page below.
+    if (data?.accessToken) {
+      Auth.setToken(data.accessToken);
+    }
+    if (data?.user) {
+      Auth.setUser(data.user);
+    }
+
+    const destination = data?.redirectUrl || '/dashboard-buyer';
+    Toast.success('Account created! Welcome to Egg Connect 🎉');
+    setTimeout(() => {
+      window.location.href = destination;
+    }, 700);
+
+    // ── OTP path (suppressed — uncomment when Resend is active) ─────────────
+    // const email = data?.email || payload.email;
+    // const destination = data?.redirectUrl || `/verify-otp?email=${encodeURIComponent(email)}`;
+    // Toast.success('Account created! Please check your email for your 6-digit verification code.');
+    // setTimeout(() => { window.location.href = destination; }, 600);
+    // ── END OTP PATH ─────────────────────────────────────────────────────────
+
   } catch (err) {
     Toast.error(err.message || 'Registration failed');
   } finally {

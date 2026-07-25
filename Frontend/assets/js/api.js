@@ -54,6 +54,12 @@ export const AuthAPI = {
   register(payload) {
     return request('/api/v1/auth/register', { method: 'POST', body: payload });
   },
+  verifyOTP(payload) {
+    return request('/api/v1/auth/verify-otp', { method: 'POST', body: payload });
+  },
+  resendOTP(payload) {
+    return request('/api/v1/auth/resend-otp', { method: 'POST', body: payload });
+  },
   logout() {
     return request('/api/v1/auth/logout', { method: 'POST' });
   },
@@ -65,6 +71,12 @@ export const AuthAPI = {
   },
   changePassword(payload) {
     return request('/api/v1/auth/change-password', { method: 'PATCH', body: payload });
+  },
+  forgotPassword(payload) {
+    return request('/api/v1/auth/forgot-password', { method: 'POST', body: payload });
+  },
+  resetPassword(token, password) {
+    return request(`/api/v1/auth/reset-password/${token}`, { method: 'PATCH', body: { password } });
   },
 };
 
@@ -149,23 +161,5 @@ export const AdminAPI = {
   },
   getStats() {
     return request('/api/v1/admin/stats', { method: 'GET' });
-  },
-  getInvitations() {
-    return request('/api/v1/invitations', { method: 'GET' });
-  },
-  createInvitation(payload) {
-    return request('/api/v1/invitations', { method: 'POST', body: payload });
-  },
-  resendInvitation(id) {
-    return request(`/api/v1/invitations/${id}/resend`, { method: 'POST' });
-  },
-  revokeInvitation(id) {
-    return request(`/api/v1/invitations/${id}/revoke`, { method: 'DELETE' });
-  },
-  verifyInvitation(token) {
-    return request(`/api/v1/invitations/verify/${token}`, { method: 'GET' });
-  },
-  acceptInvitation(token, payload) {
-    return request(`/api/v1/invitations/accept/${token}`, { method: 'POST', body: payload });
   },
 };

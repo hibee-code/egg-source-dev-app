@@ -13,7 +13,6 @@ const guardAccess = () => {
 // State
 let stats = {};
 let usersList = [];
-let invitationsList = [];
 let auditLogs = [];
 let farmsList = [];
 
@@ -82,7 +81,6 @@ const handleHashNavigation = () => {
     'dashboard': 'Overview',
     'users': 'User Directory',
     'farms': 'Poultry Farms',
-    'invitations': 'Invitation Manager',
     'reports': 'Platform Reports',
     'audit-logs': 'System Security Logs',
     'profile': 'Profile Settings',
@@ -95,7 +93,6 @@ const handleHashNavigation = () => {
     'dashboard': { title: 'Overview Dashboard', subtitle: 'Real-time system health and administration stats' },
     'users': { title: 'User Directory', subtitle: 'Manage registered buyers and farm owners' },
     'farms': { title: 'Poultry Farms', subtitle: 'View all registered poultry farms and their owners' },
-    'invitations': { title: 'Invitation Manager', subtitle: 'Invite and onboard new Farm Owners' },
     'reports': { title: 'Platform Reports', subtitle: 'Download platform metrics and view activity reports' },
     'audit-logs': { title: 'System Security Logs', subtitle: 'Stateless activity logging and platform audits' },
     'profile': { title: 'Administrator Profile', subtitle: 'Manage your administrator settings and environment context' },
@@ -123,8 +120,6 @@ const loadDataForTab = async (tab) => {
       await loadUserDirectory();
     } else if (tab === 'farms') {
       await loadPoultryFarms();
-    } else if (tab === 'invitations') {
-      await loadInvitations();
     } else if (tab === 'reports') {
       await loadPlatformReports();
     } else if (tab === 'audit-logs') {
@@ -244,109 +239,7 @@ const loadUserDirectory = async () => {
   });
 };
 
-// ── View 3: Invitations ──────────────────────────────────────
-const loadInvitations = async () => {
-  const response = await AdminAPI.getInvitations();
-  invitationsList = response.data;
-
-  const tbody = $('#invitations-tbody');
-  tbody.innerHTML = '';
-
-  if (invitationsList.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 40px; color: var(--color-slate-500);">No Farm Owner invitations found.</td></tr>`;
-    return;
-  }
-
-  invitationsList.forEach(invite => {
-    const expires = new Date(invite.expiresAt).toLocaleDateString() + ' ' + new Date(invite.expiresAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    const isExpired = new Date(invite.expiresAt) < new Date();
-    const isAccepted = invite.status === 'accepted';
-    const isRevoked = invite.status === 'revoked';
-    
-    let statusBadgeClass = 'badge-warning';
-    let statusText = 'Pending';
-
-    if (isAccepted) {
-      statusBadgeClass = 'badge-success';
-      statusText = 'Accepted';
-    } else if (isRevoked) {
-      statusBadgeClass = 'badge-critical';
-      statusText = 'Revoked';
-    } else if (isExpired && invite.status === 'pending') {
-      statusBadgeClass = 'badge-expired';
-      statusText = 'Expired';
-    }
-
-    const inviteLink = `${window.location.origin}/register-invite?token=${invite.rawToken || ''}`;
-
-    const actionButtons = isAccepted || isRevoked
-      ? `<span style="color: var(--color-slate-500); font-size: 0.8rem;">None</span>`
-      : `
-        <div style="display: flex; justify-content: flex-end; gap: 8px;">
-          ${invite.rawToken ? `<button class="btn btn-copy" data-link="${inviteLink}" style="padding: 6px 12px; font-size: 0.8rem; background: var(--color-primary); color: #fff; border: none; border-radius: 6px; cursor: pointer;">Copy Link</button>` : ''}
-          <button class="btn btn-resend" data-id="${invite._id}" style="padding: 6px 12px; font-size: 0.8rem; background: transparent; border: 1px solid var(--color-primary); color: var(--color-primary); border-radius: 6px; cursor: pointer;">Resend</button>
-          <button class="btn btn-revoke" data-id="${invite._id}" style="padding: 6px 12px; font-size: 0.8rem; background: transparent; border: 1px solid #dc2626; color: #dc2626; border-radius: 6px; cursor: pointer;">Revoke</button>
-        </div>
-      `;
-
-    const row = document.createElement('tr');
-    row.style.borderBottom = '1px solid var(--color-slate-100)';
-    row.innerHTML = `
-      <td style="padding: 14px 12px; font-weight: 500; color: var(--color-slate-900);">${invite.email}</td>
-      <td style="padding: 14px 12px; color: var(--color-slate-500);">${invite.businessName}</td>
-      <td style="padding: 14px 12px;"><span class="badge ${statusBadgeClass}">${statusText}</span></td>
-      <td style="padding: 14px 12px; color: var(--color-slate-500);">${expires}</td>
-      <td style="padding: 14px 12px; text-align: right;">${actionButtons}</td>
-    `;
-    tbody.appendChild(row);
-  });
-
-  // Action listeners
-  tbody.querySelectorAll('.btn-resend').forEach(btn => {
-    btn.addEventListener('click', async () => {
-      try {
-        const res = await AdminAPI.resendInvitation(btn.dataset.id);
-        Toast.success("Invitation link resent successfully");
-        
-        // Show success modal with new copy link
-        toggleInviteModal(true);
-        $('#invite-form-container').classList.add('hidden');
-        
-        const inviteLink = `${window.location.origin}/register-invite?token=${res.data.rawToken || ''}`;
-        $('#invite-success-url').value = inviteLink;
-        $('#invite-success-text').innerText = "The invitation link has been successfully regenerated and sent to the owner's email. You can also copy the secure registration link below.";
-        
-        $('#invite-success-container').classList.remove('hidden');
-        
-        loadInvitations();
-      } catch (err) {
-        Toast.error(err.message || "Failed to resend");
-      }
-    });
-  });
-
-  tbody.querySelectorAll('.btn-revoke').forEach(btn => {
-    btn.addEventListener('click', async () => {
-      if (!confirm("Are you sure you want to revoke this invitation?")) return;
-      try {
-        await AdminAPI.revokeInvitation(btn.dataset.id);
-        Toast.success("Invitation link revoked");
-        loadInvitations();
-      } catch (err) {
-        Toast.error(err.message || "Failed to revoke");
-      }
-    });
-  });
-
-  tbody.querySelectorAll('.btn-copy').forEach(btn => {
-    btn.addEventListener('click', () => {
-      navigator.clipboard.writeText(btn.dataset.link);
-      Toast.success("Invitation link copied to clipboard");
-    });
-  });
-};
-
-// ── View 4: Audit Logs ───────────────────────────────────────
+// ── View 3: Audit Logs ───────────────────────────────────────
 const loadAuditLogs = async () => {
   const response = await AdminAPI.getAuditLogs();
   auditLogs = response.data;
@@ -362,21 +255,21 @@ const loadAuditLogs = async () => {
   auditLogs.forEach(log => {
     const timestamp = new Date(log.createdAt).toLocaleString();
     const user = log.userId
-      ? `<strong>${log.userId.firstName} ${log.userId.lastName}</strong><br><span style="font-size:0.76rem; color:var(--color-slate-500);">${log.userId.email} (${log.userId.role})</span>`
-      : `<span style="color:var(--color-slate-500);">Anonymous / System</span>`;
+      ? `<div style="font-weight: 600; color: var(--color-slate-900); white-space: nowrap;">${log.userId.firstName} ${log.userId.lastName}</div><div style="font-size: 0.76rem; color: var(--color-slate-500); white-space: nowrap;">${log.userId.email} (${log.userId.role})</div>`
+      : `<span style="color: var(--color-slate-500); white-space: nowrap;">Anonymous / System</span>`;
 
     const metadataStr = log.details ? JSON.stringify(log.details) : '{}';
 
     const row = document.createElement('tr');
     row.style.borderBottom = '1px solid var(--color-slate-100)';
     row.innerHTML = `
-      <td style="padding: 12px; color: var(--color-slate-500); font-size: 0.8rem; font-family: monospace;">${timestamp}</td>
-      <td style="padding: 12px;"><span class="badge badge-${log.severity.toLowerCase()} text-capitalize">${log.severity}</span></td>
-      <td style="padding: 12px; font-weight: 500; color: var(--color-slate-900);">${log.action}</td>
-      <td style="padding: 12px;">${user}</td>
-      <td style="padding: 12px; font-family: monospace; font-size: 0.8rem; color: var(--color-slate-500);">${log.ipAddress || 'N/A'}</td>
-      <td style="padding: 12px; font-size: 0.78rem; max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-        <code title="${metadataStr}" style="background: rgba(0,0,0,0.04); padding: 3px 6px; border-radius: 4px; font-family: monospace;">${metadataStr}</code>
+      <td style="padding: 14px 16px; color: var(--color-slate-600); font-size: 0.8rem; font-family: monospace; white-space: nowrap;">${timestamp}</td>
+      <td style="padding: 14px 16px; white-space: nowrap;"><span class="badge badge-${log.severity.toLowerCase()} text-capitalize">${log.severity}</span></td>
+      <td style="padding: 14px 16px; font-weight: 500; color: var(--color-slate-900); white-space: nowrap;">${log.action}</td>
+      <td style="padding: 14px 16px; white-space: nowrap;">${user}</td>
+      <td style="padding: 14px 16px; font-family: monospace; font-size: 0.8rem; color: var(--color-slate-500); white-space: nowrap;">${log.ipAddress || 'N/A'}</td>
+      <td style="padding: 14px 16px; font-size: 0.78rem; max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+        <code title="${metadataStr}" style="background: rgba(0,0,0,0.04); padding: 3px 6px; border-radius: 4px; font-family: monospace; max-width: 240px; display: inline-block; overflow: hidden; text-overflow: ellipsis; vertical-align: middle;">${metadataStr}</code>
       </td>
     `;
     tbody.appendChild(row);
@@ -462,55 +355,6 @@ const downloadCSV = (filename, headers, rows) => {
 };
 
 // ── Modal Actions ───────────────────────────────────────────
-const toggleInviteModal = (show) => {
-  const modal = $('#invite-modal');
-  if (show) {
-    modal.classList.remove('hidden');
-    $('#invite-form-container').classList.remove('hidden');
-    $('#invite-success-container').classList.add('hidden');
-  } else {
-    modal.classList.add('hidden');
-    $('#invite-form').reset();
-  }
-};
-
-const submitInvitationForm = async (event) => {
-  event.preventDefault();
-  const btn = $('#submit-invite-btn');
-  Loading.show(btn, 'Sending invitation...');
-
-  const payload = {
-    email: $('#invite-email').value.trim(),
-    businessName: $('#invite-business').value.trim(),
-  };
-
-  try {
-    const res = await AdminAPI.createInvitation(payload);
-    Toast.success("Invitation sent successfully!");
-    
-    // Switch to success view in modal
-    $('#invite-form-container').classList.add('hidden');
-    
-    const inviteLink = `${window.location.origin}/register-invite?token=${res.data.rawToken || ''}`;
-    $('#invite-success-url').value = inviteLink;
-    $('#invite-success-text').innerText = "The invitation has been successfully sent to the owner's email. You can also copy the secure registration link below.";
-    
-    $('#invite-success-container').classList.remove('hidden');
-    
-    // Reload active panel
-    const hash = window.location.hash || '#dashboard';
-    if (hash === '#invitations') {
-      loadInvitations();
-    } else if (hash === '#dashboard') {
-      loadDashboardOverview();
-    }
-  } catch (err) {
-    Toast.error(err.message || "Failed to create invitation");
-  } finally {
-    Loading.hide(btn, 'Send Secure Invitation');
-  }
-};
-
 const setupLayoutControls = () => {
   // Collapsible Sidebar logic
   const sidebarToggle = $('#sidebar-toggle-btn');
@@ -570,45 +414,6 @@ const setupLayoutControls = () => {
 const setupEventListeners = () => {
   // Navigation Hash Listeners
   window.addEventListener('hashchange', handleHashNavigation);
-
-  // Shortcut invite buttons
-  const inviteBtnShortcut = $('#invite-btn-shortcut');
-  if (inviteBtnShortcut) {
-    inviteBtnShortcut.addEventListener('click', () => toggleInviteModal(true));
-  }
-  
-  const inviteBtn = $('#invite-btn');
-  if (inviteBtn) {
-    inviteBtn.addEventListener('click', () => toggleInviteModal(true));
-  }
-
-  const closeModalBtn = $('#close-modal-btn');
-  if (closeModalBtn) {
-    closeModalBtn.addEventListener('click', () => toggleInviteModal(false));
-  }
-
-  const inviteDoneBtn = $('#invite-done-btn');
-  if (inviteDoneBtn) {
-    inviteDoneBtn.addEventListener('click', () => toggleInviteModal(false));
-  }
-
-  const inviteCopyBtn = $('#invite-copy-btn');
-  if (inviteCopyBtn) {
-    inviteCopyBtn.addEventListener('click', () => {
-      const urlInput = $('#invite-success-url');
-      if (urlInput) {
-        urlInput.select();
-        navigator.clipboard.writeText(urlInput.value);
-        Toast.success("Secure link copied!");
-      }
-    });
-  }
-
-  // Form submits
-  const inviteForm = $('#invite-form');
-  if (inviteForm) {
-    inviteForm.addEventListener('submit', submitInvitationForm);
-  }
 
   // Profile Form update submits
   const profileInfoForm = $('#profile-info-form');

@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 const connectDB = require("../config/db");
-const seedSuperAdmin = require("../config/seed");
 const User = require("../models/user.model");
 const Poultry = require("../models/poultry.model");
 const Product = require("../models/product.model");
@@ -11,15 +10,10 @@ const seedData = async () => {
     // 1. Connect to Database
     await connectDB();
 
-    // 2. Seed Super Admin Account
-    await seedSuperAdmin();
+    // 2. Sync Logic (Preserves existing DB data)
+    logger.info("Syncing seed poultry and product data without wiping existing database items...");
 
-    // 3. Clear Existing Data
-    logger.info("Clearing existing poultry and product data...");
-    await Poultry.deleteMany({});
-    await Product.deleteMany({});
-
-    // 3. Create or Find Seed Owner (FARM_OWNER)
+    // 3. Create or Update Default Seed Farm Owner
     let owner = await User.findOne({ email: "farmowner@eggconnect.com" });
     if (!owner) {
       logger.info("Creating default seed farm owner...");
@@ -27,7 +21,7 @@ const seedData = async () => {
         firstName: "Seed",
         lastName: "Farm Owner",
         email: "farmowner@eggconnect.com",
-        password: "Password123!", // pre-save will hash this
+        password: "Password123!",
         role: "FARM_OWNER",
         phone: "+2348000000000",
         isVerified: true,
@@ -40,347 +34,285 @@ const seedData = async () => {
       await owner.save({ validateBeforeSave: false });
     }
 
-    // 4. Poultry Farms Dataset
+    // 4. Poultry Farms Dataset (20 Real-World Locations across Lagos, Oyo & Ogun)
     const poultryFarms = [
-      // ── LAGOS STATE ──
+      // ── LAGOS STATE (10 Farms / Depots) ──
       {
         businessName: "Lekki Golden Feathers",
         state: "Lagos",
         lga: "Eti-Osa",
-        address: "Plot 15, Admiralty Way, Lekki Phase 1",
+        address: "Plot 15, Admiralty Way, Lekki Phase 1, Lagos",
         phoneNumber: "+2348011112222",
-        description: "Premium organic eggs and day-old chicks available daily.",
+        description: "Premium organic table eggs and day-old chicks available daily.",
         deliveryAvailable: true,
         rating: 4.8,
-        location: { type: "Point", coordinates: [3.4833, 6.4281] }, // [longitude, latitude]
+        location: { type: "Point", coordinates: [3.4735, 6.4474] }, // [longitude, latitude]
       },
       {
         businessName: "Ikeja Poultry Hub",
         state: "Lagos",
         lga: "Ikeja",
-        address: "24, Allen Avenue, Ikeja",
+        address: "24, Allen Avenue, Ikeja, Lagos",
         phoneNumber: "+2348022223333",
-        description: "Fresh farm eggs and high-grade poultry feeds.",
+        description: "Fresh farm eggs and high-grade poultry feeds distributor.",
         deliveryAvailable: true,
         rating: 4.5,
-        location: { type: "Point", coordinates: [3.3421, 6.6018] },
+        location: { type: "Point", coordinates: [3.3541, 6.6018] },
       },
       {
         businessName: "Surulere Egg Basket",
         state: "Lagos",
         lga: "Surulere",
-        address: "12, Adeniran Ogunsanya Street, Surulere",
+        address: "12, Adeniran Ogunsanya Street, Surulere, Lagos",
         phoneNumber: "+2348033334444",
-        description: "Your local source for affordable crates of eggs.",
+        description: "Your reliable neighborhood source for fresh crates of eggs.",
         deliveryAvailable: false,
         rating: 4.2,
-        location: { type: "Point", coordinates: [3.3614, 6.5003] },
+        location: { type: "Point", coordinates: [3.3592, 6.4947] },
       },
       {
         businessName: "Ikorodu Valley Poultry",
         state: "Lagos",
         lga: "Ikorodu",
-        address: "88, Sagamu Road, Ikorodu",
+        address: "88, Sagamu Road, Ikorodu, Lagos",
         phoneNumber: "+2348044445555",
-        description: "Massive scale production of eggs and point-of-lay pullets.",
+        description: "Commercial scale production of table eggs and point-of-lay pullets.",
         deliveryAvailable: true,
         rating: 4.6,
         location: { type: "Point", coordinates: [3.5101, 6.6149] },
       },
       {
-        businessName: "Epe Lagoon Farms",
+        businessName: "Epe Agro Lagoon Farms",
         state: "Lagos",
         lga: "Epe",
-        address: "5, Marina Road, Epe",
+        address: "Kilometer 5, Epe-Ijebu Ode Road, Epe, Lagos",
         phoneNumber: "+2348055556666",
-        description: "Naturally raised poultry products on the edge of the lagoon.",
+        description: "Naturally raised poultry products on the fertile edge of the lagoon.",
         deliveryAvailable: true,
         rating: 4.7,
         location: { type: "Point", coordinates: [3.9834, 6.5841] },
       },
       {
-        businessName: "Yaba Tech Farms",
+        businessName: "Yaba Central Egg Depot",
         state: "Lagos",
         lga: "Lagos Mainland",
-        address: "Herbert Macaulay Way, Yaba",
+        address: "210, Herbert Macaulay Way, Yaba, Lagos",
         phoneNumber: "+2348066667777",
-        description: "Academic standard poultry breeding and egg supplies.",
-        deliveryAvailable: false,
-        rating: 4.0,
-        location: { type: "Point", coordinates: [3.3792, 6.5244] },
+        description: "Wholesale egg depot serving mainland restaurants and retailers.",
+        deliveryAvailable: true,
+        rating: 4.3,
+        location: { type: "Point", coordinates: [3.3792, 6.5085] },
       },
       {
-        businessName: "Victoria Island Broilers",
+        businessName: "Victoria Island Broilers & Eggs",
         state: "Lagos",
         lga: "Eti-Osa",
-        address: "Plot 9, Adeola Odeku Street, Victoria Island",
+        address: "Plot 9, Adeola Odeku Street, Victoria Island, Lagos",
         phoneNumber: "+2348077778888",
-        description: "Gourmet poultry products for premium consumers.",
+        description: "Gourmet free-range eggs and fresh dressed broilers for premium consumers.",
         deliveryAvailable: true,
         rating: 4.9,
         location: { type: "Point", coordinates: [3.4244, 6.4281] },
       },
       {
-        businessName: "Maryland Chickens",
+        businessName: "Maryland Poultry Store",
         state: "Lagos",
         lga: "Kosofe",
-        address: "14, Ikorodu Road, Maryland",
+        address: "14, Ikorodu Road, Maryland, Lagos",
         phoneNumber: "+2348088889999",
-        description: "Fresh farm chickens and organic eggs.",
+        description: "Fresh daily farm eggs and organic poultry supplies.",
         deliveryAvailable: true,
-        rating: 4.3,
-        location: { type: "Point", coordinates: [3.3721, 6.5802] },
+        rating: 4.4,
+        location: { type: "Point", coordinates: [3.3685, 6.5683] },
       },
       {
         businessName: "Festac Egg Supreme",
         state: "Lagos",
         lga: "Amuwo-Odofin",
-        address: "2nd Avenue, Festac Town",
+        address: "Plot 42, 2nd Avenue, Festac Town, Lagos",
         phoneNumber: "+2348099990000",
-        description: "Top-quality egg supply and broiler processing.",
+        description: "Top-quality egg distribution and broiler processing depot.",
         deliveryAvailable: true,
         rating: 4.4,
         location: { type: "Point", coordinates: [3.2844, 6.4682] },
       },
       {
-        businessName: "Badagry Organic Farms",
+        businessName: "Alimosho Farm Direct",
         state: "Lagos",
-        lga: "Badagry",
-        address: "21, Joseph Dosu Way, Badagry",
+        lga: "Alimosho",
+        address: "45, Idimu Road, Egbeda, Alimosho, Lagos",
         phoneNumber: "+2348012345678",
-        description: "100% organic poultry and egg production.",
+        description: "Direct farm-to-consumer crates of eggs at affordable prices.",
         deliveryAvailable: false,
         rating: 4.1,
-        location: { type: "Point", coordinates: [2.8834, 6.4244] },
+        location: { type: "Point", coordinates: [3.2682, 6.5925] },
       },
 
-      // ── OGUN STATE (ABEOKUTA) ──
+      // ── OYO STATE (5 Farms / Depots) ──
       {
-        businessName: "Abeokuta North Poultry",
-        state: "Ogun",
-        lga: "Abeokuta North",
-        address: "Lafenwa Market Road, Abeokuta",
-        phoneNumber: "+2348111112222",
-        description: "Leading egg suppliers in Abeokuta North.",
-        deliveryAvailable: true,
-        rating: 4.5,
-        location: { type: "Point", coordinates: [3.3294, 7.1994] },
-      },
-      {
-        businessName: "RockCity Poultry Palace",
-        state: "Ogun",
-        lga: "Abeokuta South",
-        address: "Oke-Yeke, Abeokuta South",
-        phoneNumber: "+2348122223333",
-        description: "Quality broilers and eggs from the rock city.",
-        deliveryAvailable: true,
-        rating: 4.7,
-        location: { type: "Point", coordinates: [3.3483, 7.1475] },
-      },
-      {
-        businessName: "Obantoko Egg Masters",
-        state: "Ogun",
-        lga: "Odeda",
-        address: "Opposite FUNAAB road, Obantoko",
-        phoneNumber: "+2348133334444",
-        description: "Affordable eggs for students and residents.",
-        deliveryAvailable: false,
-        rating: 4.3,
-        location: { type: "Point", coordinates: [3.4333, 7.1667] },
-      },
-      {
-        businessName: "Oke-Mosan Royal Broilers",
-        state: "Ogun",
-        lga: "Abeokuta South",
-        address: "Governor's Office Road, Oke-Mosan",
-        phoneNumber: "+2348144445555",
-        description: "Royal quality poultry products for all functions.",
-        deliveryAvailable: true,
-        rating: 4.6,
-        location: { type: "Point", coordinates: [3.3654, 7.1189] },
-      },
-      {
-        businessName: "Ita-Oshin Feeds & Farms",
-        state: "Ogun",
-        lga: "Abeokuta North",
-        address: "Ita-Oshin Expressway, Abeokuta",
-        phoneNumber: "+2348155556666",
-        description: "One stop shop for feeds, chicks, and eggs.",
-        deliveryAvailable: true,
-        rating: 4.4,
-        location: { type: "Point", coordinates: [3.2984, 7.1823] },
-      },
-      {
-        businessName: "Kemta Poultry Palace",
-        state: "Ogun",
-        lga: "Abeokuta South",
-        address: "Kemta Housing Estate, Abeokuta",
-        phoneNumber: "+2348166667777",
-        description: "High quality table eggs and healthy birds.",
-        deliveryAvailable: false,
-        rating: 4.2,
-        location: { type: "Point", coordinates: [3.3512, 7.1321] },
-      },
-      {
-        businessName: "Idi-Aba Fresh Eggs",
-        state: "Ogun",
-        lga: "Abeokuta South",
-        address: "Idi-Aba Road, Abeokuta",
-        phoneNumber: "+2348177778888",
-        description: "Freshly collected daily eggs for wholesale and retail.",
-        deliveryAvailable: true,
-        rating: 4.5,
-        location: { type: "Point", coordinates: [3.3822, 7.1511] },
-      },
-
-      // ── OYO STATE (IBADAN) ──
-      {
-        businessName: "Ibadan North Poultry",
+        businessName: "Bodija Central Egg Depot",
         state: "Oyo",
         lga: "Ibadan North",
-        address: "UI-Ojoo Road, Ibadan",
+        address: "Block B, Bodija International Market, Ibadan North, Oyo State",
         phoneNumber: "+2348211112222",
-        description: "Premium eggs sourced from healthy layers.",
-        deliveryAvailable: true,
-        rating: 4.6,
-        location: { type: "Point", coordinates: [3.9167, 7.4167] },
-      },
-      {
-        businessName: "Ibadan Southwest Egg Kings",
-        state: "Oyo",
-        lga: "Ibadan South West",
-        address: "Ring Road, near Challenge, Ibadan",
-        phoneNumber: "+2348222223333",
-        description: "The biggest egg distributor in Southwest Ibadan.",
+        description: "Major wholesale egg hub at Bodija Market with nationwide supply routes.",
         deliveryAvailable: true,
         rating: 4.8,
+        location: { type: "Point", coordinates: [3.9142, 7.4358] },
+      },
+      {
+        businessName: "UI Agro Research Poultry",
+        state: "Oyo",
+        lga: "Ibadan North",
+        address: "Teaching & Research Farm, University of Ibadan, Ojoo-UI Road, Ibadan, Oyo State",
+        phoneNumber: "+2348222223333",
+        description: "Scientific breeding and high-yield organic layer egg production.",
+        deliveryAvailable: true,
+        rating: 4.7,
+        location: { type: "Point", coordinates: [3.8992, 7.4435] },
+      },
+      {
+        businessName: "Ring Road Egg Kings",
+        state: "Oyo",
+        lga: "Ibadan South West",
+        address: "105, Ring Road, Opposite Mobil Station, Challenge, Ibadan, Oyo State",
+        phoneNumber: "+2348233334444",
+        description: "Leading egg distributor serving eateries and hotels across Ring Road.",
+        deliveryAvailable: true,
+        rating: 4.6,
         location: { type: "Point", coordinates: [3.8667, 7.3500] },
       },
       {
-        businessName: "Ibadan Northeast Chicks",
+        businessName: "Iwo Road Poultry Hub",
         state: "Oyo",
         lga: "Ibadan North East",
-        address: "Iwo Road, Ibadan",
-        phoneNumber: "+2348233334444",
-        description: "Specialized in day-old chicks and poultry equipment.",
+        address: "18, Iwo Road Commercial Complex, Ibadan North-East, Oyo State",
+        phoneNumber: "+2348244445555",
+        description: "Specialized in bulk egg logistics, day-old chicks, and feeds.",
         deliveryAvailable: true,
         rating: 4.4,
         location: { type: "Point", coordinates: [3.9333, 7.3833] },
       },
       {
-        businessName: "Ibadan Northwest Layers",
+        businessName: "Akinyele Agro Farms",
         state: "Oyo",
-        lga: "Ibadan North West",
-        address: "Eleyele Road, Ibadan",
-        phoneNumber: "+2348244445555",
-        description: "Excellent egg layer management and organic feeds.",
-        deliveryAvailable: false,
-        rating: 4.2,
-        location: { type: "Point", coordinates: [3.8833, 7.4000] },
-      },
-      {
-        businessName: "Bodija Market Eggs",
-        state: "Oyo",
-        lga: "Ibadan North",
-        address: "Bodija Market, Ibadan",
+        lga: "Akinyele",
+        address: "Kilometer 12, Moniya-Iseyin Road, Moniya, Akinyele, Oyo State",
         phoneNumber: "+2348255556666",
-        description: "Direct wholesale prices for crates of eggs.",
-        deliveryAvailable: true,
+        description: "Large-scale commercial layer farm producing thousands of crates daily.",
+        deliveryAvailable: false,
         rating: 4.5,
-        location: { type: "Point", coordinates: [3.9142, 7.4358] },
+        location: { type: "Point", coordinates: [3.9114, 7.5278] },
       },
+
+      // ── OGUN STATE (5 Farms / Depots) ──
       {
-        businessName: "RingRoad Feeds and Broilers",
-        state: "Oyo",
-        lga: "Ibadan South West",
-        address: "Mobil, Ring Road, Ibadan",
-        phoneNumber: "+2348266667777",
-        description: "Healthy broiler birds and top quality starter feeds.",
+        businessName: "Lafenwa Market Poultry Depot",
+        state: "Ogun",
+        lga: "Abeokuta North",
+        address: "14, Lafenwa Market Road, Abeokuta North, Ogun State",
+        phoneNumber: "+2348111112222",
+        description: "Leading wholesale egg market distributor in Abeokuta North.",
         deliveryAvailable: true,
         rating: 4.6,
-        location: { type: "Point", coordinates: [3.8542, 7.3458] },
+        location: { type: "Point", coordinates: [3.3294, 7.1594] },
       },
       {
-        businessName: "Akobo Valley Poultry",
-        state: "Oyo",
-        lga: "Ibadan North East",
-        address: "Akobo Road, Ibadan",
-        phoneNumber: "+2348277778888",
-        description: "Scenic valley farm producing organic fresh eggs.",
+        businessName: "Oke-Mosan Royal Egg Depot",
+        state: "Ogun",
+        lga: "Abeokuta South",
+        address: "Near Secretariat Complex, Oke-Mosan, Abeokuta South, Ogun State",
+        phoneNumber: "+2348122223333",
+        description: "Premium table eggs and broilers for government and corporate events.",
         deliveryAvailable: true,
         rating: 4.7,
-        location: { type: "Point", coordinates: [3.9642, 7.4458] },
+        location: { type: "Point", coordinates: [3.3654, 7.1189] },
       },
       {
-        businessName: "Samonda Fresh Farm",
-        state: "Oyo",
-        lga: "Ibadan North",
-        address: "Samonda Road, Ibadan",
-        phoneNumber: "+2348288889999",
-        description: "Direct sales of day-old chicks and point of lay birds.",
+        businessName: "Odeda FUNAAB Poultry Corridor",
+        state: "Ogun",
+        lga: "Odeda",
+        address: "Kilometer 4, Abeokuta-Ibadan Road, Obantoko, Odeda, Ogun State",
+        phoneNumber: "+2348133334444",
+        description: "Academic standard poultry breeding and affordable egg crates.",
         deliveryAvailable: false,
-        rating: 4.1,
-        location: { type: "Point", coordinates: [3.8942, 7.4258] },
+        rating: 4.3,
+        location: { type: "Point", coordinates: [3.4333, 7.1667] },
       },
       {
-        businessName: "Challenge Junction Poultry",
-        state: "Oyo",
-        lga: "Ibadan South West",
-        address: "Challenge Junction, Ibadan",
-        phoneNumber: "+2348299990000",
-        description: "Fast delivery of fresh eggs across Ibadan city.",
+        businessName: "Sagamu Agro Feeds & Eggs",
+        state: "Ogun",
+        lga: "Sagamu",
+        address: "25, Akarigbo Street, Sabo, Sagamu, Ogun State",
+        phoneNumber: "+2348144445555",
+        description: "One-stop depot for poultry feeds, fresh egg crates, and pullets.",
         deliveryAvailable: true,
         rating: 4.5,
-        location: { type: "Point", coordinates: [3.8742, 7.3358] },
+        location: { type: "Point", coordinates: [3.6482, 6.8482] },
+      },
+      {
+        businessName: "Canaanland Egg Hub Ota",
+        state: "Ogun",
+        lga: "Ado-Odo/Ota",
+        address: "Kilometer 10, Idiroko Road, Ota, Ado-Odo/Ota, Ogun State",
+        phoneNumber: "+2348155556666",
+        description: "High-yield commercial egg supply hub connecting Ogun and Lagos borders.",
+        deliveryAvailable: true,
+        rating: 4.8,
+        location: { type: "Point", coordinates: [3.2354, 6.6912] },
       },
     ];
 
-    // 5. Insert Poultry Farms & Generate Products for each
-    logger.info(`Inserting ${poultryFarms.length} poultry farms...`);
+    // 5. Sync Poultry Farms & Generate 3 Egg Products for Each
+    logger.info(`Syncing ${poultryFarms.length} poultry farms across Lagos, Oyo, and Ogun...`);
 
     for (const farmInfo of poultryFarms) {
-      const isDepot = /hub|basket|palace|feeds|market|junction|depot|supreme|masters|kings/i.test(farmInfo.businessName);
-      const poultry = await Poultry.create({
-        ...farmInfo,
-        farmType: isDepot ? "depot" : "farmer",
-        ownerId: owner._id,
-      });
+      const isDepot = /hub|basket|palace|feeds|market|depot|supreme|kings|store/i.test(farmInfo.businessName);
 
-      // Generate 3 egg-only products per poultry
-      const products = [
-        {
-          poultryId: poultry._id,
-          productName: "Fresh Organic Eggs",
-          category: "Eggs",
-          pricePerCrate: Math.floor(Math.random() * (2800 - 1800 + 1)) + 1800, // 1800 to 2800
-          stockQuantity: Math.floor(Math.random() * 400) + 50, // 50 to 450
-          imageUrl: "https://images.unsplash.com/photo-1516448424440-9dbca97779c1?auto=format&fit=crop&q=80&w=900",
-          isAvailable: true,
-        },
-        {
-          poultryId: poultry._id,
-          productName: "Jumbo White Eggs",
-          category: "Eggs",
-          pricePerCrate: Math.floor(Math.random() * (3200 - 2200 + 1)) + 2200, // 2200 to 3200
-          stockQuantity: Math.floor(Math.random() * 300) + 40, 
-          imageUrl: "https://images.unsplash.com/photo-1506976785307-8732e854ad03?auto=format&fit=crop&q=80&w=900",
-          isAvailable: true,
-        },
-        {
-          poultryId: poultry._id,
-          productName: "Free-Range Golden Eggs",
-          category: "Eggs",
-          pricePerCrate: Math.floor(Math.random() * (3600 - 2500 + 1)) + 2500, // 2500 to 3600
-          stockQuantity: Math.floor(Math.random() * 200) + 20, 
-          imageUrl: "https://images.unsplash.com/photo-1587486913049-53fc88980cfc?auto=format&fit=crop&q=80&w=900",
-          isAvailable: Math.random() > 0.15,
-        },
-      ];
+      let poultry = await Poultry.findOne({ businessName: farmInfo.businessName });
+      if (!poultry) {
+        poultry = await Poultry.create({
+          ...farmInfo,
+          farmType: isDepot ? "depot" : "farmer",
+          ownerId: owner._id,
+        });
 
-      await Product.insertMany(products);
+        // Generate 3 egg products per farm only when farm is newly created
+        const products = [
+          {
+            poultryId: poultry._id,
+            productName: "Fresh Organic Eggs (Medium)",
+            category: "Eggs",
+            pricePerCrate: Math.floor(Math.random() * (2600 - 1800 + 1)) + 1800,
+            stockQuantity: Math.floor(Math.random() * 400) + 50,
+            imageUrl: "https://images.unsplash.com/photo-1516448424440-9dbca97779c1?auto=format&fit=crop&q=80&w=900",
+            isAvailable: true,
+          },
+          {
+            poultryId: poultry._id,
+            productName: "Jumbo Brown Eggs (Large)",
+            category: "Eggs",
+            pricePerCrate: Math.floor(Math.random() * (3200 - 2300 + 1)) + 2300,
+            stockQuantity: Math.floor(Math.random() * 300) + 40,
+            imageUrl: "https://images.unsplash.com/photo-1506976785307-8732e854ad03?auto=format&fit=crop&q=80&w=900",
+            isAvailable: true,
+          },
+          {
+            poultryId: poultry._id,
+            productName: "Free-Range Golden Eggs (Special)",
+            category: "Eggs",
+            pricePerCrate: Math.floor(Math.random() * (3800 - 2700 + 1)) + 2700,
+            stockQuantity: Math.floor(Math.random() * 200) + 20,
+            imageUrl: "https://images.unsplash.com/photo-1587486913049-53fc88980cfc?auto=format&fit=crop&q=80&w=900",
+            isAvailable: Math.random() > 0.15,
+          },
+        ];
+
+        await Product.insertMany(products);
+      }
     }
 
-    logger.info("🎉 Database successfully seeded with Poultry Farms and Products!");
+    logger.info("🎉 Database successfully seeded with 20 Poultry Farms and 60 Products across Lagos, Oyo, and Ogun!");
     process.exit(0);
   } catch (error) {
     logger.error(`❌ Seeding failed: ${error.message}`);

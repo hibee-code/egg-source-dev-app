@@ -113,6 +113,23 @@ const resendVerificationSchema = Joi.object({
   email,
 });
 
+const verifyOTPSchema = Joi.object({
+  email,
+  otp: Joi.string()
+    .length(6)
+    .pattern(/^\d{6}$/)
+    .required()
+    .messages({
+      "string.length": "OTP code must be exactly 6 digits",
+      "string.pattern.base": "OTP code must contain numbers only",
+      "any.required": "OTP code is required",
+    }),
+});
+
+const resendOTPSchema = Joi.object({
+  email,
+});
+
 module.exports = {
   registerSchema,
   loginSchema,
@@ -121,4 +138,6 @@ module.exports = {
   changePasswordSchema,
   updateProfileSchema,
   resendVerificationSchema,
+  verifyOTPSchema,
+  resendOTPSchema,
 };

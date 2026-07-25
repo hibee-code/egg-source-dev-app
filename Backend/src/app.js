@@ -18,14 +18,33 @@ const app = express();
 // ── Security headers ──────────────────────────────────────
 app.use(
   helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" },
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
         scriptSrc: ["'self'", "'unsafe-inline'", "https://unpkg.com", "https://www.googletagmanager.com"],
         styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
         fontSrc: ["'self'", "https://fonts.gstatic.com"],
-        imgSrc: ["'self'", "data:", "https://images.unsplash.com", "https://www.google-analytics.com"],
-        connectSrc: ["'self'", "https://www.google-analytics.com", "https://region1.google-analytics.com"],
+        imgSrc: [
+          "'self'",
+          "data:",
+          "https://images.unsplash.com",
+          "https://www.google-analytics.com",
+          "https://maps.googleapis.com",
+          "https://maps.gstatic.com",
+          "https://*.ggpht.com",         // Google Maps street view tiles
+        ],
+        connectSrc: [
+          "'self'",
+          "https://www.google-analytics.com",
+          "https://region1.google-analytics.com",
+          "https://maps.googleapis.com",
+        ],
+        // Allow Google Maps iframe embeds
+        frameSrc: [
+          "https://maps.google.com",
+          "https://www.google.com",
+        ],
       },
     },
   })
@@ -60,8 +79,16 @@ app.use("/api/products", productRoutes);
 app.use("/api/search", searchRoutes);
 app.use("/api/bookings", bookingRoutes);
 
-// ── Serve static frontend assets ──────────────────────────
+// ── Serve PWA Manifest & Static Frontend Assets ──────────
 const FRONTEND_DIR = path.join(__dirname, "../../Frontend");
+
+app.get("/manifest.json", (_req, res) => {
+  res.setHeader("Content-Type", "application/manifest+json; charset=utf-8");
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Cache-Control", "public, max-age=86400");
+  res.sendFile(path.join(FRONTEND_DIR, "manifest.json"));
+});
+
 app.use(express.static(FRONTEND_DIR));
 
 // ── SEO Redirects (301 Permanent) ────────────────────────
@@ -94,6 +121,7 @@ app.get("/robots.txt", (req, res) => {
 // ── Clean Page Routes ──────────────────────────────────────
 app.get(["/", "/home"], (_req, res) => res.sendFile(path.join(FRONTEND_DIR, "index.html")));
 app.get(["/login", "/register", "/auth"], (_req, res) => res.sendFile(path.join(FRONTEND_DIR, "pages/auth.html")));
+app.get("/verify-otp", (_req, res) => res.sendFile(path.join(FRONTEND_DIR, "pages/verify-otp.html")));
 app.get("/about", (_req, res) => res.sendFile(path.join(FRONTEND_DIR, "pages/about.html")));
 app.get("/why", (_req, res) => res.sendFile(path.join(FRONTEND_DIR, "pages/why.html"))); 
 app.get("/marketplace", (_req, res) => res.sendFile(path.join(FRONTEND_DIR, "pages/marketplace.html")));
@@ -104,6 +132,9 @@ app.get(["/dashboard-admin", "/dashboard/admin"], (_req, res) => res.sendFile(pa
 app.get("/privacy", (_req, res) => res.sendFile(path.join(FRONTEND_DIR, "pages/privacy.html")));
 app.get("/terms", (_req, res) => res.sendFile(path.join(FRONTEND_DIR, "pages/terms.html")));
 app.get(["/register-invite", "/invite"], (_req, res) => res.sendFile(path.join(FRONTEND_DIR, "pages/register-invite.html")));
+app.get("/forgot-password", (_req, res) => res.sendFile(path.join(FRONTEND_DIR, "pages/forgot-password.html")));
+app.get(["/reset-password", "/reset-password/:token"], (_req, res) => res.sendFile(path.join(FRONTEND_DIR, "pages/reset-password.html")));
+app.get("/change-password", (_req, res) => res.sendFile(path.join(FRONTEND_DIR, "pages/change-password.html")));
 
 // ── Root SPA fallback route for unrecognized paths ─────────
 app.get(/^(?!\/api).*$/, (_req, res) => {

@@ -753,7 +753,7 @@ button {
 
 .cards-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 24px;
 }
 
@@ -808,6 +808,8 @@ button {
   font-size: 0.85rem;
   background: rgba(31, 77, 10, 0.1);
   color: var(--color-primary);
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .product-chip--pickup {

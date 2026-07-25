@@ -30,7 +30,7 @@ const renderDashboardTable = (bookings) => {
           </tr>
         `;
       }).join('')
-    : '<tr><td colspan="5" style="color: var(--color-text-muted); padding: 18px 0; text-align: center;">No bookings yet.</td></tr>';
+    : '<tr><td colspan="5" style="color: var(--color-text-muted); padding: 24px 0; text-align: center; font-weight: 500;">No bookings found.</td></tr>';
 
   // Attach cancel listeners
   table.querySelectorAll('.cancel-booking-btn').forEach((btn) => {
@@ -73,7 +73,7 @@ const renderOrdersTable = (bookings) => {
           </tr>
         `;
       }).join('')
-    : '<tr><td colspan="7" style="color: var(--color-text-muted); padding: 18px 0; text-align: center;">No orders found.</td></tr>';
+    : '<tr><td colspan="7" style="color: var(--color-text-muted); padding: 24px 0; text-align: center; font-weight: 500;">No bookings found.</td></tr>';
 
   // Attach cancel listeners
   table.querySelectorAll('.cancel-booking-btn').forEach((btn) => {
@@ -184,7 +184,7 @@ const handleProfileUpdate = async (e) => {
     // Update local storage credentials
     const currentUser = Auth.getUser();
     const updatedUser = { ...currentUser, firstName, lastName, phone };
-    localStorage.setItem('eggsource_user', JSON.stringify(updatedUser));
+    Auth.setUser(updatedUser);
     
     Toast.success('Profile updated successfully');
     initPage(); // Re-render sidebar & header profile
@@ -215,8 +215,8 @@ const showTableSkeletons = () => {
 
   const getSkeletonRow = (cols) => `
     <tr>
-      <td colspan="${cols}">
-        <div class="skeleton skeleton-row"></div>
+      <td colspan="${cols}" style="padding: 14px 16px;">
+        <div class="skeleton skeleton-row" style="height: 20px; width: 100%; border-radius: 6px;"></div>
       </td>
     </tr>
   `;
@@ -228,9 +228,19 @@ const showTableSkeletons = () => {
 
 const fetchAndRenderData = async () => {
   showTableSkeletons();
+  const startTime = Date.now();
   try {
     const res = await BookingAPI.getMyBookings();
     allBookings = res.data?.bookings || [];
+  } catch (err) {
+    console.error('Error loading dashboard data:', err);
+    allBookings = [];
+  } finally {
+    const elapsed = Date.now() - startTime;
+    const minDelay = 2000;
+    if (elapsed < minDelay) {
+      await new Promise((resolve) => setTimeout(resolve, minDelay - elapsed));
+    }
 
     // Update stats cards in Dashboard
     const statsTotal = document.getElementById('stat-total-bookings');
@@ -246,8 +256,6 @@ const fetchAndRenderData = async () => {
     renderOrdersTable(allBookings);
     renderInventoryTable(allBookings);
     renderAnalytics(allBookings);
-  } catch (err) {
-    console.error('Error loading dashboard data:', err);
   }
 };
 
@@ -293,6 +301,29 @@ const initPage = async () => {
       window.location.hash = hash;
     });
   });
+
+  setupBookingsCollapsible();
+};
+
+const setupBookingsCollapsible = () => {
+  const btn = document.getElementById('toggle-bookings-btn');
+  const wrapper = document.getElementById('buyer-bookings-wrapper');
+  const iconSpan = document.getElementById('bookings-toggle-icon');
+
+  if (btn && wrapper) {
+    btn.addEventListener('click', (e) => {
+      // Prevent triggering toggle if "View All" link is clicked
+      if (e.target.closest('.select-tab-link')) return;
+
+      const isHidden = wrapper.classList.toggle('hidden');
+      if (iconSpan) {
+        iconSpan.innerHTML = isHidden 
+          ? `<i data-lucide="chevron-down" style="width: 16px; height: 16px;"></i>` 
+          : `<i data-lucide="chevron-up" style="width: 16px; height: 16px;"></i>`;
+        if (window.lucide) window.lucide.createIcons();
+      }
+    });
+  }
 };
 
 window.addEventListener('hashchange', handleTabRouting);

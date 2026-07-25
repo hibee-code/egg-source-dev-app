@@ -27,10 +27,127 @@
       margin: 0 auto;
     }
 
+    /* ── TABLET (≤1024px) ─────────────────────────────────────────────────── */
     @media (max-width: 1024px) {
       .dashboard-grid-layout {
         grid-template-columns: 1fr;
+        padding: 20px 16px;
+        gap: 20px;
       }
+    }
+
+    /* ── MOBILE (≤768px) ──────────────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .dashboard-grid-layout {
+        grid-template-columns: 1fr;
+        padding: 12px;
+        gap: 16px;
+      }
+
+      /* Sidebar: hide on mobile — navbar hamburger handles navigation */
+      #sidebar-root {
+        display: none !important;
+      }
+
+      /* Main page content: no extra padding */
+      .page { padding: 0 !important; }
+
+      /* Stats grids: single column */
+      .stats-grid,
+      .grid-2col {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+      }
+
+      /* Metric cards: tighten */
+      .metric-card { padding: 16px !important; }
+
+      /* Headings: scale down */
+      h1 { font-size: 1.4rem !important; }
+      h2 { font-size: 1.15rem !important; }
+      h3 { font-size: 1rem !important; }
+
+      /* All table wrappers: horizontal scroll */
+      .card > div[style*="overflow"],
+      [style*="overflow-x: auto"],
+      [style*="overflow-x:auto"] {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      /* Section headers: wrap and tighten */
+      section[style*="flex"] {
+        flex-wrap: wrap !important;
+        gap: 10px !important;
+        margin-bottom: 16px !important;
+      }
+
+      /* Filter tabs: horizontal scroll, no wrap */
+      .filter-tabs-row {
+        flex-wrap: nowrap !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 8px;
+        gap: 6px;
+      }
+
+      /* Product cards grid: single column */
+      .product-cards-grid {
+        grid-template-columns: 1fr !important;
+      }
+
+      /* Bar chart: compact on mobile */
+      .bar-chart-container { padding: 16px !important; }
+      .chart-bar-wrapper   { height: 100px !important; }
+
+      /* Modal: full-screen on mobile */
+      .modal-overlay { padding: 12px; align-items: flex-end; }
+      .modal-content {
+        width: 100% !important;
+        max-width: 100% !important;
+        max-height: 90vh;
+        overflow-y: auto;
+        border-radius: 16px 16px 0 0 !important;
+      }
+
+      /* Quick actions area: wrap */
+      div[style*="display: flex"][style*="gap"] {
+        flex-wrap: wrap;
+      }
+
+      /* Profile/shop form: full width */
+      .card[style*="max-width"],
+      form.auth-form {
+        max-width: 100% !important;
+        width: 100% !important;
+      }
+
+      .field-row { grid-template-columns: 1fr !important; }
+
+      /* Card headers: allow wrapping */
+      .card-header {
+        flex-wrap: wrap !important;
+        gap: 8px !important;
+      }
+    }
+
+    /* ── SMALL MOBILE (≤480px) ────────────────────────────────────────────── */
+    @media (max-width: 480px) {
+      .dashboard-grid-layout { padding: 8px; }
+      .metric-card           { padding: 14px !important; }
+
+      .filter-tab-pill {
+        font-size: 0.78rem !important;
+        padding: 5px 10px !important;
+      }
+
+      .card-img-container { height: 140px !important; }
+
+      /* Activity timeline: tighter */
+      .activity-timeline { padding-left: 14px; gap: 14px; }
+
+      /* Stepper: wrap labels */
+      .step-node { flex-direction: column; text-align: center; }
     }
 
     .metric-card {
@@ -390,6 +507,177 @@
       filter: brightness(0.92);
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
     }
+
+    /* Recent Orders Table Legibility & Alignment Adjustments */
+    #farm-bookings-table {
+      min-width: 850px;
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    #farm-bookings-table th,
+    #farm-bookings-table td {
+      white-space: nowrap;
+      vertical-align: middle;
+      padding: 14px 16px;
+    }
+
+    /* Keep the Product name wrapping controlled but legible if long, while preventing ugly character splits */
+    #farm-bookings-table td:nth-child(3) {
+      white-space: normal;
+      min-width: 150px;
+      max-width: 250px;
+      line-height: 1.4;
+    }
+
+    /* Right-align numeric columns for professional readability (accounting best practice) */
+    #farm-bookings-table th:nth-child(4),
+    #farm-bookings-table td:nth-child(4), /* Qty */
+    #farm-bookings-table th:nth-child(6),
+    #farm-bookings-table td:nth-child(6) { /* Total */
+      text-align: right;
+    }
+
+    /* Center-align status badges and actions for neat vertical alignment */
+    #farm-bookings-table th:nth-child(7),
+    #farm-bookings-table td:nth-child(7), /* Status */
+    #farm-bookings-table th:nth-child(8),
+    #farm-bookings-table td:nth-child(8) { /* Action */
+      text-align: center;
+    }
+
+    /* Align action button styles nicely inside the cell */
+    #farm-bookings-table td:nth-child(8) .btn {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0 auto;
+    }
+
+    /* Farm Inventory Table Legibility & Alignment Adjustments */
+    #farm-inventory {
+      min-width: 850px;
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    #farm-inventory th,
+    #farm-inventory td {
+      white-space: nowrap;
+      vertical-align: middle;
+      padding: 14px 16px;
+    }
+
+    /* Keep the Product name wrapping controlled but legible if long, while preventing ugly character splits */
+    #farm-inventory td:nth-child(1) {
+      white-space: normal;
+      min-width: 150px;
+      max-width: 250px;
+      line-height: 1.4;
+    }
+
+    /* Right-align numeric columns for professional readability (accounting best practice) */
+    #farm-inventory th:nth-child(3),
+    #farm-inventory td:nth-child(3), /* Price */
+    #farm-inventory th:nth-child(4),
+    #farm-inventory td:nth-child(4) { /* Stock Qty */
+      text-align: right;
+    }
+
+    /* Center-align status badges for neat vertical alignment */
+    #farm-inventory th:nth-child(6),
+    #farm-inventory td:nth-child(6) { /* Status */
+      text-align: center;
+    }
+
+    /* Booking Requests Tab: Full Booking History Table */
+    #requests-full-table {
+      min-width: 950px;
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    #requests-full-table th,
+    #requests-full-table td {
+      white-space: nowrap;
+      vertical-align: middle;
+      padding: 14px 16px;
+    }
+
+    /* Product Name wrapping controlled */
+    #requests-full-table td:nth-child(3) {
+      white-space: normal;
+      min-width: 120px;
+      max-width: 180px;
+      line-height: 1.4;
+    }
+
+    /* Delivery Address column controls */
+    #requests-full-table td:nth-child(5) {
+      white-space: normal;
+      min-width: 180px;
+      max-width: 250px;
+      line-height: 1.4;
+    }
+
+    /* Right-align numeric columns */
+    #requests-full-table th:nth-child(4),
+    #requests-full-table td:nth-child(4), /* Qty */
+    #requests-full-table th:nth-child(7),
+    #requests-full-table td:nth-child(7) { /* Total Value */
+      text-align: right;
+    }
+
+    /* Center-align status badges and actions */
+    #requests-full-table th:nth-child(8),
+    #requests-full-table td:nth-child(8), /* Status */
+    #requests-full-table th:nth-child(9),
+    #requests-full-table td:nth-child(9) { /* Action */
+      text-align: center;
+    }
+
+    /* Center align the buttons within action cell */
+    #requests-full-table td:nth-child(9) .btn {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0 auto;
+    }
+
+    /* Inventory Edit Table Legibility & Alignment Adjustments */
+    #inventory-edit-table {
+      min-width: 700px;
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    #inventory-edit-table th,
+    #inventory-edit-table td {
+      white-space: nowrap;
+      vertical-align: middle;
+      padding: 14px 16px;
+    }
+
+    /* Product name column */
+    #inventory-edit-table td:nth-child(1) {
+      white-space: normal;
+      min-width: 150px;
+      max-width: 250px;
+      line-height: 1.4;
+    }
+
+    /* Right-align numeric columns */
+    #inventory-edit-table th:nth-child(3),
+    #inventory-edit-table td:nth-child(3) { /* Current Stock */
+      text-align: right;
+    }
+
+    /* Center-align Quick Adjustment column */
+    #inventory-edit-table th:nth-child(4),
+    #inventory-edit-table td:nth-child(4) { /* Quick Adjustment */
+      text-align: left;
+      padding-left: 24px;
+    }
   </style>
 </head>
 <body>
@@ -523,124 +811,81 @@
           </div>
         </section>
 
-        <!-- Two Column Content Table and Activity Feeds -->
-        <section class="grid-2col">
-          <!-- Left Column: Tables -->
-          <div style="display: flex; flex-direction: column; gap: 32px;">
-            <!-- Booking Requests -->
-            <div class="card" style="padding: 24px;">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
-                <div style="display:flex; align-items:center; gap: 10px;">
-                  <h3 style="margin: 0; font-size: 1.1rem; font-weight: 700;">Recent Orders</h3>
-                  <span class="badge-pill badge-pill--accent" id="booking-badge-count" style="padding: 4px 10px; font-size: 0.78rem;">0 Bookings</span>
-                </div>
-                <!-- Status Filter Pill bar -->
-                <div class="filter-tabs-row" id="booking-status-filters" style="margin: 0; border: none; padding: 0;">
-                  <span class="filter-tab-pill active" data-status="All">All</span>
-                  <span class="filter-tab-pill" data-status="Pending">Pending</span>
-                  <span class="filter-tab-pill" data-status="Confirmed">Confirmed</span>
-                  <span class="filter-tab-pill" data-status="Delivered">Delivered</span>
-                </div>
+        <!-- Content Tables (Full Width for Premium UI/UX) -->
+        <div style="display: flex; flex-direction: column; gap: 32px;">
+          <!-- Booking Requests -->
+          <div class="card" style="padding: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+              <div style="display:flex; align-items:center; gap: 10px;">
+                <h3 style="margin: 0; font-size: 1.1rem; font-weight: 700;">Recent Orders</h3>
+                <span class="badge-pill badge-pill--accent" id="booking-badge-count" style="padding: 4px 10px; font-size: 0.78rem;">0 Bookings</span>
+              </div>
+              <!-- Status Filter Pill bar -->
+              <div class="filter-tabs-row" id="booking-status-filters" style="margin: 0; border: none; padding: 0;">
+                <span class="filter-tab-pill active" data-status="All">All</span>
+                <span class="filter-tab-pill" data-status="Pending">Pending</span>
+                <span class="filter-tab-pill" data-status="Confirmed">Confirmed</span>
+                <span class="filter-tab-pill" data-status="Delivered">Delivered</span>
+              </div>
+            </div>
+            <div style="overflow-x: auto;">
+              <table class="table-list" id="farm-bookings-table">
+                <thead>
+                  <tr>
+                    <th>Order ID</th>
+                    <th>Customer</th>
+                    <th>Product</th>
+                    <th>Qty</th>
+                    <th>Method</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td colspan="8" style="color: var(--color-text-muted); padding: 24px 0; text-align: center;">Loading bookings...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Inventory health -->
+          <div class="card" style="padding: 16px 20px;">
+            <div id="toggle-inventory-health-btn" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <i data-lucide="activity" style="width:18px; height:18px; color: var(--color-primary);"></i>
+                <h3 style="margin: 0; font-size: 1rem; font-weight: 700;">Inventory Health</h3>
+              </div>
+              <span id="inventory-toggle-icon" style="font-size: 0.8rem; color: var(--color-text-muted); display: flex; align-items: center; gap: 4px;">
+                Expand <i data-lucide="chevron-down" style="width:16px; height:16px;"></i>
+              </span>
+            </div>
+            
+            <!-- Collapsible Wrapper -->
+            <div id="inventory-health-wrapper" class="hidden" style="margin-top: 16px; border-top: 1px solid var(--color-border); padding-top: 16px;">
+              <div style="display: flex; justify-content: flex-end; margin-bottom: 12px;">
+                <a class="btn btn-ghost select-tab-link" href="#inventory" style="font-size: 0.78rem; padding: 4px 10px;">Stock Management →</a>
               </div>
               <div style="overflow-x: auto;">
-                <table class="table-list" id="farm-bookings-table">
+                <table class="table-list" id="farm-inventory">
                   <thead>
                     <tr>
-                      <th>Order ID</th>
-                      <th>Customer</th>
-                      <th>Product</th>
-                      <th>Qty</th>
-                      <th>Method</th>
-                      <th>Total</th>
+                      <th>Product Name</th>
+                      <th>Category</th>
+                      <th>Price/Crate</th>
+                      <th>Stock Quantity</th>
+                      <th>Capacity Level</th>
                       <th>Status</th>
-                      <th>Action</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr><td colspan="8" style="color: var(--color-text-muted); padding: 24px 0; text-align: center;">Loading bookings...</td></tr>
+                    <tr><td colspan="6" style="color: var(--color-text-muted); padding: 24px 0; text-align: center;">Loading inventory...</td></tr>
                   </tbody>
                 </table>
               </div>
             </div>
-
-            <!-- Inventory health -->
-            <div class="card" style="padding: 16px 20px;">
-              <div id="toggle-inventory-health-btn" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none;">
-                <div style="display: flex; align-items: center; gap: 8px;">
-                  <i data-lucide="activity" style="width:18px; height:18px; color: var(--color-primary);"></i>
-                  <h3 style="margin: 0; font-size: 1rem; font-weight: 700;">Inventory Health</h3>
-                </div>
-                <span id="inventory-toggle-icon" style="font-size: 0.8rem; color: var(--color-text-muted); display: flex; align-items: center; gap: 4px;">
-                  Expand <i data-lucide="chevron-down" style="width:16px; height:16px;"></i>
-                </span>
-              </div>
-              
-              <!-- Collapsible Wrapper -->
-              <div id="inventory-health-wrapper" class="hidden" style="margin-top: 16px; border-top: 1px solid var(--color-border); padding-top: 16px;">
-                <div style="display: flex; justify-content: flex-end; margin-bottom: 12px;">
-                  <a class="btn btn-ghost select-tab-link" href="#inventory" style="font-size: 0.78rem; padding: 4px 10px;">Stock Management →</a>
-                </div>
-                <div style="overflow-x: auto;">
-                  <table class="table-list" id="farm-inventory">
-                    <thead>
-                      <tr>
-                        <th>Product Name</th>
-                        <th>Category</th>
-                        <th>Price/Crate</th>
-                        <th>Stock Quantity</th>
-                        <th>Capacity Level</th>
-                        <th>Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr><td colspan="6" style="color: var(--color-text-muted); padding: 24px 0; text-align: center;">Loading inventory...</td></tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
           </div>
-
-          <!-- Right Column: Recent Activities & Profile Card -->
-          <div style="display: flex; flex-direction: column; gap: 32px;">
-            <!-- Farm Details Sidebar Badge Card -->
-            <div class="card" style="padding: 20px;">
-              <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-                <div class="avatar-circle" style="background: var(--color-primary); width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; color: #fff; font-weight: bold; font-size: 1rem;">FO</div>
-                <div>
-                  <h3 id="farm-owner-name" style="margin: 0; font-size: 0.96rem; font-weight: 700;">Farm Owner</h3>
-                  <span id="farm-owner-role" style="color: var(--color-text-muted); font-size: 0.8rem;">Premium Seller</span>
-                </div>
-              </div>
-              <p style="color: var(--color-text-muted); font-size: 0.82rem; line-height: 1.5; margin: 0 0 14px;">Update details and physical coordinates for buyer search catalog maps.</p>
-              <button class="btn btn-secondary select-tab-link" href="#profile" style="width: 100%; padding: 8px 14px; font-size: 0.86rem;">Configure Shop Settings</button>
-            </div>
-
-            <!-- Recent Activities Feed -->
-            <div class="card" style="padding: 16px 20px;">
-              <div id="toggle-recent-events-btn" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none;">
-                <div style="display: flex; align-items: center; gap: 8px;">
-                  <i data-lucide="bell" style="width:18px; height:18px; color: var(--color-primary);"></i>
-                  <h3 style="margin: 0; font-size: 1rem; font-weight: 700;">Recent Events</h3>
-                </div>
-                <span id="events-toggle-icon" style="font-size: 0.8rem; color: var(--color-text-muted); display: flex; align-items: center; gap: 4px;">
-                  Expand <i data-lucide="chevron-down" style="width:16px; height:16px;"></i>
-                </span>
-              </div>
-
-              <!-- Collapsible Wrapper -->
-              <div id="recent-activities-wrapper" class="hidden" style="margin-top: 16px; border-top: 1px solid var(--color-border); padding-top: 16px;">
-                <div class="activity-timeline" id="recent-activities-feed">
-                  <div class="activity-item">
-                    <div class="activity-marker"></div>
-                    <span class="activity-time">Just now</span>
-                    <span style="font-size: 0.86rem;">Checking database connectivity...</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+        </div>
       </div>
 
       <!-- TAB: POULTRY PROFILE -->
@@ -694,6 +939,20 @@
               <i data-lucide="save" style="width:16px; height:16px; margin-right:4px;"></i> Save Shop Profile
             </button>
           </form>
+        </div>
+
+        <!-- Security Section -->
+        <div class="card" style="padding: 24px; margin-top: 20px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+            <div>
+              <h3 style="margin: 0 0 4px;">Password &amp; Security</h3>
+              <p style="margin: 0; font-size: 0.875rem; color: var(--color-text-muted);">Keep your seller account safe with a strong, unique password.</p>
+            </div>
+            <a href="/change-password" class="btn btn-secondary" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: var(--radius-pill); font-size: 0.875rem; font-weight: 600; text-decoration: none; flex-shrink: 0;">
+              <i data-lucide="key-round" style="width: 15px; height: 15px;"></i>
+              Change Password
+            </a>
+          </div>
         </div>
       </div>
 
@@ -888,6 +1147,113 @@
       <div id="modal-order-actions" style="margin-top: 24px; border-top: 1px solid var(--color-border); padding-top: 18px; display: flex; justify-content: flex-end; gap: 12px;">
         <!-- Filled dynamically by JavaScript -->
       </div>
+    </div>
+  </div>
+
+  <!-- First-Time Seller Onboarding Wizard Modal Overlay -->
+  <div id="seller-onboarding-modal" class="modal-overlay hidden" style="z-index: 10000; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(8px);">
+    <style>
+      .onboarding-input,
+      .onboarding-select {
+        width: 100%;
+        height: 44px;
+        padding: 8px 16px;
+        background-color: var(--color-card, #ffffff);
+        border: 1.5px solid var(--color-border, #cbd5e1);
+        border-radius: var(--radius-pill, 9999px);
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--color-text, #0f172a);
+        outline: none;
+        transition: all 0.2s ease;
+        box-sizing: border-box;
+        font-family: inherit;
+      }
+
+      .onboarding-select {
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 14px center;
+        background-size: 16px;
+        padding-right: 38px;
+        cursor: pointer;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .onboarding-input:focus,
+      .onboarding-select:focus {
+        border-color: var(--color-primary, #1f4d0a);
+        background-color: #ffffff;
+        box-shadow: 0 0 0 3px rgba(31, 77, 10, 0.12);
+      }
+
+      .onboarding-select option {
+        background-color: #ffffff;
+        color: #0f172a;
+        font-weight: 500;
+        padding: 8px 12px;
+      }
+    </style>
+    <div class="modal-content card" style="max-width: 580px; padding: 32px; width: 92%; background: var(--color-card); border-radius: 24px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); border: 1px solid var(--color-border);">
+      <div style="text-align: center; margin-bottom: 24px;">
+        <div style="width: 56px; height: 56px; border-radius: 16px; background: rgba(31, 77, 10, 0.1); color: var(--color-primary); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 12px;">
+          <i data-lucide="store" style="width: 28px; height: 28px;"></i>
+        </div>
+        <h2 style="margin: 0; font-size: 1.45rem; font-weight: 800; color: var(--color-text);">Welcome to Egg Connect Seller Hub!</h2>
+        <p style="color: var(--color-text-muted); font-size: 0.88rem; margin-top: 6px; line-height: 1.4;">Set up your Farm or Depot profile in 1 minute to start receiving buyer bookings immediately.</p>
+      </div>
+
+      <form id="seller-onboarding-form" style="display: flex; flex-direction: column; gap: 18px;">
+        <div class="field-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div class="filter-group">
+            <label class="label label-pill" for="onboarding-business-name" style="font-size: 0.76rem; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; display: block;">Business / Farm Name <span class="required-star" style="color: #dc2626;">*</span></label>
+            <input id="onboarding-business-name" type="text" class="onboarding-input" placeholder="e.g. Sunrise Egg Depot" required>
+          </div>
+          
+          <div class="filter-group">
+            <label class="label label-pill" for="onboarding-seller-type" style="font-size: 0.76rem; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; display: block;">Seller Type <span class="required-star" style="color: #dc2626;">*</span></label>
+            <select id="onboarding-seller-type" class="onboarding-select" required>
+              <option value="farmer">Farm (Direct Producer)</option>
+              <option value="depot">Depot (Distributor / Wholesaler)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div class="filter-group">
+            <label class="label label-pill" for="onboarding-state" style="font-size: 0.76rem; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; display: block;">State <span class="required-star" style="color: #dc2626;">*</span></label>
+            <input id="onboarding-state" type="text" class="onboarding-input" placeholder="e.g. Lagos" required>
+          </div>
+          
+          <div class="filter-group">
+            <label class="label label-pill" for="onboarding-lga" style="font-size: 0.76rem; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; display: block;">LGA <span class="required-star" style="color: #dc2626;">*</span></label>
+            <input id="onboarding-lga" type="text" class="onboarding-input" placeholder="e.g. Ikorodu" required>
+          </div>
+        </div>
+
+        <div class="field-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div class="filter-group">
+            <label class="label label-pill" for="onboarding-stock" style="font-size: 0.76rem; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; display: block;">Initial Stock (Crates) <span class="required-star" style="color: #dc2626;">*</span></label>
+            <input id="onboarding-stock" type="number" min="1" class="onboarding-input" placeholder="e.g. 100" value="100" required>
+          </div>
+          
+          <div class="filter-group">
+            <label class="label label-pill" for="onboarding-price" style="font-size: 0.76rem; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; display: block;">Price per Crate (₦) <span class="required-star" style="color: #dc2626;">*</span></label>
+            <input id="onboarding-price" type="number" min="100" step="50" class="onboarding-input" placeholder="e.g. 3800" value="3800" required>
+          </div>
+        </div>
+
+        <div style="margin-top: 8px;">
+          <button id="onboarding-submit-btn" type="submit" class="btn btn-gradient" style="width: 100%; height: 48px; font-size: 0.96rem; font-weight: 700; border-radius: 9999px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <i data-lucide="rocket" style="width: 18px; height: 18px;"></i> Launch My Business Profile & Listings
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 
