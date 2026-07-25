@@ -27,12 +27,23 @@
       margin: 0 auto;
     }
 
-    /* ── TABLET (≤1024px) ─────────────────────────────────────────────────── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-bottom: 28px;
+    }
+
+    /* ── TABLET (769px - 1024px) ─────────────────────────────────────────── */
     @media (max-width: 1024px) {
       .dashboard-grid-layout {
         grid-template-columns: 1fr;
         padding: 20px 16px;
         gap: 20px;
+      }
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 14px !important;
       }
     }
 
@@ -40,22 +51,23 @@
     @media (max-width: 768px) {
       .dashboard-grid-layout {
         grid-template-columns: 1fr;
-        padding: 12px;
-        gap: 16px;
+        padding: 12px 10px !important;
+        gap: 14px;
       }
 
-      /* Sidebar: hide on mobile — navbar hamburger handles navigation */
+      /* Sidebar: hide on mobile */
       #sidebar-root {
         display: none !important;
       }
 
-      /* Main page content: no extra padding */
-      .page { padding: 0 !important; }
+      /* Main page content */
+      .page { padding: 0 0 80px 0 !important; }
 
-      /* Stats grids: 2-column compact grid on mobile */
+      /* Stats grids: 2-column compact grid covering full screen width */
       .stats-grid {
         grid-template-columns: repeat(2, 1fr) !important;
-        gap: 12px !important;
+        gap: 10px !important;
+        width: 100% !important;
       }
       .grid-2col {
         grid-template-columns: 1fr !important;
@@ -762,8 +774,8 @@
           </div>
         </div>
 
-        <!-- Metric Widgets -->
-        <section class="stats-grid" style="margin-bottom: 32px; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px;">
+        <!-- Metric Widgets (4 Desktop / 2 Tablet & Mobile) -->
+        <section class="stats-grid">
           <div class="metric-card">
             <div style="display: flex; justify-content: space-between; align-items: flex-start;">
               <div>

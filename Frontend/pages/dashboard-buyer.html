@@ -84,44 +84,48 @@
       margin: 0 auto;
     }
 
-    /* ── Dashboard home 2-column grid ────────────────────────────────────── */
-    .dashboard-main {
+    /* ── DASHBOARD METRICS GRID ────────────────────────────────────────────── */
+    .stats-grid {
       display: grid;
-      grid-template-columns: 1.5fr 1fr;
-      gap: 24px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
     }
 
-    /* ── TABLET (≤1024px) ─────────────────────────────────────────────────── */
+    /* ── TABLET (769px - 1024px) ── */
     @media (max-width: 1024px) {
       .dashboard-main {
         grid-template-columns: 1fr;
       }
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 14px !important;
+      }
     }
 
-    /* ── MOBILE (≤768px) ──────────────────────────────────────────────────── */
+    /* ── MOBILE (≤768px) ── */
     @media (max-width: 768px) {
-      /* Sidebar-layout: let the global tokens.css handle stacking (grid-cols:1fr),
-         but we also collapse the sidebar width so it doesn't push content */
       .sidebar-layout {
-        padding: 12px !important;
-        gap: 16px !important;
+        padding: 12px 10px !important;
+        gap: 14px !important;
       }
 
-      /* Sidebar panel: hide it entirely; the navbar hamburger handles navigation */
+      /* Sidebar panel: hide on mobile */
       #sidebar-root {
         display: none !important;
       }
 
       /* Main content stretches full width */
       .page {
-        padding: 0 !important;
+        padding: 0 0 80px 0 !important;
         width: 100% !important;
       }
 
-      /* Stats grid: 2-column compact grid on mobile */
+      /* Stats grid: 2 cards per row covering full screen width (Kuda/Opay/Moniepoint style) */
       .stats-grid {
         grid-template-columns: repeat(2, 1fr) !important;
-        gap: 12px !important;
+        gap: 10px !important;
+        width: 100% !important;
       }
 
       .stats-card--dark,
@@ -274,14 +278,14 @@
           </div>
         </section>
 
-        <!-- 2-Column Mobile Compact Metric Cards -->
-        <section class="stats-grid" style="margin-bottom: 20px;">
+        <!-- 4-Grid Desktop / 2-Grid Tablet & Mobile Metric Cards (Kuda/Opay/Moniepoint style) -->
+        <section class="stats-grid">
           <div class="stats-card" style="padding: 16px; border-radius: 14px; background: var(--color-card); border: 1px solid var(--color-border); box-shadow: 0 4px 14px rgba(0,0,0,0.03);">
             <div class="card-header" style="margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
               <h3 style="font-size: 0.82rem; font-weight: 600; color: var(--color-text-muted); margin: 0;">Total Bookings</h3>
               <span class="chip chip--success" style="font-size: 0.7rem; padding: 2px 6px;">+12% ↑</span>
             </div>
-            <p id="stat-total-bookings" style="font-size: 1.8rem; margin: 0; font-weight: 800; color: var(--color-primary);">0</p>
+            <p id="stat-total-bookings" style="font-size: 1.7rem; margin: 0; font-weight: 800; color: var(--color-primary);">0</p>
           </div>
 
           <div class="stats-card" style="padding: 16px; border-radius: 14px; background: var(--color-card); border: 1px solid var(--color-border); box-shadow: 0 4px 14px rgba(0,0,0,0.03);">
@@ -289,10 +293,26 @@
               <h3 style="font-size: 0.82rem; font-weight: 600; color: var(--color-text-muted); margin: 0;">In Transit</h3>
               <span class="chip chip--orange" style="font-size: 0.7rem; padding: 2px 6px;">Pending</span>
             </div>
-            <p id="stat-in-transit" style="font-size: 1.8rem; margin: 0; font-weight: 800; color: var(--color-text);">0</p>
+            <p id="stat-in-transit" style="font-size: 1.7rem; margin: 0; font-weight: 800; color: var(--color-text);">0</p>
           </div>
 
-          <!-- Full Width Promo Card with High Contrast -->
+          <div class="stats-card" style="padding: 16px; border-radius: 14px; background: var(--color-card); border: 1px solid var(--color-border); box-shadow: 0 4px 14px rgba(0,0,0,0.03);">
+            <div class="card-header" style="margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+              <h3 style="font-size: 0.82rem; font-weight: 600; color: var(--color-text-muted); margin: 0;">Total Spent</h3>
+              <span class="chip chip--success" style="font-size: 0.7rem; padding: 2px 6px;">₦</span>
+            </div>
+            <p id="stat-total-spent-mini" style="font-size: 1.7rem; margin: 0; font-weight: 800; color: var(--color-primary);">₦0</p>
+          </div>
+
+          <div class="stats-card" style="padding: 16px; border-radius: 14px; background: var(--color-card); border: 1px solid var(--color-border); box-shadow: 0 4px 14px rgba(0,0,0,0.03);">
+            <div class="card-header" style="margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+              <h3 style="font-size: 0.82rem; font-weight: 600; color: var(--color-text-muted); margin: 0;">Saved Farms</h3>
+              <span class="chip chip--orange" style="font-size: 0.7rem; padding: 2px 6px;">⭐ 4.8</span>
+            </div>
+            <p style="font-size: 1.7rem; margin: 0; font-weight: 800; color: var(--color-text);">2 Farms</p>
+          </div>
+
+          <!-- Full Width Promo Banner Card -->
           <div class="stats-card stats-card--dark" style="grid-column: 1 / -1; background: linear-gradient(135deg, #1f4d0a 0%, #163807 100%); color: #ffffff !important; border-radius: 16px; padding: 20px; box-shadow: 0 8px 24px rgba(31, 77, 10, 0.18); border: 1px solid rgba(255,255,255,0.1);">
             <h3 style="color: #ffffff !important; margin: 0 0 6px 0; font-size: 1.1rem; font-weight: 700;">Premium Supplier Access</h3>
             <p style="font-size: 0.88rem; margin: 0 0 16px 0; color: rgba(255,255,255,0.9) !important; line-height: 1.4;">Unlock verified farms & priority inventory with price transparency.</p>
