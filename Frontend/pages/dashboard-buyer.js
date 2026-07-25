@@ -245,11 +245,18 @@ const fetchAndRenderData = async () => {
     // Update stats cards in Dashboard
     const statsTotal = document.getElementById('stat-total-bookings');
     const statsTransit = document.getElementById('stat-in-transit');
+    const statsSpentMini = document.getElementById('stat-total-spent-mini');
     
     if (statsTotal) statsTotal.textContent = allBookings.length;
     if (statsTransit) {
       const inTransitCount = allBookings.filter((b) => ['Pending', 'In Transit'].includes(b.status)).length;
       statsTransit.textContent = inTransitCount;
+    }
+    if (statsSpentMini) {
+      const totalSpent = allBookings
+        .filter((b) => b.status !== 'Cancelled')
+        .reduce((sum, b) => sum + (b.totalAmount || 0), 0);
+      statsSpentMini.textContent = Format.currency(totalSpent);
     }
 
     renderDashboardTable(allBookings);
