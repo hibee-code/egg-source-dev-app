@@ -65,6 +65,14 @@ const userSchema = new mongoose.Schema(
       type: String,
       select: false,
     },
+    previousRefreshTokenHash: {
+      type: String,
+      select: false,
+    },
+    refreshTokenRotatedAt: {
+      type: Date,
+      select: false,
+    },
     isVerified: {
       type: Boolean,
       default: false,

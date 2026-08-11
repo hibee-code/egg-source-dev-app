@@ -38,6 +38,13 @@ class BookingRepository {
       .populate("productId", "productName category pricePerCrate imageUrl");
   }
 
+  async findExpiredPendingReservations() {
+    return Booking.find({
+      status: "Pending",
+      reservationExpiresAt: { $lt: new Date() },
+    });
+  }
+
   async delete(id) {
     return Booking.findByIdAndDelete(id);
   }
