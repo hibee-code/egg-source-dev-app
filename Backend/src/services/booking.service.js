@@ -3,19 +3,44 @@ const productRepository = require("../repositories/product.repository");
 const poultryRepository = require("../repositories/poultry.repository");
 const ApiError = require("../utils/ApiError");
 
+const logger = require("../utils/logger");
+
 const SHIPPING_FEE = 1500; // ₦1,500 flat rate for delivery
 const SERVICE_FEE_RATE = 0.025; // 2.5%
+const RESERVATION_TTL_MS = 15 * 60 * 1000; // 15 minutes hold for unpaid pending bookings
 
 class BookingService {
   /**
+   * Release expired unpaid reservations and restore product stock.
+   */
+  async releaseExpiredReservations() {
+    try {
+      const expiredBookings = await bookingRepository.findExpiredPendingReservations();
+      for (const booking of expiredBookings) {
+        booking.status = "Cancelled";
+        await booking.save();
+        await productRepository.incrementStock(booking.productId, booking.quantity);
+        logger.info(
+          `⏱️ [RESERVATION EXPIRED]: Released ${booking.quantity} stock for product ${booking.productId} from cancelled booking ${booking._id}`
+        );
+      }
+    } catch (err) {
+      logger.error("Error releasing expired reservations:", err);
+    }
+  }
+
+  /**
    * Create a new booking.
-   * Validates product availability, calculates pricing, decrements stock.
+   * Validates availability, performs atomic stock decrement, saves product snapshot & reservation expiry.
    *
-   * @param {Object} data - { productId, quantity, deliveryMethod, deliveryAddress }
+   * @param {Object} data - { productId, quantity, deliveryMethod, deliveryAddress, scheduledSlot }
    * @param {string} userId - Authenticated buyer's user ID
    * @returns {Object} Created booking document
    */
   async createBooking(data, userId) {
+    // Proactively clean up expired reservations to free up stock pool
+    await this.releaseExpiredReservations();
+
     // 1. Verify product exists and is available
     const product = await productRepository.findById(data.productId);
     if (!product) {
@@ -23,11 +48,6 @@ class BookingService {
     }
     if (!product.isAvailable) {
       throw ApiError.badRequest("This product is currently unavailable");
-    }
-    if (product.stockQuantity < data.quantity) {
-      throw ApiError.badRequest(
-        `Insufficient stock. Only ${product.stockQuantity} crates available.`
-      );
     }
 
     // 2. Get the poultry farm
@@ -41,36 +61,67 @@ class BookingService {
       throw ApiError.notFound("Associated poultry farm not found");
     }
 
-    // 3. Calculate pricing
+    // 3. Atomically decrement stock to prevent race condition overselling
+    const updatedProduct = await productRepository.decrementStock(product._id, data.quantity);
+    if (!updatedProduct) {
+      throw ApiError.badRequest(
+        `Insufficient stock available or item was reserved by another buyer.`
+      );
+    }
+
+    // 4. Calculate pricing
     const pricePerCrate = product.pricePerCrate;
     const subtotal = pricePerCrate * data.quantity;
     const shippingFee = data.deliveryMethod === "delivery" ? SHIPPING_FEE : 0;
     const serviceFee = Math.round((subtotal + shippingFee) * SERVICE_FEE_RATE);
     const totalAmount = subtotal + shippingFee + serviceFee;
 
-    // 4. Create booking
-    const booking = await bookingRepository.create({
-      buyerId: userId,
-      poultryId: poultryId,
-      productId: data.productId,
-      quantity: data.quantity,
-      pricePerCrate,
-      subtotal,
-      shippingFee,
-      serviceFee,
-      totalAmount,
-      deliveryMethod: data.deliveryMethod,
-      deliveryAddress: data.deliveryAddress,
-      status: "Pending",
-    });
+    // 5. Build historical product/farm snapshot
+    const farmLocationStr = poultry.location
+      ? `${poultry.location.city || ""}, ${poultry.location.state || ""}`.trim()
+      : "";
+    const productSnapshot = {
+      productName: product.productName,
+      category: product.category,
+      farmName: poultry.businessName || "",
+      farmLocation: farmLocationStr,
+    };
 
-    // 5. Decrement product stock
-    await productRepository.update(product._id, {
-      stockQuantity: product.stockQuantity - data.quantity,
-    });
+    // 6. Set unpaid reservation expiration threshold (15 mins)
+    const reservationExpiresAt = new Date(Date.now() + RESERVATION_TTL_MS);
 
-    // 6. Return populated booking
-    return bookingRepository.findById(booking._id);
+    // 7. Create booking with unique scheduled slot handling
+    try {
+      const booking = await bookingRepository.create({
+        buyerId: userId,
+        poultryId: poultryId,
+        productId: data.productId,
+        quantity: data.quantity,
+        pricePerCrate,
+        subtotal,
+        shippingFee,
+        serviceFee,
+        totalAmount,
+        deliveryMethod: data.deliveryMethod,
+        deliveryAddress: data.deliveryAddress,
+        scheduledSlot: data.scheduledSlot,
+        productSnapshot,
+        reservationExpiresAt,
+        status: "Pending",
+      });
+
+      return await bookingRepository.findById(booking._id);
+    } catch (error) {
+      // Rollback stock decrement if DB save fails
+      await productRepository.incrementStock(product._id, data.quantity);
+
+      if (error.code === 11000) {
+        throw ApiError.conflict(
+          "The requested scheduled time slot is already reserved by another user."
+        );
+      }
+      throw error;
+    }
   }
 
   /**
@@ -78,6 +129,8 @@ class BookingService {
    * Only the buyer, the farm owner, or an admin can view it.
    */
   async getBookingById(id, userId, userRole) {
+    await this.releaseExpiredReservations();
+
     const booking = await bookingRepository.findById(id);
     if (!booking) {
       throw ApiError.notFound("Booking not found");
@@ -102,6 +155,7 @@ class BookingService {
    * Get all bookings for a buyer.
    */
   async getBuyerBookings(userId) {
+    await this.releaseExpiredReservations();
     return bookingRepository.findByBuyer(userId);
   }
 
@@ -109,7 +163,7 @@ class BookingService {
    * Get all bookings for farms owned by the current user.
    */
   async getFarmBookings(userId) {
-    // Find all poultry farms owned by this user
+    await this.releaseExpiredReservations();
     const farms = await poultryRepository.findAll({ ownerId: userId });
     if (!farms.length) {
       return [];
@@ -142,7 +196,13 @@ class BookingService {
       );
     }
 
-    return bookingRepository.update(id, { status });
+    // If status is updated to Confirmed or beyond, clear reservationExpiresAt
+    const updatePayload = { status };
+    if (status !== "Pending") {
+      updatePayload.reservationExpiresAt = null;
+    }
+
+    return bookingRepository.update(id, updatePayload);
   }
 
   /**
@@ -166,17 +226,11 @@ class BookingService {
       );
     }
 
-    // Restore product stock
-    const product = await productRepository.findById(
-      booking.productId._id || booking.productId
-    );
-    if (product) {
-      await productRepository.update(product._id, {
-        stockQuantity: product.stockQuantity + booking.quantity,
-      });
-    }
+    // Atomically restore product stock
+    const productId = booking.productId._id || booking.productId;
+    await productRepository.incrementStock(productId, booking.quantity);
 
-    return bookingRepository.update(id, { status: "Cancelled" });
+    return bookingRepository.update(id, { status: "Cancelled", reservationExpiresAt: null });
   }
 
   /**

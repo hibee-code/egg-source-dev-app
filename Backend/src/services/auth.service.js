@@ -271,19 +271,42 @@ class AuthService {
       throw ApiError.unauthorized("Invalid or expired refresh token");
     }
 
-    // Find user and check that the stored token matches
-    const user = await User.findById(decoded.id).select("+refreshTokenHash");
-    const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
-    if (!user || user.refreshTokenHash !== tokenHash) {
+    // Find user and select refresh token hashes & timestamp
+    const user = await User.findById(decoded.id).select(
+      "+refreshTokenHash +previousRefreshTokenHash +refreshTokenRotatedAt"
+    );
+    if (!user) {
       throw ApiError.unauthorized("Invalid refresh token");
     }
 
-    // Issue new tokens (rotate refresh token for security)
+    const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
+    const REFRESH_GRACE_PERIOD_MS = 30 * 1000; // 30 seconds
+
+    const isCurrentToken = user.refreshTokenHash === tokenHash;
+    const isPreviousTokenInGracePeriod =
+      user.previousRefreshTokenHash === tokenHash &&
+      user.refreshTokenRotatedAt &&
+      Date.now() - new Date(user.refreshTokenRotatedAt).getTime() < REFRESH_GRACE_PERIOD_MS;
+
+    if (!isCurrentToken && !isPreviousTokenInGracePeriod) {
+      throw ApiError.unauthorized("Invalid or re-used refresh token");
+    }
+
     const accessToken = generateAccessToken(user._id, user.role);
+
+    // If request matched previous token within grace window, reuse active session without re-rotating
+    if (isPreviousTokenInGracePeriod) {
+      logger.info(`ℹ️ [AUTH REFRESH GRACE PERIOD]: Allowed concurrent refresh for user ${user._id}`);
+      return { accessToken };
+    }
+
+    // Issue new tokens (rotate refresh token for security)
     const newRefreshToken = generateRefreshToken(user._id);
     const newHash = crypto.createHash("sha256").update(newRefreshToken).digest("hex");
 
+    user.previousRefreshTokenHash = user.refreshTokenHash;
     user.refreshTokenHash = newHash;
+    user.refreshTokenRotatedAt = new Date();
     await user.save({ validateBeforeSave: false });
 
     setRefreshCookie(res, newRefreshToken);

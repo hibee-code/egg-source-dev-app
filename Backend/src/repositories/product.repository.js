@@ -45,6 +45,29 @@ class ProductRepository {
     });
   }
 
+  /**
+   * Atomically decrement stock for a product if available stock is sufficient.
+   * Prevents race conditions and overselling.
+   */
+  async decrementStock(id, quantity) {
+    return Product.findOneAndUpdate(
+      { _id: id, isAvailable: true, stockQuantity: { $gte: quantity } },
+      { $inc: { stockQuantity: -quantity } },
+      { new: true, runValidators: true }
+    );
+  }
+
+  /**
+   * Atomically restore stock for a product when a booking is cancelled/expired.
+   */
+  async incrementStock(id, quantity) {
+    return Product.findOneAndUpdate(
+      { _id: id },
+      { $inc: { stockQuantity: quantity } },
+      { new: true, runValidators: true }
+    );
+  }
+
   async delete(id) {
     return Product.findByIdAndDelete(id);
   }

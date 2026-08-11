@@ -84,6 +84,23 @@ const bookingSchema = new mongoose.Schema(
         trim: true,
       },
     },
+    // ── Historical Snapshot (Prevents data drift if seller modifies product/farm details) ──
+    productSnapshot: {
+      productName: { type: String, trim: true, default: "" },
+      category: { type: String, trim: true, default: "" },
+      farmName: { type: String, trim: true, default: "" },
+      farmLocation: { type: String, trim: true, default: "" },
+    },
+    // ── Optional Slot Schedule (Prevents double booking collisions for visits/consultations) ──
+    scheduledSlot: {
+      slotDate: { type: String, trim: true }, // Format: YYYY-MM-DD
+      timeSlot: { type: String, trim: true }, // Format: HH:mm-HH:mm
+    },
+    // ── Unpaid Reservation Timeout (Auto-releases stock back to pool if unconfirmed) ──
+    reservationExpiresAt: {
+      type: Date,
+      index: true,
+    },
     status: {
       type: String,
       enum: ["Pending", "Confirmed", "In Transit", "Delivered", "Cancelled"],
@@ -99,6 +116,20 @@ bookingSchema.index({ buyerId: 1 });
 bookingSchema.index({ poultryId: 1 });
 bookingSchema.index({ productId: 1 });
 bookingSchema.index({ status: 1 });
+bookingSchema.index({ status: 1, reservationExpiresAt: 1 });
+
+// Enforce database-level unique lock on provider/farm scheduled time slots
+bookingSchema.index(
+  { poultryId: 1, "scheduledSlot.slotDate": 1, "scheduledSlot.timeSlot": 1 },
+  {
+    unique: true,
+    partialFilterExpression: {
+      "scheduledSlot.slotDate": { $exists: true, $ne: null },
+      "scheduledSlot.timeSlot": { $exists: true, $ne: null },
+      status: { $ne: "Cancelled" },
+    },
+  }
+);
 
 const Booking = mongoose.model("Booking", bookingSchema);
 
