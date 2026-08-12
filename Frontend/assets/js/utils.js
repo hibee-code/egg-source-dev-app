@@ -2,6 +2,37 @@ export const $ = (selector, parent = document) => parent.querySelector(selector)
 export const $$ = (selector, parent = document) => Array.from(parent.querySelectorAll(selector));
 export const on = (element, event, handler) => element?.addEventListener(event, handler);
 
+/**
+ * Calculates a professional time-based greeting phrase based on current local client time.
+ * - 04:00 - 11:59 -> "Good morning"
+ * - 12:00 - 16:59 -> "Good afternoon"
+ * - 17:00 - 03:59 -> "Good evening"
+ * @param {Date} [date=new Date()] Optional Date object for testing/overrides
+ * @returns {string} Time-based greeting phrase
+ */
+export const getTimeBasedGreeting = (date = new Date()) => {
+  const hour = date.getHours();
+  if (hour >= 4 && hour < 12) {
+    return 'Good morning';
+  } else if (hour >= 12 && hour < 17) {
+    return 'Good afternoon';
+  } else {
+    return 'Good evening';
+  }
+};
+
+/**
+ * Dynamically updates all greeting text elements in the DOM matching selector.
+ * @param {string} [selector='.dash-user-greeting'] Target CSS selector
+ */
+export const updateGreetings = (selector = '.dash-user-greeting') => {
+  const greetingText = getTimeBasedGreeting();
+  document.querySelectorAll(selector).forEach(el => {
+    el.textContent = greetingText;
+  });
+};
+
+
 export const Format = {
   currency(value) {
     const number = Number(value) || 0;

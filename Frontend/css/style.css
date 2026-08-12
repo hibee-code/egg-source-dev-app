@@ -540,68 +540,108 @@ header .navbar-inner {
 }
 
 .dual-cta {
-  grid-template-columns: 1.25fr 0.85fr;
-  gap: 32px;
-}
-
-.cta-panel {
-  border-radius: 28px;
-  overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02);
-  transition: all 0.3s ease;
-}
-
-.cta-panel:hover {
-  box-shadow: 0 20px 40px rgba(31, 77, 10, 0.08);
-}
-
-.cta-panel--dark {
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-light-green) 100%);
-  color: #fff;
-  padding: 48px;
   display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 24px;
 }
 
-.cta-panel--light {
-  background: var(--color-card);
-  border: 1px solid var(--color-border);
-  padding: 48px;
+@media (max-width: 768px) {
+  .dual-cta {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
 }
 
+.cta-panel {
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 4px 14px rgba(20, 35, 26, 0.05);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.cta-panel:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(20, 35, 26, 0.08);
+}
+
+.cta-panel--dark {
+  background: linear-gradient(135deg, #1B3A22 0%, #122817 100%);
+  color: #fff;
+  padding: 28px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.cta-panel--dark h3,
 .cta-panel__title {
-  margin: 0 0 12px;
-  font-size: 1.75rem;
+  margin: 0;
+  font-size: 1.35rem;
   font-weight: 700;
-  letter-spacing: -0.02em;
+  color: #ffffff;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
 }
 
 .cta-panel__list {
   list-style: none;
   padding: 0;
   margin: 0;
-  display: grid;
-  gap: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .cta-panel__list li {
   display: flex;
   align-items: center;
-  gap: 12px;
-  font-size: 1.05rem;
+  gap: 10px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.95);
 }
 
 .cta-panel__list li::before {
   content: '✓';
   color: var(--color-accent);
   background: rgba(255, 255, 255, 0.15);
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
   display: grid;
   place-items: center;
-  font-weight: bold;
-  font-size: 0.85rem;
+  font-weight: 700;
+  font-size: 0.78rem;
+  flex-shrink: 0;
+}
+
+.cta-panel--light {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  padding: 28px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.cta-panel--light h3 {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--color-text);
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+.cta-panel--light img {
+  width: 100%;
+  height: 130px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-top: 8px;
 }
 
 .testimonials {
@@ -2641,6 +2681,459 @@ html, body {
     padding: 22px 18px;
   }
 }
+
+/* ── SCREENSHOT-ACCURATE DASHBOARD MOCK SYSTEM ── */
+.dash-user-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.dash-user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.dash-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: #ffffff;
+  display: grid;
+  place-items: center;
+  font-size: 1.05rem;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(31, 77, 10, 0.15);
+}
+
+.dash-user-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.dash-user-greeting {
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: #5F6D56;
+}
+
+.dash-user-name {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--color-text);
+  line-height: 1.15;
+}
+
+.dash-bell-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 1px solid var(--color-border);
+  display: grid;
+  place-items: center;
+  color: var(--color-text);
+  position: relative;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.dash-bell-btn:hover {
+  transform: scale(1.05);
+}
+
+.dash-bell-badge {
+  position: absolute;
+  top: 10px;
+  right: 11px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #E8A020;
+  border: 1.5px solid #ffffff;
+}
+
+/* 2x2 Screenshot Stat Cards */
+.mock-stat-card {
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 20px;
+  padding: 18px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 140px;
+}
+
+.mock-stat-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.mock-icon-box {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: #E8F2E6;
+  color: var(--color-primary);
+  display: grid;
+  place-items: center;
+}
+
+.mock-icon-box i {
+  width: 20px;
+  height: 20px;
+}
+
+.mock-trend-pill {
+  background: #E6F4EA;
+  color: #1E7E34;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.mock-stat-label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #5F6D56;
+  margin-bottom: 4px;
+}
+
+.mock-stat-value {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--color-text);
+  margin: 0;
+  line-height: 1.1;
+}
+
+.mock-stat-value span.unit {
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: #5F6D56;
+  margin-left: 4px;
+}
+
+.mock-stat-subtext {
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+  margin-top: 4px;
+  line-height: 1.35;
+}
+
+/* Banner Card from screenshot */
+.mock-banner-card {
+  grid-column: 1 / -1;
+  background: linear-gradient(135deg, #133807 0%, #1F4D0A 100%);
+  border-radius: 24px;
+  padding: 24px 20px;
+  color: #ffffff;
+  box-shadow: 0 8px 24px rgba(31, 77, 10, 0.18);
+  position: relative;
+  overflow: hidden;
+}
+
+.mock-banner-title {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 6px;
+}
+
+.mock-banner-text {
+  font-size: 0.88rem;
+  color: rgba(255, 255, 255, 0.88);
+  margin: 0 0 18px;
+  line-height: 1.4;
+  max-width: 90%;
+}
+
+.mock-banner-btn {
+  background: #E8A020;
+  color: #1A2E0A;
+  font-weight: 800;
+  font-size: 0.92rem;
+  padding: 14px 24px;
+  border-radius: 9999px;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  text-decoration: none;
+  box-shadow: 0 4px 14px rgba(232, 160, 32, 0.35);
+  transition: transform 0.15s ease;
+}
+
+.mock-banner-btn:hover {
+  transform: translateY(-1px);
+}
+
+/* Quick Actions Section */
+.mock-quick-actions {
+  margin-top: 24px;
+  margin-bottom: 24px;
+}
+
+.mock-section-title {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--color-text);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mock-section-title a {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.mock-action-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.mock-action-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+}
+
+.mock-action-icon {
+  width: 54px;
+  height: 54px;
+  border-radius: 18px;
+  background: #E8F2E6;
+  color: var(--color-primary);
+  display: grid;
+  place-items: center;
+  transition: transform 0.15s ease;
+}
+
+.mock-action-item:hover .mock-action-icon {
+  transform: translateY(-2px);
+  background: #DCECD9;
+}
+
+.mock-action-icon i {
+  width: 22px;
+  height: 22px;
+}
+
+.mock-action-label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--color-text);
+  text-align: center;
+}
+
+/* Booking Card Item from screenshot */
+.mock-booking-card {
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 20px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
+  margin-bottom: 12px;
+}
+
+.mock-booking-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mock-booking-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 2px;
+}
+
+.mock-booking-sub {
+  font-size: 0.82rem;
+  color: #8A9678;
+}
+
+.mock-status-pill {
+  background: #E6F4EA;
+  color: #1E7E34;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  white-space: nowrap;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   GLOBAL RESPONSIVE NAVIGATION & TABLE STANDARDS (Senior UX Enforcements)
+   ───────────────────────────────────────────────────────────────────────── */
+
+/* 1. Mobile Bottom Sticky Nav — STRICTLY HIDDEN ON DESKTOP (> 768px) */
+.mobile-bottom-nav {
+  display: none !important;
+}
+
+@media (max-width: 768px) {
+  .mobile-bottom-nav {
+    display: flex !important;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 62px;
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-top: 1px solid var(--color-border);
+    z-index: 9999;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0 8px;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+  }
+
+  .mobile-bottom-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    color: var(--color-text-muted);
+    text-decoration: none;
+    font-size: 0.72rem;
+    font-weight: 500;
+    padding: 6px 12px;
+    border-radius: 8px;
+    min-height: 44px;
+    justify-content: center;
+    transition: all 0.2s ease;
+  }
+
+  .mobile-bottom-item.active {
+    color: var(--color-primary);
+    font-weight: 700;
+    background: rgba(31, 77, 10, 0.08);
+  }
+}
+
+/* 2. Responsive Table Wrappers — Prevents text compression & letter breaking */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 1rem;
+  border-radius: var(--radius-card);
+}
+
+.table-responsive table,
+table.table-list,
+table.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+@media (max-width: 768px) {
+  .table-responsive table,
+  table.table-list,
+  table.table {
+    min-width: 580px;
+  }
+
+  .table-list th,
+  .table-list td,
+  table.table th,
+  table.table td {
+    white-space: nowrap !important;
+    word-break: normal !important;
+    hyphens: none !important;
+    font-size: 0.82rem !important;
+    padding: 10px 10px !important;
+  }
+
+  button,
+  .btn,
+  .mobile-drawer-link,
+  .sidebar-link,
+  .dropdown-item {
+    min-height: 44px;
+  }
+}
+
+/* 3. SENIOR UI/UX DASHBOARD GRID LAYOUT STANDARDS (Desktop & Mobile) */
+.sidebar-layout,
+.dashboard-grid-layout {
+  display: grid !important;
+  grid-template-columns: 280px minmax(0, 1fr) !important;
+  gap: 28px !important;
+  align-items: start !important;
+  width: 100% !important;
+  max-width: var(--page-max, 1320px) !important;
+  margin: 0 auto !important;
+  box-sizing: border-box !important;
+}
+
+#sidebar-root,
+.sidebar {
+  display: block !important;
+  width: 280px !important;
+  position: sticky !important;
+  top: 24px !important;
+  align-self: start !important;
+}
+
+main.page {
+  min-width: 0 !important;
+  width: 100% !important;
+  flex-grow: 1 !important;
+}
+
+/* Mobile viewport override: strictly hide static sidebar, convert layout to 1 column */
+@media (max-width: 768px) {
+  .sidebar-layout,
+  .dashboard-grid-layout {
+    display: block !important;
+    width: 100% !important;
+    padding: 12px 10px !important;
+    gap: 0 !important;
+  }
+
+  #sidebar-root,
+  .sidebar {
+    display: none !important;
+  }
+
+  main.page {
+    width: 100% !important;
+    padding-bottom: 80px !important;
+  }
+}
+
+
+
 
 
 

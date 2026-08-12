@@ -1215,7 +1215,6 @@ button {
   .testimonials-grid,
   .section-steps,
   .page-grid,
-  .sidebar-layout,
   .stats-grid {
     grid-template-columns: 1fr;
   }

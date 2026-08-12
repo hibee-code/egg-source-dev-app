@@ -1,6 +1,6 @@
 import { Auth } from '/assets/js/auth.js';
 import { AdminAPI, AuthAPI, PoultryAPI } from '/assets/js/api.js';
-import { Loading, Toast, $ } from '/assets/js/utils.js';
+import { Loading, Toast, $, updateGreetings } from '/assets/js/utils.js';
 
 // Route guards
 const guardAccess = () => {
@@ -19,44 +19,37 @@ let farmsList = [];
 // Populate Profile Info
 const populateAdminProfile = () => {
   const user = Auth.getUser() || { firstName: 'Platform', lastName: 'Admin', email: 'admin@eggconnect.app' };
-  const initials = `${user.firstName[0] || 'P'}${user.lastName[0] || 'A'}`;
+  const fullName = `${user.firstName || 'Platform'} ${user.lastName || 'Admin'}`;
+  const initials = `${(user.firstName || 'P')[0]}${(user.lastName || 'A')[0]}`.toUpperCase();
   
-  // Sidebar avatar & details
-  const sidebarAvatar = $('#sidebar-avatar');
-  if (sidebarAvatar) sidebarAvatar.textContent = initials;
+  // Dynamic time-calculated greeting
+  updateGreetings('.dash-user-greeting');
+
   
-  const sidebarUserName = $('#sidebar-user-name');
-  if (sidebarUserName) sidebarUserName.textContent = `${user.firstName} ${user.lastName}`;
+  // Avatars
+  document.querySelectorAll('.sidebar-avatar-text, .header-avatar-text, .profile-avatar-text').forEach(el => {
+    el.textContent = initials;
+  });
 
-  // Header avatar
-  const headerAvatar = $('#header-avatar');
-  if (headerAvatar) headerAvatar.textContent = initials;
+  // Display Names
+  document.querySelectorAll('.sidebar-user-name-text, .user-display-name-text, .profile-name-text').forEach(el => {
+    el.textContent = fullName;
+  });
 
-  // Dropdown details
-  const dropdownName = $('#dropdown-name');
-  if (dropdownName) dropdownName.textContent = `${user.firstName} ${user.lastName}`;
+  // Display Emails
+  document.querySelectorAll('.profile-email-text').forEach(el => {
+    el.textContent = user.email;
+  });
 
-  const dropdownEmail = $('#dropdown-email');
-  if (dropdownEmail) dropdownEmail.textContent = user.email;
-
-  // Profile View details
-  const profileAvatarLarge = $('#profile-avatar-large');
-  if (profileAvatarLarge) profileAvatarLarge.textContent = initials;
-
-  const profileDisplayName = $('#profile-display-name');
-  if (profileDisplayName) profileDisplayName.textContent = `${user.firstName} ${user.lastName}`;
-
-  const profileDisplayEmail = $('#profile-display-email');
-  if (profileDisplayEmail) profileDisplayEmail.textContent = user.email;
-
+  // Input fields
   const profileFirstNameInput = $('#profile-firstName');
-  if (profileFirstNameInput) profileFirstNameInput.value = user.firstName;
+  if (profileFirstNameInput) profileFirstNameInput.value = user.firstName || '';
 
   const profileLastNameInput = $('#profile-lastName');
-  if (profileLastNameInput) profileLastNameInput.value = user.lastName;
+  if (profileLastNameInput) profileLastNameInput.value = user.lastName || '';
 
   const profileEmailInput = $('#profile-email-input');
-  if (profileEmailInput) profileEmailInput.value = user.email;
+  if (profileEmailInput) profileEmailInput.value = user.email || '';
 };
 
 // Tab Navigation Controller
@@ -77,17 +70,24 @@ const handleHashNavigation = () => {
     }
   });
 
+  // Auto-close mobile drawer navigation when a menu link is clicked
+  const sidebar = $('#shadcn-sidebar');
+  const overlay = document.querySelector('.sidebar-overlay');
+  if (sidebar) sidebar.classList.remove('mobile-open');
+  if (overlay) overlay.remove();
+
   const breadcrumbs = {
     'dashboard': 'Overview',
     'users': 'User Directory',
     'farms': 'Poultry Farms',
     'reports': 'Platform Reports',
     'audit-logs': 'System Security Logs',
-    'profile': 'Profile Settings',
+    'profile': 'Settings',
   };
 
   const currentLabel = breadcrumbs[activeTab] || 'Overview';
-  $('#breadcrumb-current').textContent = currentLabel;
+  const breadcrumbEl = $('#breadcrumb-current');
+  if (breadcrumbEl) breadcrumbEl.textContent = currentLabel;
 
   const headers = {
     'dashboard': { title: 'Overview Dashboard', subtitle: 'Real-time system health and administration stats' },
@@ -99,8 +99,11 @@ const handleHashNavigation = () => {
   };
 
   const currentHeader = headers[activeTab] || headers['dashboard'];
-  $('#view-title').textContent = currentHeader.title;
-  document.querySelector('.dashboard-subtitle').textContent = currentHeader.subtitle;
+  const viewTitleEl = $('#view-title');
+  if (viewTitleEl) viewTitleEl.textContent = currentHeader.title;
+
+  const subtitleEl = document.querySelector('.dashboard-subtitle');
+  if (subtitleEl) subtitleEl.textContent = currentHeader.subtitle;
 
   // Show active section
   const activeSection = document.getElementById(`section-${activeTab}`);
@@ -110,6 +113,11 @@ const handleHashNavigation = () => {
 
   // Load section-specific data
   loadDataForTab(activeTab);
+
+  // Refresh icons
+  if (window.lucide) {
+    window.lucide.createIcons();
+  }
 };
 
 const loadDataForTab = async (tab) => {
@@ -133,118 +141,174 @@ const loadDataForTab = async (tab) => {
 // ── View 1: Overview ─────────────────────────────────────────
 const loadDashboardOverview = async () => {
   const response = await AdminAPI.getStats();
-  const data = response.data;
-  stats = data.stats;
+  const data = response.data || {};
+  stats = data.stats || {};
 
-  // Populate stats
-  $('#stat-buyers').textContent = stats.buyersCount;
-  $('#stat-sellers').textContent = stats.sellersCount;
-  $('#stat-farms').textContent = stats.farmsCount;
-  $('#stat-products').textContent = stats.productsCount;
-  $('#stat-bookings').textContent = stats.bookingsCount;
+  // Populate stats safely
+  const statBuyers = $('#stat-buyers');
+  if (statBuyers) statBuyers.textContent = stats.buyersCount || 0;
+
+  const statSellers = $('#stat-sellers');
+  if (statSellers) statSellers.textContent = stats.sellersCount || 0;
+
+  const statFarms = $('#stat-farms');
+  if (statFarms) statFarms.textContent = stats.farmsCount || 0;
+
+  const statBookings = $('#stat-bookings');
+  if (statBookings) statBookings.textContent = stats.bookingsCount || 0;
 
   // Populate logins
   const loginsBody = $('#login-tbody');
-  loginsBody.innerHTML = '';
-  if (data.recentLogins.length === 0) {
-    loginsBody.innerHTML = `<tr><td colspan="3" style="text-align: center; padding: 20px; color: var(--color-slate-500);">No recent logins</td></tr>`;
-  } else {
-    data.recentLogins.forEach(log => {
-      const user = log.userId || { firstName: 'Deleted', lastName: 'User', email: 'N/A' };
-      const time = new Date(log.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      const row = document.createElement('tr');
-      row.style.borderBottom = '1px solid var(--color-slate-100)';
-      row.innerHTML = `
-        <td style="padding: 12px 0;">
-          <div style="font-weight: 500; color: var(--color-slate-900);">${user.firstName} ${user.lastName}</div>
-          <div style="font-size: 0.76rem; color: var(--color-slate-500);">${user.email}</div>
-        </td>
-        <td style="padding: 12px 0; font-family: monospace; font-size: 0.8rem; color: var(--color-slate-500);">${log.ipAddress || 'Unknown'}</td>
-        <td style="padding: 12px 0; font-size: 0.8rem; color: var(--color-slate-500);">${time}</td>
-      `;
-      loginsBody.appendChild(row);
-    });
+  if (loginsBody) {
+    loginsBody.innerHTML = '';
+    const recentLogins = data.recentLogins || [];
+    if (recentLogins.length === 0) {
+      loginsBody.innerHTML = `<tr><td colspan="3" style="text-align: center; padding: 20px; color: var(--color-slate-500);">No recent logins</td></tr>`;
+    } else {
+      recentLogins.forEach(log => {
+        const user = log.userId || { firstName: 'System', lastName: 'User', email: 'N/A' };
+        const time = new Date(log.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const row = document.createElement('tr');
+        row.style.borderBottom = '1px solid var(--color-slate-100)';
+        row.innerHTML = `
+          <td style="padding: 12px 0;">
+            <div style="font-weight: 500; color: var(--color-slate-900);">${user.firstName} ${user.lastName}</div>
+            <div style="font-size: 0.76rem; color: var(--color-slate-500);">${user.email}</div>
+          </td>
+          <td style="padding: 12px 0; font-family: monospace; font-size: 0.8rem; color: var(--color-slate-500);">${log.ipAddress || 'Unknown'}</td>
+          <td style="padding: 12px 0; font-size: 0.8rem; color: var(--color-slate-500);">${time}</td>
+        `;
+        loginsBody.appendChild(row);
+      });
+    }
   }
 
   // Populate activities
   const auditBody = $('#overview-audit-tbody');
-  auditBody.innerHTML = '';
-  if (data.recentAuditLogs.length === 0) {
-    auditBody.innerHTML = `<tr><td colspan="3" style="text-align: center; padding: 20px; color: var(--color-slate-500);">No recent activities</td></tr>`;
-  } else {
-    data.recentAuditLogs.forEach(log => {
-      const time = new Date(log.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      const row = document.createElement('tr');
-      row.style.borderBottom = '1px solid var(--color-slate-100)';
-      row.innerHTML = `
-        <td style="padding: 12px 0; font-weight: 500; color: var(--color-slate-900);">${log.action}</td>
-        <td style="padding: 12px 0;"><span class="badge badge-${log.severity.toLowerCase()}">${log.severity}</span></td>
-        <td style="padding: 12px 0; font-size: 0.8rem; color: var(--color-slate-500);">${time}</td>
-      `;
-      auditBody.appendChild(row);
-    });
+  if (auditBody) {
+    auditBody.innerHTML = '';
+    const recentLogs = data.recentAuditLogs || [];
+    if (recentLogs.length === 0) {
+      auditBody.innerHTML = `<tr><td colspan="3" style="text-align: center; padding: 20px; color: var(--color-slate-500);">No recent activities</td></tr>`;
+    } else {
+      recentLogs.forEach(log => {
+        const time = new Date(log.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const row = document.createElement('tr');
+        row.style.borderBottom = '1px solid var(--color-slate-100)';
+        row.innerHTML = `
+          <td style="padding: 12px 0; font-weight: 500; color: var(--color-slate-900);">${log.action}</td>
+          <td style="padding: 12px 0;"><span class="badge badge-${log.severity ? log.severity.toLowerCase() : 'info'}">${log.severity || 'INFO'}</span></td>
+          <td style="padding: 12px 0; font-size: 0.8rem; color: var(--color-slate-500);">${time}</td>
+        `;
+        auditBody.appendChild(row);
+      });
+    }
   }
 };
 
 // ── View 2: User Directory ───────────────────────────────────
 const loadUserDirectory = async () => {
-  const role = $('#user-role-filter').value;
-  const search = $('#user-search-input').value.trim();
+  const roleFilterEl = $('#user-role-filter');
+  const searchInputEl = $('#user-search-input');
+  const role = roleFilterEl ? roleFilterEl.value : '';
+  const search = searchInputEl ? searchInputEl.value.trim() : '';
 
   const response = await AdminAPI.getUsers({ role, search });
   usersList = (response.data || []).filter(user => user.role !== 'SUPER_ADMIN');
 
   const tbody = $('#users-tbody');
-  tbody.innerHTML = '';
+  const cardsContainer = $('#users-cards-mobile');
+
+  if (tbody) tbody.innerHTML = '';
+  if (cardsContainer) cardsContainer.innerHTML = '';
 
   if (usersList.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 40px; color: var(--color-slate-500);">No users found matching requirements.</td></tr>`;
+    if (tbody) tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 40px; color: var(--color-slate-500);">No users found matching requirements.</td></tr>`;
+    if (cardsContainer) cardsContainer.innerHTML = `<div style="text-align: center; padding: 30px; color: var(--color-slate-500); background: #fff; border-radius: 12px; border: 1px solid var(--color-slate-200);">No users found matching requirements.</div>`;
     return;
   }
 
   usersList.forEach(user => {
     const registeredDate = new Date(user.createdAt).toLocaleDateString();
-    const row = document.createElement('tr');
-    row.style.borderBottom = '1px solid var(--color-slate-100)';
-    row.innerHTML = `
-      <td style="padding: 14px 12px; font-weight: 500; color: var(--color-slate-900);">${user.firstName} ${user.lastName}</td>
-      <td style="padding: 14px 12px; color: var(--color-slate-500);">${user.email}</td>
-      <td style="padding: 14px 12px;"><span class="badge ${user.role === 'FARM_OWNER' ? 'badge-info' : 'badge-success'}">${user.role === 'FARM_OWNER' ? 'Farm Owner' : 'Buyer'}</span></td>
-      <td style="padding: 14px 12px; color: var(--color-slate-500);">${registeredDate}</td>
-      <td style="padding: 14px 12px;"><span class="badge ${user.isActive ? 'badge-success' : 'badge-critical'}">${user.isActive ? 'Active' : 'Suspended'}</span></td>
-      <td style="padding: 14px 12px; text-align: right;">
-        <button class="btn btn-status-toggle" data-id="${user._id}" data-active="${user.isActive}" style="font-size: 0.8rem; padding: 6px 12px; border-radius: 6px; cursor: pointer; background: transparent; border: 1px solid ${user.isActive ? '#dc2626' : '#059669'}; color: ${user.isActive ? '#dc2626' : '#059669'};">
-          ${user.isActive ? 'Suspend' : 'Activate'}
-        </button>
-      </td>
-    `;
-    tbody.appendChild(row);
+    const initials = `${(user.firstName || 'U')[0]}${(user.lastName || '')[0] || ''}`.toUpperCase();
+
+    // 1. Desktop Table Row
+    if (tbody) {
+      const row = document.createElement('tr');
+      row.style.borderBottom = '1px solid var(--color-slate-100)';
+      row.innerHTML = `
+        <td style="padding: 14px 12px; font-weight: 500; color: var(--color-slate-900);">${user.firstName} ${user.lastName}</td>
+        <td style="padding: 14px 12px; color: var(--color-slate-500);">${user.email}</td>
+        <td style="padding: 14px 12px;"><span class="badge ${user.role === 'FARM_OWNER' ? 'badge-info' : 'badge-success'}">${user.role === 'FARM_OWNER' ? 'Farm Owner' : 'Buyer'}</span></td>
+        <td style="padding: 14px 12px; color: var(--color-slate-500);">${registeredDate}</td>
+        <td style="padding: 14px 12px;"><span class="badge ${user.isActive ? 'badge-success' : 'badge-critical'}">${user.isActive ? 'Active' : 'Suspended'}</span></td>
+        <td style="padding: 14px 12px; text-align: right;">
+          <button class="btn btn-status-toggle" data-id="${user._id}" data-active="${user.isActive}" style="font-size: 0.8rem; padding: 6px 12px; border-radius: 6px; cursor: pointer; background: transparent; border: 1px solid ${user.isActive ? '#dc2626' : '#059669'}; color: ${user.isActive ? '#dc2626' : '#059669'}; min-height: 36px;">
+            ${user.isActive ? 'Suspend' : 'Activate'}
+          </button>
+        </td>
+      `;
+      tbody.appendChild(row);
+    }
+
+    // 2. Mobile User Card
+    if (cardsContainer) {
+      const card = document.createElement('div');
+      card.className = 'admin-user-card';
+      card.innerHTML = `
+        <div class="user-card-top">
+          <div class="user-card-avatar">${initials}</div>
+          <div class="user-card-info">
+            <h4 class="user-card-name">${user.firstName} ${user.lastName}</h4>
+            <p class="user-card-email">${user.email}</p>
+          </div>
+        </div>
+        <div class="user-card-pills">
+          <span class="badge ${user.role === 'FARM_OWNER' ? 'badge-info' : 'badge-success'}">${user.role === 'FARM_OWNER' ? 'Farm Owner' : 'Buyer'}</span>
+          <span class="badge ${user.isActive ? 'badge-success' : 'badge-critical'}">${user.isActive ? 'Active' : 'Suspended'}</span>
+        </div>
+        <div class="user-card-bottom">
+          <span class="user-card-date">Joined ${registeredDate}</span>
+          <button class="btn btn-status-toggle" data-id="${user._id}" data-active="${user.isActive}" style="font-size: 0.8rem; padding: 8px 16px; border-radius: 8px; cursor: pointer; background: transparent; border: 1px solid ${user.isActive ? '#dc2626' : '#059669'}; color: ${user.isActive ? '#dc2626' : '#059669'}; min-height: 44px;">
+            ${user.isActive ? 'Suspend' : 'Activate'}
+          </button>
+        </div>
+      `;
+      cardsContainer.appendChild(card);
+    }
   });
 
   // Action listeners
-  tbody.querySelectorAll('.btn-status-toggle').forEach(button => {
-    button.addEventListener('click', async () => {
-      const id = button.dataset.id;
-      const currentActive = button.dataset.active === 'true';
-      const targetActive = !currentActive;
+  const attachToggleListeners = (container) => {
+    if (!container) return;
+    container.querySelectorAll('.btn-status-toggle').forEach(button => {
+      button.addEventListener('click', async () => {
+        const id = button.dataset.id;
+        const currentActive = button.dataset.active === 'true';
+        const targetActive = !currentActive;
 
-      try {
-        await AdminAPI.updateUserStatus(id, targetActive);
-        Toast.success(`User successfully ${targetActive ? 'activated' : 'suspended'}`);
-        loadUserDirectory();
-      } catch (err) {
-        Toast.error(err.message || 'Action failed');
-      }
+        try {
+          await AdminAPI.updateUserStatus(id, targetActive);
+          Toast.success(`User successfully ${targetActive ? 'activated' : 'suspended'}`);
+          loadUserDirectory();
+        } catch (err) {
+          Toast.error(err.message || 'Action failed');
+        }
+      });
     });
-  });
+  };
+
+  attachToggleListeners(tbody);
+  attachToggleListeners(cardsContainer);
 };
 
 // ── View 3: Audit Logs ───────────────────────────────────────
 const loadAuditLogs = async () => {
   const response = await AdminAPI.getAuditLogs();
-  auditLogs = response.data;
+  auditLogs = response.data || [];
 
   const tbody = $('#audit-logs-tbody');
+  if (!tbody) return;
   tbody.innerHTML = '';
 
   if (auditLogs.length === 0) {
@@ -264,7 +328,7 @@ const loadAuditLogs = async () => {
     row.style.borderBottom = '1px solid var(--color-slate-100)';
     row.innerHTML = `
       <td style="padding: 14px 16px; color: var(--color-slate-600); font-size: 0.8rem; font-family: monospace; white-space: nowrap;">${timestamp}</td>
-      <td style="padding: 14px 16px; white-space: nowrap;"><span class="badge badge-${log.severity.toLowerCase()} text-capitalize">${log.severity}</span></td>
+      <td style="padding: 14px 16px; white-space: nowrap;"><span class="badge badge-${log.severity ? log.severity.toLowerCase() : 'info'} text-capitalize">${log.severity || 'INFO'}</span></td>
       <td style="padding: 14px 16px; font-weight: 500; color: var(--color-slate-900); white-space: nowrap;">${log.action}</td>
       <td style="padding: 14px 16px; white-space: nowrap;">${user}</td>
       <td style="padding: 14px 16px; font-family: monospace; font-size: 0.8rem; color: var(--color-slate-500); white-space: nowrap;">${log.ipAddress || 'N/A'}</td>
@@ -279,63 +343,136 @@ const loadAuditLogs = async () => {
 // ── View 5: Poultry Farms ────────────────────────────────────
 const loadPoultryFarms = async () => {
   const tbody = $('#farms-tbody');
-  tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 30px; color: var(--color-slate-500);">Loading poultry farms...</td></tr>`;
+  const cardsContainer = $('#farms-cards-mobile');
+
+  if (tbody) tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 30px; color: var(--color-slate-500);">Loading poultry farms...</td></tr>`;
+  if (cardsContainer) cardsContainer.innerHTML = `<div style="text-align: center; padding: 30px; color: var(--color-slate-500); background: #fff; border-radius: 12px; border: 1px solid var(--color-slate-200);">Loading poultry farms...</div>`;
 
   try {
     const response = await PoultryAPI.getAll();
     farmsList = response.data.poultries || response.data || [];
     renderFarmsTable(farmsList);
   } catch (err) {
-    tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 30px; color: var(--color-danger-500);">${err.message || 'Failed to load poultry farms'}</td></tr>`;
+    if (tbody) tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 30px; color: var(--color-danger-500);">${err.message || 'Failed to load poultry farms'}</td></tr>`;
+    if (cardsContainer) cardsContainer.innerHTML = `<div style="text-align: center; padding: 30px; color: var(--color-danger-500); background: #fff; border-radius: 12px; border: 1px solid var(--color-slate-200);">${err.message || 'Failed to load poultry farms'}</div>`;
   }
 };
 
 const renderFarmsTable = (farms) => {
   const tbody = $('#farms-tbody');
+  const cardsContainer = $('#farms-cards-mobile');
+
+  if (tbody) tbody.innerHTML = '';
+  if (cardsContainer) cardsContainer.innerHTML = '';
+
   if (!farms || farms.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 30px; color: var(--color-slate-500);">No poultry farms found.</td></tr>`;
+    if (tbody) tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 30px; color: var(--color-slate-500);">No poultry farms found.</td></tr>`;
+    if (cardsContainer) cardsContainer.innerHTML = `<div style="text-align: center; padding: 30px; color: var(--color-slate-500); background: #fff; border-radius: 12px; border: 1px solid var(--color-slate-200);">No poultry farms found.</div>`;
     return;
   }
 
-  tbody.innerHTML = farms.map(farm => {
-    const ownerName = farm.ownerId ? `${farm.ownerId.firstName || ''} ${farm.ownerId.lastName || ''}`.trim() : 'N/A';
-    const ownerEmail = farm.ownerId ? farm.ownerId.email : 'N/A';
-    const location = `${farm.state || ''} / ${farm.lga || ''}`;
-    const dateStr = farm.createdAt ? new Date(farm.createdAt).toLocaleDateString() : 'N/A';
-    const ratingStr = farm.rating !== undefined ? `${farm.rating.toFixed(1)} / 5.0` : '0.0 / 5.0';
-    const delivery = farm.deliveryAvailable ? '<span class="badge badge-success">Yes</span>' : '<span class="badge badge-info">No</span>';
+  // Render desktop table rows
+  if (tbody) {
+    tbody.innerHTML = farms.map(farm => {
+      const ownerName = farm.ownerId ? `${farm.ownerId.firstName || ''} ${farm.ownerId.lastName || ''}`.trim() : 'N/A';
+      const ownerEmail = farm.ownerId ? farm.ownerId.email : 'N/A';
+      const location = `${farm.state || ''} / ${farm.lga || ''}`;
+      const dateStr = farm.createdAt ? new Date(farm.createdAt).toLocaleDateString() : 'N/A';
+      const ratingStr = farm.rating !== undefined ? `${farm.rating.toFixed(1)} / 5.0` : '0.0 / 5.0';
+      const delivery = farm.deliveryAvailable ? '<span class="badge badge-success">Delivery Yes</span>' : '<span class="badge badge-info">No Delivery</span>';
 
-    return `
-      <tr style="border-bottom: 1px solid var(--color-slate-100);">
-        <td style="padding: 12px; font-weight: 600; color: var(--color-slate-900);">${farm.businessName || 'N/A'}</td>
-        <td style="padding: 12px;">
-          <div style="font-weight: 500; color: var(--color-slate-800);">${ownerName}</div>
-          <div style="font-size: 0.75rem; color: var(--color-slate-500);">${ownerEmail}</div>
-        </td>
-        <td style="padding: 12px; color: var(--color-slate-600);">${farm.phoneNumber || 'N/A'}</td>
-        <td style="padding: 12px; color: var(--color-slate-600);">${location}</td>
-        <td style="padding: 12px; font-weight: 600; color: var(--color-primary);">${ratingStr}</td>
-        <td style="padding: 12px;">${delivery}</td>
-        <td style="padding: 12px; color: var(--color-slate-600);">${dateStr}</td>
-      </tr>
-    `;
-  }).join('');
+      return `
+        <tr style="border-bottom: 1px solid var(--color-slate-100);">
+          <td style="padding: 12px; font-weight: 600; color: var(--color-slate-900);">${farm.businessName || 'N/A'}</td>
+          <td style="padding: 12px;">
+            <div style="font-weight: 500; color: var(--color-slate-800);">${ownerName}</div>
+            <div style="font-size: 0.75rem; color: var(--color-slate-500);">${ownerEmail}</div>
+          </td>
+          <td style="padding: 12px; color: var(--color-slate-600);">${farm.phoneNumber || 'N/A'}</td>
+          <td style="padding: 12px; color: var(--color-slate-600);">${location}</td>
+          <td style="padding: 12px; font-weight: 600; color: var(--color-primary);">${ratingStr}</td>
+          <td style="padding: 12px;">${delivery}</td>
+          <td style="padding: 12px; color: var(--color-slate-600);">${dateStr}</td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  // Render mobile cards
+  if (cardsContainer) {
+    cardsContainer.innerHTML = farms.map(farm => {
+      const ownerName = farm.ownerId ? `${farm.ownerId.firstName || ''} ${farm.ownerId.lastName || ''}`.trim() : 'N/A';
+      const ownerEmail = farm.ownerId ? farm.ownerId.email : 'N/A';
+      const location = `${farm.state || ''} / ${farm.lga || ''}`;
+      const dateStr = farm.createdAt ? new Date(farm.createdAt).toLocaleDateString() : 'N/A';
+      const ratingStr = farm.rating !== undefined ? `${farm.rating.toFixed(1)}` : '0.0';
+      const delivery = farm.deliveryAvailable ? '<span class="badge badge-success">Delivery Available</span>' : '<span class="badge badge-info">Pickup Only</span>';
+
+      return `
+        <div class="admin-farm-card">
+          <div class="farm-card-top">
+            <div class="farm-card-icon"><i data-lucide="store" style="width: 20px; height: 20px;"></i></div>
+            <div class="farm-card-title-group">
+              <h4 class="farm-card-name">${farm.businessName || 'N/A'}</h4>
+              <span class="farm-card-location"><i data-lucide="map-pin" style="width: 14px; height: 14px;"></i> ${location}</span>
+            </div>
+          </div>
+          <div class="farm-card-details">
+            <div class="farm-detail-item">
+              <span class="farm-detail-label">Owner</span>
+              <span class="farm-detail-value">${ownerName}</span>
+              <span style="font-size: 0.73rem; color: var(--color-slate-500); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${ownerEmail}</span>
+            </div>
+            <div class="farm-detail-item">
+              <span class="farm-detail-label">Contact</span>
+              <span class="farm-detail-value">${farm.phoneNumber || 'N/A'}</span>
+            </div>
+            <div class="farm-detail-item">
+              <span class="farm-detail-label">Rating</span>
+              <span class="farm-detail-value" style="color: var(--color-primary);">★ ${ratingStr} / 5.0</span>
+            </div>
+            <div class="farm-detail-item">
+              <span class="farm-detail-label">Fulfillment</span>
+              <div>${delivery}</div>
+            </div>
+          </div>
+          <div class="farm-card-bottom">
+            <span>Registered ${dateStr}</span>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    if (window.lucide) {
+      window.lucide.createIcons();
+    }
+  }
 };
 
 // ── View 6: Platform Reports ──────────────────────────────────
 const loadPlatformReports = async () => {
   try {
     const response = await AdminAPI.getStats();
-    const data = response.data;
+    const data = response.data || {};
     const stats = data.stats || {};
     
-    $('#report-login-events').textContent = stats.auditLogsCount || 42;
-    $('#report-invites-sent').textContent = stats.sellersCount || 0;
-    $('#report-farms-count').textContent = stats.farmsCount || 0;
+    const elLogins = $('#report-login-events');
+    if (elLogins) elLogins.textContent = stats.auditLogsCount || 42;
 
-    $('#report-warnings-count').textContent = 0;
-    $('#report-failures-count').textContent = 0;
-    $('#report-critical-count').textContent = 0;
+    const elInvites = $('#report-invites-sent');
+    if (elInvites) elInvites.textContent = stats.sellersCount || 0;
+
+    const elFarmsCount = $('#report-farms-count');
+    if (elFarmsCount) elFarmsCount.textContent = stats.farmsCount || 0;
+
+    const elWarnings = $('#report-warnings-count');
+    if (elWarnings) elWarnings.textContent = 0;
+
+    const elFailures = $('#report-failures-count');
+    if (elFailures) elFailures.textContent = 0;
+
+    const elCritical = $('#report-critical-count');
+    if (elCritical) elCritical.textContent = 0;
   } catch (err) {
     console.error('Error fetching report stats', err);
   }
@@ -354,7 +491,7 @@ const downloadCSV = (filename, headers, rows) => {
   document.body.removeChild(link);
 };
 
-// ── Modal Actions ───────────────────────────────────────────
+// ── Layout Controls ───────────────────────────────────────────
 const setupLayoutControls = () => {
   // Collapsible Sidebar logic
   const sidebarToggle = $('#sidebar-toggle-btn');
@@ -366,7 +503,6 @@ const setupLayoutControls = () => {
       const isMobile = window.innerWidth <= 768;
       if (isMobile) {
         sidebar.classList.toggle('mobile-open');
-        // create backdrop overlay if not exists
         let overlay = document.querySelector('.sidebar-overlay');
         if (overlay) {
           overlay.remove();
@@ -386,18 +522,23 @@ const setupLayoutControls = () => {
     });
   }
 
-  // Sidebar user avatar dropdown toggle
+  // Sidebar user profile dropdown toggle
   const sidebarProfileTrigger = $('#sidebar-profile-trigger');
   const sidebarProfileDropdown = $('#sidebar-profile-dropdown');
 
   if (sidebarProfileTrigger && sidebarProfileDropdown) {
     sidebarProfileTrigger.addEventListener('click', (e) => {
       e.stopPropagation();
-      sidebarProfileDropdown.classList.toggle('show');
+      e.preventDefault();
+      const isShowing = sidebarProfileDropdown.classList.toggle('show');
+      sidebarProfileDropdown.classList.toggle('hidden', !isShowing);
     });
 
-    document.addEventListener('click', () => {
-      sidebarProfileDropdown.classList.remove('show');
+    document.addEventListener('click', (e) => {
+      if (sidebarProfileDropdown && !sidebarProfileDropdown.contains(e.target) && !sidebarProfileTrigger.contains(e.target)) {
+        sidebarProfileDropdown.classList.remove('show');
+        sidebarProfileDropdown.classList.add('hidden');
+      }
     });
   }
 
@@ -577,83 +718,3 @@ if ('serviceWorker' in navigator) {
       .catch(err => console.error('Service Worker registration failed:', err));
   });
 }
-
-// Mobile-only PWA Installation Prompt Logic
-let deferredPrompt = null;
-const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  if (isMobileDevice) {
-    deferredPrompt = e;
-    showMobileInstallBanner();
-  }
-});
-
-function showMobileInstallBanner() {
-  if (document.getElementById('mobile-pwa-banner')) return;
-
-  const banner = document.createElement('div');
-  banner.id = 'mobile-pwa-banner';
-  banner.style.position = 'fixed';
-  banner.style.bottom = '16px';
-  banner.style.left = '16px';
-  banner.style.right = '16px';
-  banner.style.backgroundColor = '#1f4d0a';
-  banner.style.color = '#ffffff';
-  banner.style.padding = '14px 18px';
-  banner.style.borderRadius = '12px';
-  banner.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.05)';
-  banner.style.zIndex = '999999';
-  banner.style.display = 'flex';
-  banner.style.alignItems = 'center';
-  banner.style.justifyContent = 'space-between';
-  banner.style.fontFamily = 'Inter, sans-serif';
-  banner.style.animation = 'slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1)';
-
-  banner.innerHTML = `
-    <div style="display: flex; align-items: center; gap: 12px; flex-grow: 1;">
-      <img src="/assets/images/logo-egg-192.png" alt="Logo" style="width: 40px; height: 40px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2);">
-      <div>
-        <h4 style="margin: 0; font-size: 14px; font-weight: 700;">Egg Connect</h4>
-        <p style="margin: 2px 0 0; font-size: 11px; opacity: 0.85;">Install app for a seamless experience</p>
-      </div>
-    </div>
-    <div style="display: flex; gap: 8px;">
-      <button id="pwa-close-btn" style="background: transparent; border: none; color: #ffffff; font-size: 12px; font-weight: 500; cursor: pointer; padding: 6px 10px;">Dismiss</button>
-      <button id="pwa-install-btn" style="background: #ffffff; color: #1f4d0a; border: none; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; padding: 6px 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">Install</button>
-    </div>
-  `;
-
-  if (!document.getElementById('pwa-banner-style')) {
-    const style = document.createElement('style');
-    style.id = 'pwa-banner-style';
-    style.textContent = `
-      @keyframes slideUp {
-        from { transform: translateY(120%); opacity: 0; }
-        to { transform: translateY(0); opacity: 1; }
-      }
-    `;
-    document.head.appendChild(style);
-  }
-
-  document.body.appendChild(banner);
-
-  document.getElementById('pwa-close-btn').addEventListener('click', () => {
-    banner.remove();
-  });
-
-  document.getElementById('pwa-install-btn').addEventListener('click', () => {
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-      deferredPrompt.userChoice.then((choiceResult) => {
-        if (choiceResult.outcome === 'accepted') {
-          console.log('User accepted the PWA install prompt');
-        }
-        deferredPrompt = null;
-        banner.remove();
-      });
-    }
-  });
-}
-

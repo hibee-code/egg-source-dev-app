@@ -1,7 +1,7 @@
-import { renderSidebar } from '/components/layout/navbar.js';
+import { renderSidebar, renderNavbar } from '/components/layout/navbar.js';
 import { Auth } from '/assets/js/auth.js';
 import { BookingAPI, AuthAPI } from '/assets/js/api.js';
-import { Format, Toast } from '/assets/js/utils.js';
+import { Format, Toast, updateGreetings } from '/assets/js/utils.js';
 
 let allBookings = [];
 
@@ -237,7 +237,7 @@ const fetchAndRenderData = async () => {
     allBookings = [];
   } finally {
     const elapsed = Date.now() - startTime;
-    const minDelay = 2000;
+    const minDelay = 300;
     if (elapsed < minDelay) {
       await new Promise((resolve) => setTimeout(resolve, minDelay - elapsed));
     }
@@ -270,30 +270,83 @@ const handleTabRouting = () => {
   const hash = window.location.hash.substring(1) || 'dashboard';
   const tabContents = document.querySelectorAll('.tab-content');
   
-  // Hide all tabs
+  // 1. Hide all tab contents
   tabContents.forEach((tab) => tab.classList.add('hidden'));
 
-  // Show active tab
+  // 2. Show active tab content
   const activeTab = document.getElementById(`tab-${hash}`);
   if (activeTab) {
     activeTab.classList.remove('hidden');
   }
 
-  // Re-render sidebar to highlight active tab
+  // 3. Re-render sidebar to highlight active page
   renderSidebar({ role: 'buyer', activePage: hash });
 
-  // Re-attach sidebar tab click interceptors
-  document.querySelectorAll('[data-tab]').forEach((link) => {
-    link.addEventListener('click', (e) => {
-      const targetTab = link.dataset.tab;
-      window.location.hash = targetTab;
-    });
+  // 4. Highlight active mobile bottom navigation item
+  document.querySelectorAll('.mobile-bottom-item').forEach((item) => {
+    const itemTab = item.getAttribute('data-tab') || item.getAttribute('href')?.substring(1);
+    if (itemTab === hash) {
+      item.classList.add('active');
+    } else {
+      item.classList.remove('active');
+    }
   });
+
+  // 5. Update mobile drawer links active state
+  document.querySelectorAll('.dash-drawer-link').forEach((item) => {
+    const itemTab = item.getAttribute('data-tab');
+    if (itemTab === hash) {
+      item.classList.add('active');
+      item.style.background = 'rgba(31, 77, 10, 0.08)';
+      item.style.color = 'var(--color-primary)';
+      item.style.fontWeight = '600';
+    } else {
+      item.classList.remove('active');
+      item.style.background = 'transparent';
+      item.style.color = 'var(--color-text)';
+      item.style.fontWeight = '500';
+    }
+  });
+
+  // 6. Close mobile drawer & sidebar dropdown if currently open
+  const mobileDrawer = document.getElementById('mobile-drawer');
+  const drawerOverlay = document.getElementById('mobile-drawer-overlay');
+  if (mobileDrawer) mobileDrawer.classList.remove('is-active');
+  if (drawerOverlay) drawerOverlay.classList.remove('is-active');
+  document.body.style.overflow = '';
+
+  const dropdown = document.getElementById('sidebar-profile-dropdown');
+  if (dropdown) {
+    dropdown.classList.remove('show');
+    dropdown.classList.add('hidden');
+  }
+
+  // 7. Scroll to top smoothly on tab switch
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  if (window.lucide) window.lucide.createIcons();
+};
+
+const populateGreeting = () => {
+  updateGreetings('.dash-user-greeting');
+  const user = Auth.getUser();
+  if (user) {
+    const greetingName = document.getElementById('user-greeting-name');
+    const avatarInitials = document.getElementById('user-avatar-initials');
+    if (greetingName && user.firstName) greetingName.textContent = user.firstName;
+    if (avatarInitials) {
+      const f = (user.firstName || 'S')[0].toUpperCase();
+      const l = (user.lastName || 'A')[0].toUpperCase();
+      avatarInitials.textContent = `${f}${l}`;
+    }
+  }
 };
 
 const initPage = async () => {
   if (!Auth.requireAuth()) return;
   
+  renderNavbar();
+  populateGreeting();
   handleTabRouting();
   await fetchAndRenderData();
   populateSettingsForm();
@@ -301,15 +354,22 @@ const initPage = async () => {
   // Attach Settings submit handler
   document.getElementById('settings-profile-form')?.addEventListener('submit', handleProfileUpdate);
 
-  // Bind view all link
-  document.querySelectorAll('.select-tab-link').forEach((link) => {
+  // Bind tab links
+  document.querySelectorAll('.select-tab-link, [data-tab]').forEach((link) => {
     link.addEventListener('click', (e) => {
-      const hash = link.getAttribute('href').substring(1);
-      window.location.hash = hash;
+      const targetHash = link.getAttribute('data-tab') || link.getAttribute('href')?.substring(1);
+      if (targetHash) {
+        if (window.location.hash === `#${targetHash}`) {
+          handleTabRouting();
+        } else {
+          window.location.hash = targetHash;
+        }
+      }
     });
   });
 
   setupBookingsCollapsible();
+  if (window.lucide) window.lucide.createIcons();
 };
 
 const setupBookingsCollapsible = () => {
