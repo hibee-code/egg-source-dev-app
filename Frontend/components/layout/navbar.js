@@ -458,6 +458,18 @@ export function renderSidebar(options = {}) {
     roleLabel = 'System Admin';
   }
 
+  const dropdownNavItemsHtml = items.map(item => {
+    const isHelp = item.key === 'help';
+    const href = item.href;
+    const dataTabAttr = isHelp ? '' : `data-tab="${item.key}"`;
+    const isActive = item.key === activePage;
+    return `
+      <a href="${href}" ${dataTabAttr} class="dropdown-item ${isActive ? 'active' : ''}" style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: var(--radius-btn); text-decoration: none; color: ${isActive ? 'var(--color-primary)' : 'var(--color-text)'}; font-size: 0.88rem; font-weight: ${isActive ? '600' : '400'}; background: ${isActive ? 'rgba(31, 77, 10, 0.08)' : 'transparent'}; transition: var(--transition);">
+        <i data-lucide="${item.icon}" style="width: 16px; height: 16px; color: ${isActive ? 'var(--color-primary)' : 'var(--color-text-muted)'}; flex-shrink: 0;"></i> ${item.label}
+      </a>
+    `;
+  }).join('');
+
   const profileBadgeHtml = `
     <div class="sidebar-profile-container" style="position: relative; margin-bottom: 20px;">
       <div id="sidebar-profile-trigger" class="sidebar-profile-badge" style="display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: rgba(31, 77, 10, 0.05); border-radius: var(--radius-card); border: 1px solid rgba(31, 77, 10, 0.08); cursor: pointer; transition: all 0.2s ease; user-select: none;">
@@ -469,10 +481,12 @@ export function renderSidebar(options = {}) {
         <i data-lucide="chevron-down" style="width: 16px; height: 16px; color: var(--color-text-muted); flex-shrink: 0;"></i>
       </div>
       
-      <div id="sidebar-profile-dropdown" class="dropdown-menu" style="left: 0; right: 0; top: calc(100% + 8px); width: auto; z-index: 1050; padding: 6px; box-shadow: var(--shadow-card); border: 1px solid var(--color-border); background: var(--color-card); border-radius: var(--radius-card);">
+      <div id="sidebar-profile-dropdown" class="dropdown-menu hidden" style="position: absolute; left: 0; right: 0; top: calc(100% + 8px); width: auto; z-index: 1050; padding: 6px; box-shadow: var(--shadow-card); border: 1px solid var(--color-border); background: var(--color-card); border-radius: var(--radius-card);">
         <a href="/" class="dropdown-item" style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: var(--radius-btn); text-decoration: none; color: var(--color-text); font-size: 0.88rem; transition: var(--transition);">
           <i data-lucide="home" style="width: 16px; height: 16px; color: var(--color-text-muted);"></i> Go to Home Page
         </a>
+        <div style="border-top: 1px solid var(--color-border); margin: 6px 0;"></div>
+        ${dropdownNavItemsHtml}
         <div style="border-top: 1px solid var(--color-border); margin: 6px 0;"></div>
         <button id="sidebar-logout-btn" class="dropdown-item dropdown-item--logout" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: var(--radius-btn); border: none; background: none; text-align: left; cursor: pointer; color: #dc2626; font-size: 0.88rem; font-weight: 500; transition: var(--transition);">
           <i data-lucide="log-out" style="width: 16px; height: 16px; color: #dc2626;"></i> Logout
@@ -529,11 +543,27 @@ export function renderSidebar(options = {}) {
   if (trigger && dropdown) {
     trigger.addEventListener('click', (e) => {
       e.stopPropagation();
-      dropdown.classList.toggle('show');
+      e.preventDefault();
+      const isShow = dropdown.classList.toggle('show');
+      dropdown.classList.toggle('hidden', !isShow);
     });
 
-    document.addEventListener('click', () => {
-      dropdown.classList.remove('show');
+    document.addEventListener('click', (e) => {
+      if (dropdown && !dropdown.contains(e.target) && !trigger.contains(e.target)) {
+        dropdown.classList.remove('show');
+        dropdown.classList.add('hidden');
+      }
+    });
+
+    // Auto close profile dropdown on navigation link click
+    dropdown.querySelectorAll('a[data-tab]').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const tabKey = link.getAttribute('data-tab');
+        dropdown.classList.remove('show');
+        dropdown.classList.add('hidden');
+        window.location.hash = tabKey;
+      });
     });
   }
 
@@ -606,7 +636,7 @@ function showMobileInstallBanner() {
 
   banner.innerHTML = `
     <div style="display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1;">
-      <img src="/assets/images/logo-egg-192.png" alt="Egg Connect Logo" style="width: 38px; height: 38px; border-radius: 8px; flex-shrink: 0; background: #ffffff; padding: 2px; box-sizing: border-box;">
+      <img src="/assets/images/logo-egg-pwa-192.png" onerror="this.onerror=null;this.src='/assets/images/logo-egg.svg';" alt="Egg Connect Logo" style="width: 38px; height: 38px; border-radius: 10px; flex-shrink: 0; background: #ffffff; padding: 3px; box-sizing: border-box; object-fit: contain; box-shadow: 0 2px 6px rgba(0,0,0,0.15);">
       <div style="min-width: 0; overflow: hidden;">
         <h4 style="margin: 0; font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #ffffff;">Egg Connect</h4>
         <p style="margin: 1px 0 0; font-size: 11px; opacity: 0.88; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: rgba(255,255,255,0.9);">Install app for instant access</p>

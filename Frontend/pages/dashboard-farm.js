@@ -1,7 +1,7 @@
 import { renderSidebar, renderNavbar } from '/components/layout/navbar.js';
 import { Auth } from '/assets/js/auth.js';
 import { PoultryAPI, ProductAPI, BookingAPI } from '/assets/js/api.js';
-import { Format, Toast } from '/assets/js/utils.js';
+import { Format, Toast, updateGreetings } from '/assets/js/utils.js';
 
 let farmId = null;
 let farmData = null;
@@ -143,9 +143,14 @@ const renderProductsCards = (products) => {
           previewContainer.classList.add('hidden');
           filenameSpan.textContent = 'No file chosen';
         }
-        document.getElementById('product-form-title').textContent = 'Edit Product Listing';
-        document.getElementById('add-product-panel').classList.remove('hidden');
-        document.getElementById('add-product-panel').scrollIntoView({ behavior: 'smooth' });
+        const formTitle = document.getElementById('product-form-title');
+        if (formTitle) formTitle.textContent = 'Edit Product Listing';
+        
+        const addPanel = document.getElementById('add-product-panel');
+        if (addPanel) {
+          addPanel.classList.remove('hidden');
+          addPanel.scrollIntoView({ behavior: 'smooth' });
+        }
       }
     });
   });
@@ -198,7 +203,8 @@ const renderInventoryEdit = (products) => {
       try {
         await ProductAPI.update(prodId, { stockQuantity: val });
         Toast.success('Stock inventory updated');
-        document.getElementById(`stock-display-${prodId}`).textContent = val;
+        const stockDisplay = document.getElementById(`stock-display-${prodId}`);
+        if (stockDisplay) stockDisplay.textContent = val;
         fetchAndRenderData();
       } catch (err) {
         Toast.error(err.message || 'Failed to update stock');
@@ -659,22 +665,33 @@ const fetchAndRenderData = async () => {
   try {
     // 1. Get/Create Poultry Farm details for owner
     const poultriesRes = await PoultryAPI.getAll();
-    const ownerId = Auth.getUser()?._id;
+    const currentUser = Auth.getUser();
+    const ownerId = (currentUser?._id || currentUser?.id)?.toString();
     const ownerFarms = (poultriesRes.data?.poultries || []).filter((f) => {
-      const fOwnerId = (f.ownerId && typeof f.ownerId === 'object') ? f.ownerId._id : f.ownerId;
-      return fOwnerId === ownerId;
+      const fOwnerId = (f.ownerId && typeof f.ownerId === 'object')
+        ? (f.ownerId._id || f.ownerId.id)?.toString()
+        : f.ownerId?.toString();
+      return fOwnerId && ownerId && fOwnerId === ownerId;
     });
 
     if (!ownerFarms.length) {
-      // Only show wizard if onboarding has not just been completed
-      if (typeof window.__onboardingComplete === 'undefined' || !window.__onboardingComplete) {
-        // Owner has no farm - launch First-Time Seller Onboarding Wizard!
+      // Check if this seller has already completed or dismissed onboarding
+      const isOnboarded = ownerId ? localStorage.getItem(`eggsource_onboarded_${ownerId}`) : null;
+      if (!isOnboarded && (typeof window.__onboardingComplete === 'undefined' || !window.__onboardingComplete)) {
+        // Owner has no farm - launch First-Time Seller Onboarding Wizard ONLY for new sellers!
         const nameEl = document.getElementById('farm-owner-name');
         if (nameEl) nameEl.textContent = 'Setup Poultry Farm Profile';
         openSellerOnboardingWizard();
       }
       return;
     }
+
+    // Owner HAS a farm! Persist onboarded state & close wizard
+    if (ownerId) {
+      localStorage.setItem(`eggsource_onboarded_${ownerId}`, 'true');
+    }
+    window.__onboardingComplete = true;
+    closeSellerOnboardingWizard();
 
     farmData = ownerFarms[0];
     farmId = farmData._id;
@@ -722,7 +739,7 @@ const fetchAndRenderData = async () => {
     allProducts = [];
   } finally {
     const elapsed = Date.now() - startTime;
-    const minDelay = 2000;
+    const minDelay = 300;
     if (elapsed < minDelay) {
       await new Promise((resolve) => setTimeout(resolve, minDelay - elapsed));
     }
@@ -838,25 +855,76 @@ const handleTabRouting = () => {
   const hash = window.location.hash.substring(1) || 'dashboard';
   const tabContents = document.querySelectorAll('.tab-content');
   
-  // Hide all tabs
+  // 1. Hide all tab contents
   tabContents.forEach((tab) => tab.classList.add('hidden'));
 
-  // Show active tab
+  // 2. Show active tab content
   const activeTab = document.getElementById(`tab-${hash}`);
   if (activeTab) {
     activeTab.classList.remove('hidden');
   }
 
-  // Render Sidebar and highlight current tab
+  // 3. Render Sidebar and highlight current tab
   renderSidebar({ role: 'farm', activePage: hash });
 
-  // Attach dynamic hash listeners to sidebar links
-  document.querySelectorAll('[data-tab]').forEach((link) => {
-    link.addEventListener('click', (e) => {
-      const targetTab = link.dataset.tab;
-      window.location.hash = targetTab;
-    });
+  // 4. Highlight active mobile bottom navigation item
+  document.querySelectorAll('.mobile-bottom-item').forEach((item) => {
+    const itemTab = item.getAttribute('data-tab') || item.getAttribute('href')?.substring(1);
+    if (itemTab === hash) {
+      item.classList.add('active');
+    } else {
+      item.classList.remove('active');
+    }
   });
+
+  // 5. Update mobile drawer links active state
+  document.querySelectorAll('.dash-drawer-link').forEach((item) => {
+    const itemTab = item.getAttribute('data-tab');
+    if (itemTab === hash) {
+      item.classList.add('active');
+      item.style.background = 'rgba(31, 77, 10, 0.08)';
+      item.style.color = 'var(--color-primary)';
+      item.style.fontWeight = '600';
+    } else {
+      item.classList.remove('active');
+      item.style.background = 'transparent';
+      item.style.color = 'var(--color-text)';
+      item.style.fontWeight = '500';
+    }
+  });
+
+  // 6. Close mobile drawer & sidebar dropdown if open
+  const mobileDrawer = document.getElementById('mobile-drawer');
+  const drawerOverlay = document.getElementById('mobile-drawer-overlay');
+  if (mobileDrawer) mobileDrawer.classList.remove('is-active');
+  if (drawerOverlay) drawerOverlay.classList.remove('is-active');
+  document.body.style.overflow = '';
+
+  const dropdown = document.getElementById('sidebar-profile-dropdown');
+  if (dropdown) {
+    dropdown.classList.remove('show');
+    dropdown.classList.add('hidden');
+  }
+
+  // 7. Scroll to top smoothly on tab switch
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  if (window.lucide) window.lucide.createIcons();
+};
+
+const populateFarmGreeting = () => {
+  updateGreetings('.dash-user-greeting');
+  const user = Auth.getUser();
+  if (user) {
+    const greetingName = document.getElementById('farm-greeting-name');
+    const avatarInitials = document.getElementById('farm-avatar-initials');
+    if (greetingName && user.firstName) greetingName.textContent = user.firstName;
+    if (avatarInitials) {
+      const f = (user.firstName || 'F')[0].toUpperCase();
+      const l = (user.lastName || 'O')[0].toUpperCase();
+      avatarInitials.textContent = `${f}${l}`;
+    }
+  }
 };
 
 const initPage = async () => {
@@ -869,6 +937,7 @@ const initPage = async () => {
 
   // Render top navbar layout to show user profile details & avatar dropdown
   renderNavbar();
+  populateFarmGreeting();
 
   const nameEl = document.getElementById('farm-owner-name');
   const roleEl = document.getElementById('farm-owner-role');
@@ -876,6 +945,13 @@ const initPage = async () => {
   if (roleEl) roleEl.textContent = user.role.replace('_', ' ');
 
   handleTabRouting();
+
+  // Attach quick action post banner button trigger
+  document.getElementById('quick-action-post-banner')?.addEventListener('click', () => {
+    resetProductForm();
+    document.getElementById('add-product-panel').classList.remove('hidden');
+    document.getElementById('add-product-panel').scrollIntoView({ behavior: 'smooth' });
+  });
   await fetchAndRenderData();
 
   // Attach Profile update handler
@@ -1024,9 +1100,45 @@ const initPage = async () => {
   if (onboardingForm) {
     onboardingForm.addEventListener('submit', handleSellerOnboardingSubmit);
   }
+
+  // Close button & overlay dismissal for seller onboarding modal
+  const closeOnboardingBtn = document.getElementById('close-onboarding-modal-btn');
+  if (closeOnboardingBtn) {
+    closeOnboardingBtn.addEventListener('click', () => {
+      const currentUser = Auth.getUser();
+      const ownerId = (currentUser?._id || currentUser?.id)?.toString();
+      if (ownerId) {
+        localStorage.setItem(`eggsource_onboarded_${ownerId}`, 'dismissed');
+      }
+      closeSellerOnboardingWizard();
+    });
+  }
+
+  const onboardingModal = document.getElementById('seller-onboarding-modal');
+  if (onboardingModal) {
+    onboardingModal.addEventListener('click', (e) => {
+      if (e.target === onboardingModal) {
+        const currentUser = Auth.getUser();
+        const ownerId = (currentUser?._id || currentUser?.id)?.toString();
+        if (ownerId) {
+          localStorage.setItem(`eggsource_onboarded_${ownerId}`, 'dismissed');
+        }
+        closeSellerOnboardingWizard();
+      }
+    });
+  }
 };
 
 const openSellerOnboardingWizard = () => {
+  const currentUser = Auth.getUser();
+  const ownerId = (currentUser?._id || currentUser?.id)?.toString();
+  const isOnboarded = ownerId ? localStorage.getItem(`eggsource_onboarded_${ownerId}`) : null;
+  
+  // Guard: NEVER pop open the onboarding wizard for registered/onboarded sellers!
+  if (isOnboarded === 'true' || window.__onboardingComplete) {
+    return;
+  }
+
   const modal = document.getElementById('seller-onboarding-modal');
   if (!modal) return;
   modal.classList.remove('hidden');
@@ -1157,7 +1269,12 @@ const handleSellerOnboardingSubmit = async (e) => {
     // ── 4. Success: close modal → navigate → reload dashboard data ─────────
     Toast.success(`🎉 "${businessName}" is now live on Egg Connect!`);
 
-    // Mark onboarding as complete so fetchAndRenderData won't re-open the wizard
+    // Mark onboarding as complete in localStorage and memory so fetchAndRenderData won't re-open the wizard
+    const currentUser = Auth.getUser();
+    const ownerId = (currentUser?._id || currentUser?.id)?.toString();
+    if (ownerId) {
+      localStorage.setItem(`eggsource_onboarded_${ownerId}`, 'true');
+    }
     window.__onboardingComplete = true;
 
     // Close modal first

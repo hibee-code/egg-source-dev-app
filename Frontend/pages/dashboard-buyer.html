@@ -261,6 +261,9 @@
   </style>
 </head>
 <body>
+  <!-- Global Top Header & Mobile Drawer Root -->
+  <div id="navbar-root"></div>
+
   <!-- Elegant watermark -->
   <div class="page-watermark"></div>
 
@@ -271,129 +274,187 @@
       
       <!-- TAB: DASHBOARD -->
       <div id="tab-dashboard" class="tab-content">
-        <section style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
-          <div>
-            <h1 style="margin: 0; font-size: 1.6rem; font-weight: 800; tracking: -0.02em;">Buyer Dashboard</h1>
-            <p style="color: var(--color-text-muted); margin: 4px 0 0; font-size: 0.9rem;">Welcome back, Egg Connect partner.</p>
+        
+        <!-- User Greeting Bar (Matching Screenshot) -->
+        <div class="dash-user-bar">
+          <div class="dash-user-info">
+            <div class="dash-avatar" id="user-avatar-initials">SA</div>
+            <div class="dash-user-text">
+              <span class="dash-user-greeting">Good morning</span>
+              <span class="dash-user-name" id="user-greeting-name">Semiu</span>
+            </div>
           </div>
-        </section>
+          <button class="dash-bell-btn" aria-label="Notifications">
+            <i data-lucide="bell" style="width: 20px; height: 20px;"></i>
+            <span class="dash-bell-badge"></span>
+          </button>
+        </div>
 
-        <!-- 4-Grid Desktop / 2-Grid Tablet & Mobile Metric Cards (Kuda/Opay/Moniepoint style) -->
+        <!-- 2x2 Stat Cards Grid (Exact screenshot match) -->
         <section class="stats-grid">
-          <div class="stats-card" style="padding: 16px; border-radius: 14px; background: var(--color-card); border: 1px solid var(--color-border); box-shadow: 0 4px 14px rgba(0,0,0,0.03);">
-            <div class="card-header" style="margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
-              <h3 style="font-size: 0.82rem; font-weight: 600; color: var(--color-text-muted); margin: 0;">Total Bookings</h3>
-              <span class="chip chip--success" style="font-size: 0.7rem; padding: 2px 6px;">+12% ↑</span>
+          <!-- Card 1: Total Spent -->
+          <div class="mock-stat-card">
+            <div class="mock-stat-top">
+              <div class="mock-icon-box">
+                <i data-lucide="wallet"></i>
+              </div>
+              <span class="mock-trend-pill">↑ 12%</span>
             </div>
-            <p id="stat-total-bookings" style="font-size: 1.7rem; margin: 0; font-weight: 800; color: var(--color-primary);">0</p>
+            <div>
+              <div class="mock-stat-label">Total Spent</div>
+              <p id="stat-total-spent-mini" class="mock-stat-value">₦45,200</p>
+            </div>
           </div>
 
-          <div class="stats-card" style="padding: 16px; border-radius: 14px; background: var(--color-card); border: 1px solid var(--color-border); box-shadow: 0 4px 14px rgba(0,0,0,0.03);">
-            <div class="card-header" style="margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
-              <h3 style="font-size: 0.82rem; font-weight: 600; color: var(--color-text-muted); margin: 0;">In Transit</h3>
-              <span class="chip chip--orange" style="font-size: 0.7rem; padding: 2px 6px;">Pending</span>
+          <!-- Card 2: Saved Farms -->
+          <div class="mock-stat-card">
+            <div class="mock-stat-top">
+              <div class="mock-icon-box">
+                <i data-lucide="bookmark"></i>
+              </div>
             </div>
-            <p id="stat-in-transit" style="font-size: 1.7rem; margin: 0; font-weight: 800; color: var(--color-text);">0</p>
+            <div>
+              <div class="mock-stat-label">Saved Farms</div>
+              <p class="mock-stat-value">2 <span class="unit">farms</span></p>
+            </div>
           </div>
 
-          <div class="stats-card" style="padding: 16px; border-radius: 14px; background: var(--color-card); border: 1px solid var(--color-border); box-shadow: 0 4px 14px rgba(0,0,0,0.03);">
-            <div class="card-header" style="margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
-              <h3 style="font-size: 0.82rem; font-weight: 600; color: var(--color-text-muted); margin: 0;">Total Spent</h3>
-              <span class="chip chip--success" style="font-size: 0.7rem; padding: 2px 6px;">₦</span>
+          <!-- Card 3: Pending Bookings -->
+          <div class="mock-stat-card">
+            <div class="mock-stat-top">
+              <div class="mock-icon-box">
+                <i data-lucide="calendar"></i>
+              </div>
             </div>
-            <p id="stat-total-spent-mini" style="font-size: 1.7rem; margin: 0; font-weight: 800; color: var(--color-primary);">₦0</p>
+            <div>
+              <div class="mock-stat-label">Pending Bookings</div>
+              <p id="stat-in-transit" class="mock-stat-value" style="font-size: 1.15rem;">Nothing pending</p>
+              <div class="mock-stat-subtext">You're all caught up — no bookings waiting on you.</div>
+            </div>
           </div>
 
-          <div class="stats-card" style="padding: 16px; border-radius: 14px; background: var(--color-card); border: 1px solid var(--color-border); box-shadow: 0 4px 14px rgba(0,0,0,0.03);">
-            <div class="card-header" style="margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
-              <h3 style="font-size: 0.82rem; font-weight: 600; color: var(--color-text-muted); margin: 0;">Saved Farms</h3>
-              <span class="chip chip--orange" style="font-size: 0.7rem; padding: 2px 6px;">⭐ 4.8</span>
+          <!-- Card 4: Completed Orders -->
+          <div class="mock-stat-card">
+            <div class="mock-stat-top">
+              <div class="mock-icon-box">
+                <i data-lucide="check-circle"></i>
+              </div>
+              <span class="mock-trend-pill">↑ 4%</span>
             </div>
-            <p style="font-size: 1.7rem; margin: 0; font-weight: 800; color: var(--color-text);">2 Farms</p>
+            <div>
+              <div class="mock-stat-label">Completed Orders</div>
+              <p id="stat-total-bookings" class="mock-stat-value">14 <span class="unit">orders</span></p>
+            </div>
           </div>
 
-          <!-- Full Width Promo Banner Card -->
-          <div class="stats-card stats-card--dark" style="grid-column: 1 / -1; background: linear-gradient(135deg, #1f4d0a 0%, #163807 100%); color: #ffffff !important; border-radius: 16px; padding: 20px; box-shadow: 0 8px 24px rgba(31, 77, 10, 0.18); border: 1px solid rgba(255,255,255,0.1);">
-            <h3 style="color: #ffffff !important; margin: 0 0 6px 0; font-size: 1.1rem; font-weight: 700;">Premium Supplier Access</h3>
-            <p style="font-size: 0.88rem; margin: 0 0 16px 0; color: rgba(255,255,255,0.9) !important; line-height: 1.4;">Unlock verified farms & priority inventory with price transparency.</p>
-            <a class="btn" href="/marketplace" style="background: #e8a020; color: #ffffff; border: none; font-weight: 700; padding: 10px 20px; border-radius: 10px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; font-size: 0.88rem; box-shadow: 0 4px 12px rgba(232, 160, 32, 0.35);">
-              <i data-lucide="store" style="width: 16px; height: 16px;"></i> Browse Farms
+          <!-- Banner Card -->
+          <div class="mock-banner-card">
+            <h3 class="mock-banner-title">Premium Supplier Access</h3>
+            <p class="mock-banner-text">Unlock verified farms and priority inventory before anyone else.</p>
+            <a href="/marketplace" class="mock-banner-btn">
+              <i data-lucide="store" style="width: 18px; height: 18px;"></i>
+              Browse Farms
             </a>
           </div>
         </section>
 
-        <!-- App Quick Actions Grid (Moniepoint/Kuda/Uber style) -->
-        <section style="margin-bottom: 24px;">
-          <div style="font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-muted); margin-bottom: 10px;">Quick Actions</div>
-          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
-            <a href="/marketplace" class="quick-action-card" style="display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 14px 6px; background: var(--color-card); border: 1px solid var(--color-border); border-radius: 14px; text-decoration: none; color: var(--color-text); text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.02); transition: transform 0.15s ease;">
-              <div style="width: 42px; height: 42px; border-radius: 12px; background: rgba(31, 77, 10, 0.08); color: var(--color-primary); display: grid; place-items: center;">
-                <i data-lucide="store" style="width: 20px; height: 20px;"></i>
+        <!-- Quick actions Section (Exact Screenshot Match) -->
+        <section class="mock-quick-actions">
+          <div class="mock-section-title">
+            <span>Quick actions</span>
+          </div>
+          <div class="mock-action-grid">
+            <a href="/marketplace" class="mock-action-item">
+              <div class="mock-action-icon">
+                <i data-lucide="store"></i>
               </div>
-              <span style="font-size: 0.75rem; font-weight: 600; line-height: 1.2;">Browse</span>
+              <span class="mock-action-label">Browse</span>
             </a>
 
-            <a href="#orders" class="quick-action-card select-tab-link" style="display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 14px 6px; background: var(--color-card); border: 1px solid var(--color-border); border-radius: 14px; text-decoration: none; color: var(--color-text); text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.02); transition: transform 0.15s ease;">
-              <div style="width: 42px; height: 42px; border-radius: 12px; background: rgba(211, 138, 24, 0.1); color: #d38a18; display: grid; place-items: center;">
-                <i data-lucide="package" style="width: 20px; height: 20px;"></i>
+            <a href="#orders" class="mock-action-item select-tab-link">
+              <div class="mock-action-icon">
+                <i data-lucide="shopping-bag"></i>
               </div>
-              <span style="font-size: 0.75rem; font-weight: 600; line-height: 1.2;">Orders</span>
+              <span class="mock-action-label">Orders</span>
             </a>
 
-            <a href="#analytics" class="quick-action-card select-tab-link" style="display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 14px 6px; background: var(--color-card); border: 1px solid var(--color-border); border-radius: 14px; text-decoration: none; color: var(--color-text); text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.02); transition: transform 0.15s ease;">
-              <div style="width: 42px; height: 42px; border-radius: 12px; background: rgba(37, 99, 235, 0.08); color: #2563eb; display: grid; place-items: center;">
-                <i data-lucide="bar-chart-3" style="width: 20px; height: 20px;"></i>
+            <a href="#analytics" class="mock-action-item select-tab-link">
+              <div class="mock-action-icon">
+                <i data-lucide="bar-chart-2"></i>
               </div>
-              <span style="font-size: 0.75rem; font-weight: 600; line-height: 1.2;">Stats</span>
+              <span class="mock-action-label">Stats</span>
             </a>
 
-            <a href="mailto:support@send.mahfuzmfb.com" class="quick-action-card" style="display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 14px 6px; background: var(--color-card); border: 1px solid var(--color-border); border-radius: 14px; text-decoration: none; color: var(--color-text); text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.02); transition: transform 0.15s ease;">
-              <div style="width: 42px; height: 42px; border-radius: 12px; background: rgba(16, 185, 129, 0.08); color: #10b981; display: grid; place-items: center;">
-                <i data-lucide="headphones" style="width: 20px; height: 20px;"></i>
+            <a href="mailto:support@send.mahfuzmfb.com" class="mock-action-item">
+              <div class="mock-action-icon">
+                <i data-lucide="headphones"></i>
               </div>
-              <span style="font-size: 0.75rem; font-weight: 600; line-height: 1.2;">Support</span>
+              <span class="mock-action-label">Support</span>
             </a>
           </div>
         </section>
 
-        <section class="dashboard-main">
-          <div class="booking-panel card">
+        <!-- My Bookings Section (Exact Screenshot Match) -->
+        <section style="margin-bottom: 28px;">
+          <div class="mock-section-title">
+            <span>My Bookings</span>
+            <a href="#orders" class="select-tab-link" style="display: flex; align-items: center; gap: 4px;">
+              View all <i data-lucide="chevron-right" style="width: 16px; height: 16px;"></i>
+            </a>
+          </div>
+
+          <!-- Cards list for mobile view -->
+          <div id="mock-bookings-list">
+            <div class="mock-booking-card">
+              <div class="mock-booking-left">
+                <div class="mock-icon-box">
+                  <i data-lucide="calendar"></i>
+                </div>
+                <div>
+                  <div class="mock-booking-title">Green Valley Poultry Farm</div>
+                  <div class="mock-booking-sub">Pickup — Aug 14, 9:00 AM</div>
+                </div>
+              </div>
+              <span class="mock-status-pill">Confirmed</span>
+            </div>
+          </div>
+
+          <!-- Collapsible Table for detailed view -->
+          <div class="booking-panel card" style="margin-top: 16px;">
             <div class="card-header" style="cursor: pointer; display: flex; align-items: center; justify-content: space-between;" id="toggle-bookings-btn">
-              <h3 style="display: flex; align-items: center; gap: 8px; margin: 0;">
-                My Bookings
+              <h3 style="display: flex; align-items: center; gap: 8px; margin: 0; font-size: 0.95rem;">
+                Detailed Table View
                 <span id="bookings-toggle-icon" style="display: inline-flex; align-items: center;">
                   <i data-lucide="chevron-down" style="width: 16px; height: 16px;"></i>
                 </span>
               </h3>
-              <a class="btn btn-ghost select-tab-link" href="#orders">View All</a>
             </div>
-            <div id="buyer-bookings-wrapper" class="hidden" style="overflow-x: auto;">
+            <div id="buyer-bookings-wrapper" class="table-responsive hidden">
               <table class="table-list" id="buyer-bookings">
                 <thead>
                   <tr><th>Supplier</th><th>Product</th><th>Quantity</th><th>Status</th><th>Action</th></tr>
                 </thead>
                 <tbody>
                   <tr><td colspan="5" style="padding: 12px 16px;"><div class="skeleton skeleton-row"></div></td></tr>
-                  <tr><td colspan="5" style="padding: 12px 16px;"><div class="skeleton skeleton-row"></div></td></tr>
-                  <tr><td colspan="5" style="padding: 12px 16px;"><div class="skeleton skeleton-row"></div></td></tr>
                 </tbody>
               </table>
             </div>
           </div>
-          
-          <div style="display:grid; gap:24px;">
-            <div class="notification-card card">
-              <div class="card-header"><h3>Recent Notifications</h3><span class="badge-pill badge-pill--accent" style="padding: 4px 10px; font-size: 0.8rem;">4 New</span></div>
-              <div class="notification-item"><div><span class="notification-dot notification-dot--green"></span><strong>New farm added near Lagos</strong><div style="color: var(--color-text-muted); font-size: 0.8rem; margin-top: 4px;">Updated just now</div></div></div>
-              <div class="notification-item"><div><span class="notification-dot notification-dot--orange"></span><strong>Price drop on feed orders</strong><div style="color: var(--color-text-muted); font-size: 0.8rem; margin-top: 4px;">2h ago</div></div></div>
-            </div>
-            <div class="saved-card card">
-              <div class="card-header"><h3>Saved Suppliers</h3><button class="btn btn-secondary btn-pill" style="font-size: 0.8rem; padding: 6px 12px;">+ Add</button></div>
-              <div class="saved-item"><div><div class="avatar-circle" style="background: #d38a18; width: 34px; height: 34px; display: inline-grid; place-items: center; margin-right: 8px; font-size: 0.8rem;">NA</div><strong>North Farm</strong><div style="color: var(--color-text-muted); font-size: 0.8rem;">⭐ 4.7</div></div></div>
-              <div class="saved-item"><div><div class="avatar-circle" style="background: #1f4d0a; width: 34px; height: 34px; display: inline-grid; place-items: center; margin-right: 8px; font-size: 0.8rem;">SA</div><strong>Sun Agri</strong><div style="color: var(--color-text-muted); font-size: 0.8rem;">⭐ 4.5</div></div></div>
-            </div>
-          </div>
         </section>
+
+        <!-- Notifications & Saved Suppliers section -->
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:24px; margin-top: 24px;">
+          <div class="notification-card card">
+            <div class="card-header"><h3>Recent Notifications</h3><span class="badge-pill badge-pill--accent" style="padding: 4px 10px; font-size: 0.8rem;">4 New</span></div>
+            <div class="notification-item"><div><span class="notification-dot notification-dot--green"></span><strong>New farm added near Lagos</strong><div style="color: var(--color-text-muted); font-size: 0.8rem; margin-top: 4px;">Updated just now</div></div></div>
+            <div class="notification-item"><div><span class="notification-dot notification-dot--orange"></span><strong>Price drop on feed orders</strong><div style="color: var(--color-text-muted); font-size: 0.8rem; margin-top: 4px;">2h ago</div></div></div>
+          </div>
+          <div class="saved-card card">
+            <div class="card-header"><h3>Saved Suppliers</h3><button class="btn btn-secondary btn-pill" style="font-size: 0.8rem; padding: 6px 12px;">+ Add</button></div>
+            <div class="saved-item"><div><div class="avatar-circle" style="background: #d38a18; width: 34px; height: 34px; display: inline-grid; place-items: center; margin-right: 8px; font-size: 0.8rem;">NA</div><strong>North Farm</strong><div style="color: var(--color-text-muted); font-size: 0.8rem;">⭐ 4.7</div></div></div>
+            <div class="saved-item"><div><div class="avatar-circle" style="background: #1f4d0a; width: 34px; height: 34px; display: inline-grid; place-items: center; margin-right: 8px; font-size: 0.8rem;">SA</div><strong>Sun Agri</strong><div style="color: var(--color-text-muted); font-size: 0.8rem;">⭐ 4.5</div></div></div>
+          </div>
+        </div>
       </div>
 
       <!-- TAB: INVENTORY -->
@@ -405,7 +466,7 @@
           </div>
         </section>
         <div class="card" style="padding: 24px;">
-          <div style="overflow-x: auto;">
+          <div class="table-responsive">
             <table class="table-list" id="inventory-tracker-table">
               <thead>
                 <tr><th>Item/Product</th><th>Supplier Farm</th><th>Total Crates Sourced</th><th>Status</th></tr>
@@ -427,7 +488,7 @@
           </div>
         </section>
         <div class="card" style="padding: 24px;">
-          <div style="overflow-x: auto;">
+          <div class="table-responsive">
             <table class="table-list" id="full-orders-table">
               <thead>
                 <tr><th>Order ID</th><th>Supplier Farm</th><th>Product</th><th>Quantity</th><th>Total Amount</th><th>Status</th><th>Action</th></tr>
@@ -526,6 +587,33 @@
               <i data-lucide="key-round" style="width: 15px; height: 15px;"></i>
               Change Password
             </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: HELP & SUPPORT -->
+      <div id="tab-help" class="tab-content hidden">
+        <section class="stats-grid" style="margin-bottom: 24px;">
+          <div>
+            <h1>Help &amp; Support</h1>
+            <p style="color: var(--color-text-muted);">Get quick help, contact customer service, or browse FAQs.</p>
+          </div>
+        </section>
+        <div class="card" style="padding: 28px; max-width: 700px;">
+          <h3 style="margin-top:0; margin-bottom: 16px;">Frequently Asked Questions</h3>
+          <div style="display: grid; gap: 16px;">
+            <div style="padding: 14px; background: rgba(31,77,10,0.03); border-radius: 8px; border: 1px solid var(--color-border);">
+              <strong style="color: var(--color-text);">How do I place an order?</strong>
+              <p style="margin: 6px 0 0; font-size: 0.85rem; color: var(--color-text-muted);">Click on "Browse Farms" on your home tab, choose your preferred verified supplier, select crate quantity, and submit your order booking.</p>
+            </div>
+            <div style="padding: 14px; background: rgba(31,77,10,0.03); border-radius: 8px; border: 1px solid var(--color-border);">
+              <strong style="color: var(--color-text);">How are payments and deliveries handled?</strong>
+              <p style="margin: 6px 0 0; font-size: 0.85rem; color: var(--color-text-muted);">Fulfillment options (Pickup or Farm Delivery) are selected during checkout. Track real-time status in your Orders tab.</p>
+            </div>
+            <div style="padding: 14px; background: rgba(31,77,10,0.03); border-radius: 8px; border: 1px solid var(--color-border);">
+              <strong style="color: var(--color-text);">Need urgent assistance?</strong>
+              <p style="margin: 6px 0 0; font-size: 0.85rem; color: var(--color-text-muted);">Contact our support team directly at <strong>support@eggconnect.app</strong> or call <strong>+234 800 EGG CONNECT</strong>.</p>
+            </div>
           </div>
         </div>
       </div>

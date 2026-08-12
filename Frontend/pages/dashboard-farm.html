@@ -36,11 +36,6 @@
 
     /* ── TABLET (769px - 1024px) ─────────────────────────────────────────── */
     @media (max-width: 1024px) {
-      .dashboard-grid-layout {
-        grid-template-columns: 1fr;
-        padding: 20px 16px;
-        gap: 20px;
-      }
       .stats-grid {
         grid-template-columns: repeat(2, 1fr) !important;
         gap: 14px !important;
@@ -773,98 +768,123 @@
             <strong>System Tip:</strong> Keep your stock quantities accurate. Fresh listings are prioritised on the buyer marketplace searches!
           </div>
         </div>
+        
+        <!-- User Greeting Bar (Matching Screenshot) -->
+        <div class="dash-user-bar">
+          <div class="dash-user-info">
+            <div class="dash-avatar" id="farm-avatar-initials">FO</div>
+            <div class="dash-user-text">
+              <span class="dash-user-greeting">Good morning</span>
+              <span class="dash-user-name" id="farm-greeting-name">Farm Owner</span>
+            </div>
+          </div>
+          <button class="dash-bell-btn" aria-label="Notifications">
+            <i data-lucide="bell" style="width: 20px; height: 20px;"></i>
+            <span class="dash-bell-badge"></span>
+          </button>
+        </div>
 
-        <!-- Metric Widgets (4 Desktop / 2 Tablet & Mobile) -->
+        <!-- 2x2 Stat Cards Grid (Exact screenshot match) -->
         <section class="stats-grid">
-          <div class="metric-card">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-              <div>
-                <span style="font-size: 0.84rem; color: var(--color-text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Sales Month-to-Date</span>
-                <p id="sales-value" style="font-size: 2.2rem; margin: 8px 0 0; font-weight: 800; color: var(--color-primary); line-height: 1;">₦0</p>
+          <!-- Card 1: Sales MTD -->
+          <div class="mock-stat-card">
+            <div class="mock-stat-top">
+              <div class="mock-icon-box">
+                <i data-lucide="wallet"></i>
               </div>
-              <div style="background: rgba(31, 77, 10, 0.08); color: var(--color-primary); padding: 10px; border-radius: 12px;">
-                <i data-lucide="trending-up" style="width: 22px; height: 22px;"></i>
-              </div>
+              <span class="mock-trend-pill">↑ 18%</span>
             </div>
-            <div class="metric-trend metric-trend--up">
-              <span>+12.4% vs last month</span>
-            </div>
-          </div>
-
-          <div class="metric-card">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-              <div>
-                <span style="font-size: 0.84rem; color: var(--color-text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Active Bookings</span>
-                <p id="active-requests" style="font-size: 2.2rem; margin: 8px 0 0; font-weight: 800; color: var(--color-accent); line-height: 1;">0</p>
-              </div>
-              <div style="background: rgba(232, 160, 32, 0.08); color: var(--color-accent); padding: 10px; border-radius: 12px;">
-                <i data-lucide="package" style="width: 22px; height: 22px;"></i>
-              </div>
-            </div>
-            <div class="metric-trend metric-trend--neutral">
-              <span>Requires fulfillment</span>
+            <div>
+              <div class="mock-stat-label">Total Sales MTD</div>
+              <p id="sales-value" class="mock-stat-value">₦0</p>
             </div>
           </div>
 
-          <div class="metric-card" style="background: linear-gradient(135deg, var(--color-primary) 0%, #163608 100%); color: #fff; border: none;">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-              <div>
-                <span style="font-size: 0.84rem; color: rgba(255,255,255,0.7); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Total Stock Inventory</span>
-                <p id="capacity-value" style="font-size: 2.2rem; margin: 8px 0 0; font-weight: 800; color: #fff; line-height: 1;">0 Crates</p>
-              </div>
-              <div style="background: rgba(255,255,255,0.1); color: #fff; padding: 10px; border-radius: 12px;">
-                <i data-lucide="layers" style="width: 22px; height: 22px;"></i>
+          <!-- Card 2: Active Orders -->
+          <div class="mock-stat-card">
+            <div class="mock-stat-top">
+              <div class="mock-icon-box">
+                <i data-lucide="package"></i>
               </div>
             </div>
-            <div style="font-size: 0.82rem; color: rgba(255,255,255,0.8); margin-top: 16px;">
-              Units across active listings
+            <div>
+              <div class="mock-stat-label">Active Orders</div>
+              <p id="active-requests" class="mock-stat-value">0 <span class="unit">orders</span></p>
             </div>
+          </div>
+
+          <!-- Card 3: Crate Inventory -->
+          <div class="mock-stat-card">
+            <div class="mock-stat-top">
+              <div class="mock-icon-box">
+                <i data-lucide="layers"></i>
+              </div>
+            </div>
+            <div>
+              <div class="mock-stat-label">Crate Inventory</div>
+              <p id="capacity-value" class="mock-stat-value" style="font-size: 1.35rem;">0 Crates</p>
+              <div class="mock-stat-subtext">Units across active listings</div>
+            </div>
+          </div>
+
+          <!-- Card 4: Farm Rating -->
+          <div class="mock-stat-card">
+            <div class="mock-stat-top">
+              <div class="mock-icon-box">
+                <i data-lucide="star"></i>
+              </div>
+              <span class="mock-trend-pill">⭐ 4.9</span>
+            </div>
+            <div>
+              <div class="mock-stat-label">Farm Rating</div>
+              <p class="mock-stat-value">4.9 <span class="unit">/ 5.0</span></p>
+            </div>
+          </div>
+
+          <!-- Banner Card -->
+          <div class="mock-banner-card">
+            <h3 class="mock-banner-title">Grow Your Poultry Sales</h3>
+            <p class="mock-banner-text">Post new egg inventory to reach thousands of verified wholesale buyers across Nigeria.</p>
+            <button id="quick-action-post-banner" class="mock-banner-btn">
+              <i data-lucide="plus-circle" style="width: 18px; height: 18px;"></i>
+              Post New Product
+            </button>
           </div>
         </section>
 
-        <!-- Dynamic Graph + Recent Activities Row -->
-        <section style="display: grid; grid-template-columns: 2fr 1fr; gap: 32px; margin-bottom: 32px;">
-          <!-- Custom CSS Chart Card -->
-          <div class="bar-chart-container" style="padding: 16px 20px;">
-            <div id="toggle-weekly-chart-btn" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none;">
-              <div style="display: flex; align-items: center; gap: 8px;">
-                <i data-lucide="bar-chart-2" style="width:18px; height:18px; color: var(--color-primary);"></i>
-                <h3 style="margin: 0; font-size: 1rem; font-weight: 700;">Weekly Booking Activity</h3>
-              </div>
-              <span id="chart-toggle-icon" style="font-size: 0.8rem; color: var(--color-text-muted); display: flex; align-items: center; gap: 4px;">
-                Expand <i data-lucide="chevron-down" style="width:16px; height:16px;"></i>
-              </span>
-            </div>
-            <!-- Collapsible Wrapper -->
-            <div id="weekly-sales-chart-wrapper" class="hidden" style="margin-top: 16px; border-top: 1px solid var(--color-border); padding-top: 16px;">
-              <div style="font-size: 0.78rem; color: var(--color-text-muted); margin-bottom: 12px;">Total sales value track over the last 7 days</div>
-              <!-- Dynamic CSS Chart Bars -->
-              <div id="weekly-sales-chart" style="display: flex; align-items: flex-end; justify-content: space-between; height: 180px; gap: 12px; padding-top: 10px;">
-                <!-- Will be dynamically populated with 7 bar columns -->
-                <div style="display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; color: var(--color-text-muted); font-size: 0.9rem;">
-                  Calculating weekly metrics...
-                </div>
-              </div>
-            </div>
+        <!-- Quick Actions Section (Exact Screenshot Match) -->
+        <section class="mock-quick-actions">
+          <div class="mock-section-title">
+            <span>Quick actions</span>
           </div>
+          <div class="mock-action-grid">
+            <a href="#inventory" class="mock-action-item select-tab-link">
+              <div class="mock-action-icon">
+                <i data-lucide="layers"></i>
+              </div>
+              <span class="mock-action-label">Products</span>
+            </a>
 
-          <!-- Quick Actions Grid -->
-          <div class="card" style="padding: 20px; display: flex; flex-direction: column; justify-content: space-between; background: var(--color-surface-soft);">
-            <div>
-              <h3 style="margin: 0 0 6px; font-size: 1rem; font-weight: 700;">Seller Fast Actions</h3>
-              <p style="font-size: 0.82rem; color: var(--color-text-muted); margin: 0 0 16px;">Fast access shortcuts to critical actions.</p>
-            </div>
-            <div style="display: flex; flex-direction: column; gap: 8px;">
-              <button id="quick-action-post" class="btn btn-primary" style="width: 100%; justify-content: flex-start; text-align: left; padding: 10px 14px; font-size: 0.86rem;">
-                <i data-lucide="plus-circle" style="width:16px; height:16px;"></i> Create New Listing
-              </button>
-              <button id="quick-action-stock" class="btn btn-secondary select-tab-link" href="#inventory" style="width: 100%; justify-content: flex-start; text-align: left; padding: 10px 14px; font-size: 0.86rem;">
-                <i data-lucide="refresh-cw" style="width:16px; height:16px;"></i> Adjust Quantities
-              </button>
-              <button id="quick-action-profile" class="btn btn-secondary select-tab-link" href="#profile" style="width: 100%; justify-content: flex-start; text-align: left; padding: 10px 14px; font-size: 0.86rem;">
-                <i data-lucide="store" style="width:16px; height:16px;"></i> Edit Shop Profile
-              </button>
-            </div>
+            <a href="#requests" class="mock-action-item select-tab-link">
+              <div class="mock-action-icon">
+                <i data-lucide="shopping-bag"></i>
+              </div>
+              <span class="mock-action-label">Orders</span>
+            </a>
+
+            <a href="#analytics" class="mock-action-item select-tab-link">
+              <div class="mock-action-icon">
+                <i data-lucide="bar-chart-2"></i>
+              </div>
+              <span class="mock-action-label">Stats</span>
+            </a>
+
+            <a href="mailto:support@send.mahfuzmfb.com" class="mock-action-item">
+              <div class="mock-action-icon">
+                <i data-lucide="headphones"></i>
+              </div>
+              <span class="mock-action-label">Support</span>
+            </a>
           </div>
         </section>
 
@@ -885,7 +905,7 @@
                 <span class="filter-tab-pill" data-status="Delivered">Delivered</span>
               </div>
             </div>
-            <div style="overflow-x: auto;">
+            <div class="table-responsive">
               <table class="table-list" id="farm-bookings-table">
                 <thead>
                   <tr>
@@ -923,7 +943,7 @@
               <div style="display: flex; justify-content: flex-end; margin-bottom: 12px;">
                 <a class="btn btn-ghost select-tab-link" href="#inventory" style="font-size: 0.78rem; padding: 4px 10px;">Stock Management →</a>
               </div>
-              <div style="overflow-x: auto;">
+              <div class="table-responsive">
                 <table class="table-list" id="farm-inventory">
                   <thead>
                     <tr>
@@ -1101,19 +1121,21 @@
         </section>
         
         <div class="card" style="padding: 24px;">
-          <table class="table-list" id="inventory-edit-table">
-            <thead>
-              <tr>
-                <th>Product Name</th>
-                <th>Category</th>
-                <th>Current Stock</th>
-                <th>Quick Adjustment</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr><td colspan="4" style="color: var(--color-text-muted); padding: 24px 0; text-align: center;">Loading stock metrics...</td></tr>
-            </tbody>
-          </table>
+          <div class="table-responsive">
+            <table class="table-list" id="inventory-edit-table">
+              <thead>
+                <tr>
+                  <th>Product Name</th>
+                  <th>Category</th>
+                  <th>Current Stock</th>
+                  <th>Quick Adjustment</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td colspan="4" style="color: var(--color-text-muted); padding: 24px 0; text-align: center;">Loading stock metrics...</td></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
@@ -1125,7 +1147,7 @@
         </section>
 
         <div class="card" style="padding: 24px;">
-          <div style="overflow-x: auto;">
+          <div class="table-responsive">
             <table class="table-list" id="requests-full-table">
               <thead>
                 <tr>
@@ -1144,6 +1166,31 @@
                 <tr><td colspan="9" style="color: var(--color-text-muted); padding: 24px 0; text-align: center;">Loading bookings...</td></tr>
               </tbody>
             </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: HELP & SUPPORT -->
+      <div id="tab-help" class="tab-content hidden">
+        <section style="margin-bottom: 24px;">
+          <h1 style="margin: 0; font-size: 1.8rem; font-weight: 800;">Seller Help &amp; Support</h1>
+          <p style="color: var(--color-text-muted); margin: 4px 0 0;">Seller portal guidance, order management FAQs, and technical assistance.</p>
+        </section>
+        <div class="card" style="padding: 28px; max-width: 700px;">
+          <h3 style="margin-top:0; margin-bottom: 16px;">Seller FAQs</h3>
+          <div style="display: grid; gap: 16px;">
+            <div style="padding: 14px; background: rgba(31,77,10,0.03); border-radius: 8px; border: 1px solid var(--color-border);">
+              <strong style="color: var(--color-text);">How do I manage my product listings?</strong>
+              <p style="margin: 6px 0 0; font-size: 0.85rem; color: var(--color-text-muted);">Navigate to the Products tab to add new egg catalog items, update crate prices, or adjust active stock quantities.</p>
+            </div>
+            <div style="padding: 14px; background: rgba(31,77,10,0.03); border-radius: 8px; border: 1px solid var(--color-border);">
+              <strong style="color: var(--color-text);">How do I confirm and fulfill buyer bookings?</strong>
+              <p style="margin: 6px 0 0; font-size: 0.85rem; color: var(--color-text-muted);">Go to the Requests tab to review pending orders, update fulfillment statuses (Pending → Confirmed → Delivered), and view customer details.</p>
+            </div>
+            <div style="padding: 14px; background: rgba(31,77,10,0.03); border-radius: 8px; border: 1px solid var(--color-border);">
+              <strong style="color: var(--color-text);">Need urgent platform assistance?</strong>
+              <p style="margin: 6px 0 0; font-size: 0.85rem; color: var(--color-text-muted);">Contact platform administration at <strong>support@eggconnect.app</strong> or reach out via your account manager.</p>
+            </div>
           </div>
         </div>
       </div>
@@ -1256,7 +1303,10 @@
         padding: 8px 12px;
       }
     </style>
-    <div class="modal-content card" style="max-width: 580px; padding: 32px; width: 92%; background: var(--color-card); border-radius: 24px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); border: 1px solid var(--color-border);">
+    <div class="modal-content card" style="max-width: 580px; padding: 32px; width: 92%; background: var(--color-card); border-radius: 24px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); border: 1px solid var(--color-border); position: relative;">
+      <button id="close-onboarding-modal-btn" type="button" aria-label="Close onboarding modal" style="position: absolute; top: 20px; right: 20px; background: rgba(0, 0, 0, 0.04); border: 1px solid var(--color-border); cursor: pointer; color: var(--color-text-muted); display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; transition: all 0.15s ease;">
+        <i data-lucide="x" style="width: 18px; height: 18px;"></i>
+      </button>
       <div style="text-align: center; margin-bottom: 24px;">
         <div style="width: 56px; height: 56px; border-radius: 16px; background: rgba(31, 77, 10, 0.1); color: var(--color-primary); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 12px;">
           <i data-lucide="store" style="width: 28px; height: 28px;"></i>
