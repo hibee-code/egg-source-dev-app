@@ -4,12 +4,19 @@
 
 Egg Connect is a full-stack marketplace that enables direct crate bookings between poultry farmers / egg depots and commercial buyers. It features a verified seller hub, real-time inventory management, GPS-based marketplace discovery, and a buyer dashboard for end-to-end order tracking.
 
+## 📚 Technical Documentation
+
+For in-depth senior engineering specifications, domain designs, and database schemas:
+- 🏛️ **[System Architecture & Design Specification](./docs/SYSTEM_DESIGN.md)**: Layered monolith design, dual JWT rotation grace period, atomic race-condition locks, reservation TTL stock recovery, and time-slot collision protection.
+- 🗄️ **[Database & Schema Design Specification](./docs/DATABASE_DESIGN.md)**: Collection data models, ERD topology, geospatial 2D Sphere indexes, partial unique compound indexes, and historical data snapshotting patterns.
+
 ---
 
 ## Table of Contents
 
 - [Overview](#overview)
 - [Tech Stack](#tech-stack)
+- [Technical Documentation](#-technical-documentation)
 - [Project Structure](#project-structure)
 - [Features](#features)
 - [API Reference](#api-reference)

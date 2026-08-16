@@ -38,9 +38,6 @@ class BookingService {
    * @returns {Object} Created booking document
    */
   async createBooking(data, userId) {
-    // Proactively clean up expired reservations to free up stock pool
-    await this.releaseExpiredReservations();
-
     // 1. Verify product exists and is available
     const product = await productRepository.findById(data.productId);
     if (!product) {
@@ -129,8 +126,6 @@ class BookingService {
    * Only the buyer, the farm owner, or an admin can view it.
    */
   async getBookingById(id, userId, userRole) {
-    await this.releaseExpiredReservations();
-
     const booking = await bookingRepository.findById(id);
     if (!booking) {
       throw ApiError.notFound("Booking not found");
@@ -155,7 +150,6 @@ class BookingService {
    * Get all bookings for a buyer.
    */
   async getBuyerBookings(userId) {
-    await this.releaseExpiredReservations();
     return bookingRepository.findByBuyer(userId);
   }
 
@@ -163,7 +157,6 @@ class BookingService {
    * Get all bookings for farms owned by the current user.
    */
   async getFarmBookings(userId) {
-    await this.releaseExpiredReservations();
     const farms = await poultryRepository.findAll({ ownerId: userId });
     if (!farms.length) {
       return [];
