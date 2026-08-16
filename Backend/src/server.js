@@ -2,6 +2,7 @@ const app = require("./app");
 const connectDB = require("./config/db");
 const env = require("./config/env");
 const logger = require("./utils/logger");
+const { initJobs } = require("./jobs");
 
 // ── Handle uncaught exceptions ────────────────────────────
 process.on("uncaughtException", (err) => {
@@ -14,6 +15,9 @@ process.on("uncaughtException", (err) => {
 
 const startServer = async () => {
   await connectDB();
+
+  // ── Initialize background cron jobs ────────────────────
+  initJobs();
 
   const server = app.listen(env.PORT, () => {
     logger.info(
